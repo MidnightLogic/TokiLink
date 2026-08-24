@@ -1,12 +1,14 @@
 # 🕒 TokiLink for Seiko
 
-[![Live Web App](https://img.shields.io/badge/Live%20PWA-midnightlogic.github.io%2FTokiLink-4f46e5?style=for-the-badge&logo=googlechrome&logoColor=white)](https://midnightlogic.github.io/TokiLink/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
+<a href="https://midnightlogic.github.io/TokiLink/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Live%20PWA-midnightlogic.github.io%2FTokiLink-4f46e5?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Web App"></a>
+<a href="https://opensource.org/licenses/Apache-2.0" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="License: Apache 2.0"></a>
 
-> 🚀 **Live Web App:** **[https://midnightlogic.github.io/TokiLink/](https://midnightlogic.github.io/TokiLink/)**
+> 🚀 **Live Web App:** <a href="https://midnightlogic.github.io/TokiLink/" target="_blank" rel="noopener noreferrer">**https://midnightlogic.github.io/TokiLink/**</a>
 
 <p align="center">
-  <img src="src/demo.gif" alt="TokiLink for Seiko Live Demo" width="680" style="max-width: 100%; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
+  <a href="https://midnightlogic.github.io/TokiLink/" target="_blank" rel="noopener noreferrer">
+    <img src="src/demo.gif" alt="TokiLink for Seiko Live Demo" width="680" style="max-width: 100%; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
+  </a>
 </p>
 
 An unofficial, high-precision **Progressive Web App (PWA)** built with **Vanilla JavaScript** and the **Web Bluetooth API** to synchronize and control Bluetooth-enabled Seiko digital and analog clocks directly from any Web Bluetooth-capable browser (Chrome, Edge, Opera, Samsung Internet on Android, Windows, macOS, ChromeOS, and Linux) without requiring proprietary native mobile apps.
