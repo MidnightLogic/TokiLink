@@ -13,11 +13,12 @@ import {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info
+  Lock, Info, Sparkles, RefreshCw
 } from 'lucide';
 
 import { registerSW } from 'virtual:pwa-register';
 import '@khmyznikov/pwa-install';
+import { pwaUpdateService } from './services/pwaUpdate.js';
 
 // Register Service Worker for PWA
 try {
@@ -73,7 +74,7 @@ const LUCIDE_ICONS = {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info
+  Lock, Info, Sparkles, RefreshCw
 };
 
 export function renderIcons() {
@@ -353,6 +354,30 @@ class App {
 
     // Look up previously permitted Bluetooth devices on page load
     await this.loadPermittedDevices();
+
+    // Watch for PWA updates
+    this.initPwaUpdateWatcher();
+  }
+
+  initPwaUpdateWatcher() {
+    const toast = document.getElementById('pwaUpdateToast');
+    const updateBtn = document.getElementById('pwaUpdateNowBtn');
+    const dismissBtn = document.getElementById('pwaUpdateDismissBtn');
+
+    pwaUpdateService.init(() => {
+      if (toast) {
+        toast.classList.remove('hidden');
+        renderIcons();
+      }
+    });
+
+    updateBtn?.addEventListener('click', () => {
+      pwaUpdateService.applyUpdate();
+    });
+
+    dismissBtn?.addEventListener('click', () => {
+      if (toast) toast.classList.add('hidden');
+    });
   }
 
   initTabs() {

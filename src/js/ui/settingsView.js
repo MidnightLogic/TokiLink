@@ -7,6 +7,7 @@
 
 import { settingsStore, themeStore, syncLogStore } from '../store.js';
 import { i18n } from '../i18n.js';
+import { pwaUpdateService } from '../services/pwaUpdate.js';
 
 export class SettingsView {
   constructor(dom, onSyncLogClear) {
@@ -126,6 +127,32 @@ export class SettingsView {
     setupCopyBtn('copyBackendFlagBtn', 'backendFlagCode', 'copyBackendFlagText');
     setupCopyBtn('copyBraveGuideFlagBtn', 'braveGuideFlagCode', 'copyBraveGuideFlagText');
     setupCopyBtn('copyBraveBackendFlagBtn', 'braveBackendFlagCode', 'copyBraveBackendFlagText');
+
+    // Check for PWA updates manually
+    const checkUpdatesBtn = document.getElementById('checkUpdatesBtn');
+    const checkUpdatesText = document.getElementById('checkUpdatesText');
+
+    checkUpdatesBtn?.addEventListener('click', async () => {
+      if (!checkUpdatesBtn) return;
+      checkUpdatesBtn.classList.add('checking');
+      checkUpdatesBtn.classList.remove('up-to-date');
+      if (checkUpdatesText) checkUpdatesText.textContent = i18n.t('pwa.checking') || 'Checking...';
+
+      const result = await pwaUpdateService.checkForUpdate(false);
+      checkUpdatesBtn.classList.remove('checking');
+
+      if (result.status === 'update_available') {
+        if (checkUpdatesText) checkUpdatesText.textContent = i18n.t('pwa.updateFound') || 'Update found!';
+        setTimeout(() => pwaUpdateService.applyUpdate(), 800);
+      } else {
+        checkUpdatesBtn.classList.add('up-to-date');
+        if (checkUpdatesText) checkUpdatesText.textContent = i18n.t('pwa.upToDate') || 'Up to date ✓';
+        setTimeout(() => {
+          checkUpdatesBtn.classList.remove('up-to-date');
+          if (checkUpdatesText) checkUpdatesText.textContent = i18n.t('pwa.checkUpdates') || 'Check for updates';
+        }, 3000);
+      }
+    });
 
     // Populate initial
     this.populateForm(settingsStore.get());
