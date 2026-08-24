@@ -402,6 +402,8 @@ class App {
         isExplicitNew
       });
       DeviceActions.setActiveDevice(device.id);
+      connectionStateStore.set('disconnected');
+      connectionStatusTextStore.set(i18n.t('sync.status.idle'));
       return device;
     } catch (err) {
       connectionStateStore.set('disconnected');
