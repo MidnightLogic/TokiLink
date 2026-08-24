@@ -88,7 +88,7 @@
   "settings.debug.desc": "BLE パケットと同期タイミングをコンソールに出力",
   "settings.persistentTipTitle": "デスクトップ 1 クリック同期のヒント",
   "settings.persistentTipDesc": "デスクトップ版 Chrome/Brave/Edge でフラグの #enable-web-bluetooth-new-permissions-backend を有効にすると、デバイス選択ダイアログなしで 1 クリック同期できます。",
-  "settings.version": "TokiLink for Seiko v2.0.0",
+  "settings.version": "TokiLink for Seiko v1.0.2",
   "settings.versionSub": "非公式 Web Bluetooth · オープンソース",
   "footer.title": "TokiLink for Seiko",
   "footer.disclaimer": "非公式オープンソースプロジェクトです。セイコーグループ株式会社とは関連ありません。",

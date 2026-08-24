@@ -88,7 +88,7 @@
   "settings.debug.desc": "Registrar bytes de BLE y precisión en la consola",
   "settings.persistentTipTitle": "Consejo de sincronización en 1 clic",
   "settings.persistentTipDesc": "En Chrome/Brave/Edge de escritorio, activar #enable-web-bluetooth-new-permissions-backend permite sincronizar en 1 clic sin diálogos repetidos.",
-  "settings.version": "TokiLink for Seiko v2.0.0",
+  "settings.version": "TokiLink for Seiko v1.0.2",
   "settings.versionSub": "Web Bluetooth no oficial · Código abierto",
   "footer.title": "TokiLink for Seiko",
   "footer.disclaimer": "Proyecto de código abierto independiente. No afiliado a Seiko Group Corporation.",

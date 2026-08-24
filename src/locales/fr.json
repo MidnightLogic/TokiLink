@@ -88,7 +88,7 @@
   "settings.debug.desc": "Afficher les octets BLE et la précision dans la console",
   "settings.persistentTipTitle": "Astuce : Synchro 1-clic sur PC/Mac",
   "settings.persistentTipDesc": "Sur Chrome/Brave/Edge PC/Mac, activer #enable-web-bluetooth-new-permissions-backend permet une synchronisation en 1 clic sans boîte de dialogue.",
-  "settings.version": "TokiLink for Seiko v2.0.0",
+  "settings.version": "TokiLink for Seiko v1.0.2",
   "settings.versionSub": "Web Bluetooth non officiel · Open Source",
   "footer.title": "TokiLink for Seiko",
   "footer.disclaimer": "Projet open-source indépendant. Non affilié à Seiko Group Corporation.",

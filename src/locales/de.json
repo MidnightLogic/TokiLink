@@ -88,7 +88,7 @@
   "settings.debug.desc": "BLE-Paketdaten und Zeitstempel in der Konsole ausgeben",
   "settings.persistentTipTitle": "Tipp für 1-Klick-Desktop-Sync",
   "settings.persistentTipDesc": "Auf Desktop Chrome/Brave/Edge ermöglicht das Aktivieren von #enable-web-bluetooth-new-permissions-backend den 1-Klick-Sync ohne Auswahldialog.",
-  "settings.version": "TokiLink for Seiko v2.0.0",
+  "settings.version": "TokiLink for Seiko v1.0.2",
   "settings.versionSub": "Inoffizielles Web Bluetooth · Open Source",
   "footer.title": "TokiLink for Seiko",
   "footer.disclaimer": "Unabhängiges Open-Source-Projekt. Nicht mit der Seiko Group Corporation verbunden.",

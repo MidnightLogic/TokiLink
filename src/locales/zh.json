@@ -88,7 +88,7 @@
   "settings.debug.desc": "在浏览器控制台打印蓝牙数据包和精确校时时间戳",
   "settings.persistentTipTitle": "桌面端一键免弹窗同步提示",
   "settings.persistentTipDesc": "在桌面端 Chrome/Brave/Edge 中启用 #enable-web-bluetooth-new-permissions-backend 标志，可实现一键即时同步而无需每次弹出设备选择框。",
-  "settings.version": "TokiLink for Seiko v2.0.0",
+  "settings.version": "TokiLink for Seiko v1.0.2",
   "settings.versionSub": "非官方 Web Bluetooth · 开源",
   "footer.title": "TokiLink for Seiko",
   "footer.disclaimer": "独立开源项目。与精工集团株式会社（Seiko Group Corporation）无关。",
