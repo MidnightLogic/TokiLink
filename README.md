@@ -1,12 +1,12 @@
 # 🕒 TokiLink for Seiko
 
-<a href="https://midnightlogic.github.io/TokiLink/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Live%20PWA-midnightlogic.github.io%2FTokiLink-4f46e5?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Web App"></a>
+<a href="https://midnightlogic.github.io/tokilink/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Live%20PWA-midnightlogic.github.io%2Ftokilink-4f46e5?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Web App"></a>
 <a href="https://opensource.org/licenses/Apache-2.0" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="License: Apache 2.0"></a>
 
-> 🚀 **Live Web App:** <a href="https://midnightlogic.github.io/TokiLink/" target="_blank" rel="noopener noreferrer">**https://midnightlogic.github.io/TokiLink/**</a>
+> 🚀 **Live Web App:** <a href="https://midnightlogic.github.io/tokilink/" target="_blank" rel="noopener noreferrer">**https://midnightlogic.github.io/tokilink/**</a>
 
 <p align="center">
-  <a href="https://midnightlogic.github.io/TokiLink/" target="_blank" rel="noopener noreferrer">
+  <a href="https://midnightlogic.github.io/tokilink/" target="_blank" rel="noopener noreferrer">
     <img src="src/demo.gif" alt="TokiLink for Seiko Live Demo" width="680" style="max-width: 100%; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
   </a>
 </p>
