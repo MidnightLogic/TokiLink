@@ -444,63 +444,11 @@ class App {
       DeviceActions.setActiveDevice(targetDevice.id);
     }
 
-    // If a scanning/picker popup will be shown, display "SEARCHING" with animated spinner
-    if (!targetDevice) {
-      connectionStateStore.set('searching');
-      connectionStatusTextStore.set(i18n.t('sync.status.searching'));
-    }
-
-    // If we have a stored device from localStorage but no live BluetoothDevice reference,
-    // use reconnectStoredDevice (narrow picker filtered to this specific device name).
-    // After the first picker confirmation, the device is session-cached and subsequent
-    // syncs won't show a popup at all.
-    if (!targetDevice && activeDevice) {
-      try {
-        targetDevice = await bleService.reconnectStoredDevice(activeDevice);
-        if (targetDevice) {
-          const model = DeviceProtocol.detectModel(targetDevice.name);
-          DeviceActions.addOrUpdateDevice({
-            id: targetDevice.id,
-            name: targetDevice.name || 'Seiko Clock',
-            model: model.type,
-          });
-          DeviceActions.setActiveDevice(targetDevice.id);
-        }
-      } catch (err) {
-        if (err.name === 'NotFoundError') {
-          // User cancelled the picker
-          connectionStateStore.set('disconnected');
-          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-          return;
-        }
-        const isBlocked = err.name === 'NotAllowedError' || /blocked|denied|permission/i.test(err.message || '');
-        if (isBlocked) {
-          connectionStateStore.set('disconnected');
-          connectionStatusTextStore.set(i18n.t('sync.status.blocked'));
-          if (this.diagnostics?.browser?.isBrave) {
-            this.dom.braveCompatBanner?.classList.remove('hidden');
-          } else {
-            this.dom.permissionBlockedBanner?.classList.remove('hidden');
-          }
-          return;
-        }
-        console.warn('[Sync] Reconnect failed, falling back to full picker:', err.message);
-      }
-    }
-
-    // Only show full picker dialog if no stored or permitted device exists at all
-    if (!targetDevice) {
-      targetDevice = await this.pairNewClock();
-      if (!targetDevice) {
-        return;
-      }
-    }
-
-    const config = DeviceProtocol.getConfig(targetDevice.name || '');
-
-    try {
+    // Helper to execute atomic time fetch, GATT connection, immediate time write, and clean disconnect
+    const executeSync = async (device) => {
+      const config = DeviceProtocol.getConfig(device.name || '');
       connectionStateStore.set('connecting');
-      connectionStatusTextStore.set(`${i18n.t('sync.btn.connecting')} ${targetDevice.name || 'clock'}...`);
+      connectionStatusTextStore.set(`${i18n.t('sync.btn.connecting')} ${device.name || 'clock'}...`);
 
       // 1. Fetch fresh atomic time FIRST (prior to opening BLE GATT connection)
       if (settingsStore.get().useApi) {
@@ -511,12 +459,12 @@ class App {
         }
       }
 
-      // 2. Pre-compute target time & payload BEFORE connecting so there is zero idle sleep while connected
+      // 2. Pre-compute target time & payload BEFORE connecting so zero idle delay while connected
       const targetDate = this.clockView.getImmediateSyncTarget();
       const payload = DeviceProtocol.buildTimePayload(targetDate);
 
       // 3. Connect to GATT
-      await bleService.connect(targetDevice);
+      await bleService.connect(device);
 
       connectionStateStore.set('syncing');
       connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
@@ -528,10 +476,10 @@ class App {
       try {
         await bleService.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
       } catch (e) {
-        // First packet already sent successfully
+        // First packet already delivered
       }
       await new Promise(r => setTimeout(r, 80));
-      if (isDebug()) console.log(`[Sync] SUCCESS! Transmitted time packet to ${targetDevice.name}`);
+      if (isDebug()) console.log(`[Sync] SUCCESS! Transmitted time packet to ${device.name}`);
 
       // 5. Explicit clean GATT disconnect so Seiko clock immediately exits BLE sync mode and renders the new time
       try {
@@ -543,16 +491,16 @@ class App {
       // 6. Update Success State
       const syncTimeStr = targetDate.toLocaleTimeString();
       connectionStateStore.set('connected');
-      connectionStatusTextStore.set(`${i18n.t('sync.status.synced')} ${syncTimeStr} → ${targetDevice.name}`);
+      connectionStatusTextStore.set(`${i18n.t('sync.status.synced')} ${syncTimeStr} → ${device.name}`);
 
-      DeviceActions.updateSyncTimestamp(targetDevice.id);
+      DeviceActions.updateSyncTimestamp(device.id);
 
       // Log entry
       const log = syncLogStore.get();
       syncLogStore.set([{
         timestamp: Date.now(),
         success: true,
-        device: targetDevice.name || 'Seiko Clock',
+        device: device.name || 'Seiko Clock',
         timeSynced: syncTimeStr
       }, ...log.slice(0, 29)]);
 
@@ -562,7 +510,30 @@ class App {
           connectionStatusTextStore.set(i18n.t('sync.status.idle'));
         }
       }, 3500);
+    };
 
+    // Phase 1: Try direct connection with cached/permitted device (for 1-click zero-dialog sync)
+    if (targetDevice) {
+      try {
+        await executeSync(targetDevice);
+        return;
+      } catch (err) {
+        console.warn(`[Sync] Direct connect to cached device (${targetDevice.name || targetDevice.id}) failed: ${err.message}. Falling back to device picker to re-establish permission...`);
+      }
+    }
+
+    // Phase 2: If no permitted device or direct connection failed (e.g. permission flag changed ID or device reset),
+    // automatically open the native device picker to let the user select/refresh their clock
+    try {
+      connectionStateStore.set('searching');
+      connectionStatusTextStore.set(i18n.t('sync.status.searching'));
+
+      targetDevice = await this.pairNewClock(false);
+      if (!targetDevice) {
+        return;
+      }
+
+      await executeSync(targetDevice);
     } catch (err) {
       console.error('[Sync] Failed:', err);
       connectionStateStore.set('error');
