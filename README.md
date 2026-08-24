@@ -64,14 +64,13 @@ Web Bluetooth (`navigator.bluetooth`) requires a secure context (HTTPS or `local
 
 ## 🏷️ Supported Clock Models
 
-TokiLink supports a wide variety of Bluetooth-enabled Seiko digital, analog, and multi-sound clocks:
+TokiLink supports genuine Bluetooth-enabled Seiko digital and multi-sound clocks:
 
-| Series / Family | Example Models | Supported Capabilities |
+| Series / Model Line | Model Identifier | Features & Capabilities |
 | :--- | :--- | :--- |
-| **Series C3 Digital** | DL308K, DL307, DL306, DL305, DL208, DL207, SQ820K | High-Precision Atomic Time Synchronization |
-| **AppClock Multi-Sound** | SS201, SS501, OPTEK Series | Time Sync, Multi-Alarms, FM Radio Tuning, Station Presets, Brightness, Bass Boost, Sleep Melody Timers, Auto Power-Off |
-| **SSUSE Series** | SSUSE, SSUSE1, SSUSE2, SSUSE3, SSUSE4 | Time Synchronization |
-| **NGAN Series** | NGAN Series Clocks | Time Synchronization |
+| **AppClock Multi-Sound** | **SS201**, **SS501** | High-Precision Atomic Time Sync, Multi-Schedule Alarms, FM Radio Tuning & Presets, Display Brightness, Bass Boost, Sleep Melody Timers, Auto Power-Off |
+| **Series C3 Digital** | **DL308K** *(DL308 Series)* | High-Precision Atomic Time Synchronization |
+| **Standard Digital** | **SQ820K** *(SQ820 Series)* | High-Precision Atomic Time Synchronization |
 
 ---
 

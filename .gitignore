@@ -8,6 +8,7 @@ dev-dist/
 # Local hardware / test artifacts
 *.pyc
 __pycache__/
+source/
 
 # Agent & IDE configs
 .agents/

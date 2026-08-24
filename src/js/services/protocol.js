@@ -22,7 +22,7 @@ export const DeviceProtocol = {
   MODELS: {
     SS201: {
       type: 'SS201',
-      displayName: 'Seiko SS201 / SS501 (Multifunction)',
+      displayName: 'Seiko SS201 / SS501 (Multi-Sound)',
       hasFeatures: true,
       timeServiceUUID: '00001806-0000-1000-8000-00805f9b34fb',
       timeWriteCharUUID: '00002a16-0000-1000-8000-00805f9b34fb',
@@ -32,44 +32,23 @@ export const DeviceProtocol = {
       pingServiceUUID: '00001805-0000-1000-8000-00805f9b34fb',
       pingCharUUID: '00002a2b-0000-1000-8000-00805f9b34fb',
     },
-    SSUSE1: {
-      type: 'SSUSE1',
-      displayName: 'Seiko SSUSE 1',
-      hasFeatures: false,
-      timeServiceUUID: '0000ffe1-0000-1000-8000-00805f9b34fb',
-      timeWriteCharUUID: '0000fff4-0000-1000-8000-00805f9b34fb',
-    },
-    SSUSE2: {
-      type: 'SSUSE2',
-      displayName: 'Seiko SSUSE 2',
+    DL308: {
+      type: 'DL308',
+      displayName: 'Seiko DL308K / Series C3',
       hasFeatures: false,
       timeServiceUUID: '0000fff0-0000-1000-8000-00805f9b34fb',
-      timeWriteCharUUID: '0000fff5-0000-1000-8000-00805f9b34fb',
+      timeWriteCharUUID: '0000fff2-0000-1000-8000-00805f9b34fb',
     },
-    SSUSE3: {
-      type: 'SSUSE3',
-      displayName: 'Seiko SSUSE 3',
+    SQ820: {
+      type: 'SQ820',
+      displayName: 'Seiko SQ820K (Standard Digital)',
       hasFeatures: false,
-      timeServiceUUID: '0000ffe3-0000-1000-8000-00805f9b34fb',
-      timeWriteCharUUID: '0000ffe5-0000-1000-8000-00805f9b34fb',
-    },
-    SSUSE4: {
-      type: 'SSUSE4',
-      displayName: 'Seiko SSUSE 4',
-      hasFeatures: false,
-      timeServiceUUID: '0000ffe2-0000-1000-8000-00805f9b34fb',
-      timeWriteCharUUID: '0000ffe5-0000-1000-8000-00805f9b34fb',
-    },
-    NGAN: {
-      type: 'NGAN',
-      displayName: 'Seiko STCCKKK1N',
-      hasFeatures: false,
-      timeServiceUUID: 'd3b55356-91ae-4aaf-ba2d-731e7a450e52',
-      timeWriteCharUUID: 'deca31cd-dea3-4dac-b432-d4ab92a62c3f',
+      timeServiceUUID: '0000fff0-0000-1000-8000-00805f9b34fb',
+      timeWriteCharUUID: '0000fff2-0000-1000-8000-00805f9b34fb',
     },
     DEFAULT: {
       type: 'DL308',
-      displayName: 'Seiko DL308 / STCC Series',
+      displayName: 'Seiko Bluetooth Clock',
       hasFeatures: false,
       timeServiceUUID: '0000fff0-0000-1000-8000-00805f9b34fb',
       timeWriteCharUUID: '0000fff2-0000-1000-8000-00805f9b34fb',
@@ -81,13 +60,12 @@ export const DeviceProtocol = {
     if (name.includes('SS201') || name.includes('SS501') || name.includes('OPTEK')) {
       return this.MODELS.SS201;
     }
-    if (name.includes('STCCKKK1N') || name.includes('NGAN')) {
-      return this.MODELS.NGAN;
+    if (name.includes('SQ820') || name.includes('SQ')) {
+      return this.MODELS.SQ820;
     }
-    if (name.includes('SSUSE4')) return this.MODELS.SSUSE4;
-    if (name.includes('SSUSE3')) return this.MODELS.SSUSE3;
-    if (name.includes('SSUSE2')) return this.MODELS.SSUSE2;
-    if (name.includes('SSUSE1') || name.includes('SSUSE')) return this.MODELS.SSUSE1;
+    if (name.includes('DL308') || name.includes('DL') || name.includes('STCC')) {
+      return this.MODELS.DL308;
+    }
     return this.MODELS.DEFAULT;
   },
 
