@@ -728,12 +728,17 @@
         </div>
         <div class="settings-tip-box">
           <div class="settings-tip-header">
-            <i data-lucide="info" width="13" height="13"></i>
-            <span data-i18n="settings.persistentTipTitle">1-Click Desktop Sync Tip</span>
+            <div class="settings-tip-title-wrap">
+              <i data-lucide="zap" width="14" height="14" class="settings-tip-icon"></i>
+              <span data-i18n="settings.persistentTipTitle">1-Click Fast Sync</span>
+            </div>
+            <button type="button" class="settings-tip-btn" id="openBackendGuideBtn">
+              <span data-i18n="settings.learnMore">Setup Guide</span>
+              <i data-lucide="chevron-right" width="13" height="13"></i>
+            </button>
           </div>
           <p class="settings-tip-text" data-i18n="settings.persistentTipDesc">
-            On Desktop Chrome/Brave/Edge, enabling <code>#enable-web-bluetooth-new-permissions-backend</code> in flags
-            allows 1-click sync without repeating the device chooser dialog.
+            Enable persistent Bluetooth permissions in your browser to remember your clock permanently across reloads for instant 1-click sync.
           </p>
         </div>
       </div>
@@ -748,6 +753,88 @@
         </a>
       </div>
     </aside>
+
+    <!-- ═══ 1-Click Fast Sync Setup Guide Modal ═══ -->
+    <div class="modal-overlay hidden" id="backendGuideModalOverlay">
+      <div class="modal-card backend-guide-card">
+        <div class="modal-header">
+          <div class="backend-guide-title-wrap">
+            <div class="backend-guide-icon-badge">
+              <i data-lucide="zap" width="18" height="18"></i>
+            </div>
+            <div>
+              <h3 class="modal-title" data-i18n="guide.modalTitle">1-Click Fast Sync Setup</h3>
+              <span class="backend-guide-sub" data-i18n="guide.modalSubtitle">Enable permanent device remembering in Chrome / Brave / Edge</span>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="backendGuideModalCloseBtn">
+            <i data-lucide="x" width="18" height="18"></i>
+          </button>
+        </div>
+
+        <div class="backend-guide-body">
+          <p class="backend-guide-intro" data-i18n="guide.intro">
+            By default, desktop browsers ask you to select your clock each time. Enabling this Chrome flag allows TokiLink to remember your clock permanently across reloads for instant 1-click sync without repeating the device chooser dialog.
+          </p>
+
+          <div class="backend-guide-steps">
+            <!-- Step 1 -->
+            <div class="backend-guide-step">
+              <span class="backend-step-badge">1</span>
+              <div class="backend-step-content">
+                <span class="backend-step-label" data-i18n="guide.step1">Copy and paste this URL into your browser address bar:</span>
+                <div class="backend-flag-copy-wrap">
+                  <code class="backend-flag-code" id="backendFlagCode">chrome://flags/#enable-web-bluetooth-new-permissions-backend</code>
+                  <button type="button" class="backend-flag-copy-btn" id="copyBackendFlagBtn" title="Copy flag URL">
+                    <i data-lucide="copy" width="12" height="12"></i>
+                    <span id="copyBackendFlagText" data-i18n="banner.copy">Copy</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="backend-guide-step">
+              <span class="backend-step-badge">2</span>
+              <div class="backend-step-content">
+                <span class="backend-step-label" data-i18n="guide.step2">Set <strong>Use the new permissions backend for Web Bluetooth</strong> to <strong>Enabled</strong>.</span>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="backend-guide-step">
+              <span class="backend-step-badge">3</span>
+              <div class="backend-step-content">
+                <span class="backend-step-label" data-i18n="guide.step3">Click the blue <strong>Relaunch</strong> button at the bottom of your browser window.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Brave Note -->
+          <div class="backend-brave-box">
+            <div class="backend-brave-header">
+              <i data-lucide="shield-alert" width="13" height="13"></i>
+              <span>Brave Browser Users</span>
+            </div>
+            <p class="backend-brave-text" data-i18n="guide.braveNote">
+              Brave also requires enabling Web Bluetooth API:
+            </p>
+            <div class="backend-flag-copy-wrap">
+              <code class="backend-flag-code" id="braveGuideFlagCode">brave://flags/#brave-web-bluetooth-api</code>
+              <button type="button" class="backend-flag-copy-btn" id="copyBraveGuideFlagBtn" title="Copy Brave flag URL">
+                <i data-lucide="copy" width="12" height="12"></i>
+                <span id="copyBraveGuideFlagText" data-i18n="banner.copy">Copy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--border);">
+          <button type="button" class="modal-btn-save" id="backendGuideModalGotItBtn" data-i18n="guide.close" style="width: 100%;">Got It</button>
+        </div>
+      </div>
+    </div>
+
     <pwa-install id="pwaInstall" manifest-url="./manifest.webmanifest" name="TokiLink for Seiko" description="Sync your Seiko Bluetooth clock from your browser." icon="./pwa-192x192.png"></pwa-install>
     <script type="module" src="/src/js/app.js"></script>
   </body>

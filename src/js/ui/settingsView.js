@@ -77,6 +77,55 @@ export class SettingsView {
       this.renderSyncLog(logs);
     });
 
+    // 1-Click Fast Sync Guide Modal wiring
+    const guideOverlay = document.getElementById('backendGuideModalOverlay');
+    const openGuideBtn = document.getElementById('openBackendGuideBtn');
+    const closeGuideBtn = document.getElementById('backendGuideModalCloseBtn');
+    const gotItGuideBtn = document.getElementById('backendGuideModalGotItBtn');
+
+    const openGuideModal = () => {
+      if (guideOverlay) {
+        guideOverlay.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    const closeGuideModal = () => {
+      if (guideOverlay) {
+        guideOverlay.classList.add('hidden');
+      }
+    };
+
+    openGuideBtn?.addEventListener('click', openGuideModal);
+    closeGuideBtn?.addEventListener('click', closeGuideModal);
+    gotItGuideBtn?.addEventListener('click', closeGuideModal);
+    guideOverlay?.addEventListener('click', (e) => {
+      if (e.target === guideOverlay) closeGuideModal();
+    });
+
+    // Copy handlers for flags
+    const setupCopyBtn = (btnId, codeId, textId) => {
+      const btn = document.getElementById(btnId);
+      const code = document.getElementById(codeId);
+      const text = document.getElementById(textId);
+      if (btn && code) {
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(code.textContent.trim());
+            if (text) text.textContent = i18n.t('banner.copied') || 'Copied!';
+            setTimeout(() => {
+              if (text) text.textContent = i18n.t('banner.copy') || 'Copy';
+            }, 2000);
+          } catch (err) {
+            console.warn('[Clipboard] Copy error:', err);
+          }
+        });
+      }
+    };
+
+    setupCopyBtn('copyBackendFlagBtn', 'backendFlagCode', 'copyBackendFlagText');
+    setupCopyBtn('copyBraveGuideFlagBtn', 'braveGuideFlagCode', 'copyBraveGuideFlagText');
+
     // Populate initial
     this.populateForm(settingsStore.get());
   }
