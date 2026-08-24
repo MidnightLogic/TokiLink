@@ -259,6 +259,50 @@ export class BluetoothService {
     }
   }
 
+  /**
+   * Forgets a device, disconnecting GATT, invoking BluetoothDevice.forget()
+   * in the browser permissions database, and clearing all local caches.
+   */
+  async forgetDevice(deviceId) {
+    let targetBleDevice = null;
+
+    if (this._device && (this._device.id === deviceId || !deviceId)) {
+      targetBleDevice = this._device;
+    } else if (deviceId && this._sessionDeviceCache.has(deviceId)) {
+      targetBleDevice = this._sessionDeviceCache.get(deviceId);
+    }
+
+    if (!targetBleDevice && typeof navigator !== 'undefined' && navigator.bluetooth?.getDevices) {
+      try {
+        const permitted = await navigator.bluetooth.getDevices();
+        targetBleDevice = permitted.find(d => d.id === deviceId);
+      } catch (e) {
+        debug.warn('[BLE] getDevices error during forget:', e);
+      }
+    }
+
+    // 1. Disconnect GATT if currently connected
+    await this.disconnect();
+
+    // 2. Revoke browser origin permission via Web Bluetooth forget() API
+    if (targetBleDevice && typeof targetBleDevice.forget === 'function') {
+      try {
+        debug.log(`[BLE] Calling device.forget() on: ${targetBleDevice.name || targetBleDevice.id}`);
+        await targetBleDevice.forget();
+      } catch (err) {
+        debug.warn('[BLE] device.forget() warning:', err);
+      }
+    }
+
+    // 3. Purge from internal session caches
+    if (deviceId) {
+      this._sessionDeviceCache.delete(deviceId);
+    }
+    if (this._device && (this._device.id === deviceId || !deviceId)) {
+      this._device = null;
+    }
+  }
+
   // ─── GATT Characteristic Operations ──────────────────────────
 
   async getCharacteristic(serviceUuid, charUuid) {

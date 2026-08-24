@@ -44,11 +44,12 @@ export class DeviceView {
       this.updateStatusPill(state);
     });
 
-    this.dom.forgetDeviceBtn?.addEventListener('click', () => {
+    this.dom.forgetDeviceBtn?.addEventListener('click', async () => {
       const activeDevice = activeDeviceStore.get();
       if (activeDevice) {
-        DeviceActions.removeDevice(activeDevice.id);
-        bleService.disconnect();
+        const deviceId = activeDevice.id;
+        await bleService.forgetDevice(deviceId);
+        DeviceActions.removeDevice(deviceId);
       }
     });
 
