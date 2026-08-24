@@ -817,13 +817,20 @@
               <span>Brave Browser Users</span>
             </div>
             <p class="backend-brave-text" data-i18n="guide.braveNote">
-              Brave also requires enabling Web Bluetooth API:
+              In Brave, enable both the Web Bluetooth API and the New Permissions Backend flags:
             </p>
             <div class="backend-flag-copy-wrap">
               <code class="backend-flag-code" id="braveGuideFlagCode">brave://flags/#brave-web-bluetooth-api</code>
-              <button type="button" class="backend-flag-copy-btn" id="copyBraveGuideFlagBtn" title="Copy Brave flag URL">
+              <button type="button" class="backend-flag-copy-btn" id="copyBraveGuideFlagBtn" title="Copy Brave Bluetooth flag URL">
                 <i data-lucide="copy" width="12" height="12"></i>
-                <span id="copyBraveGuideFlagText" data-i18n="banner.copy">Copy</span>
+                <span id="copyBraveGuideFlagText" data-i18n="banner.copy">Copy Flag 1</span>
+              </button>
+            </div>
+            <div class="backend-flag-copy-wrap" style="margin-top: 4px;">
+              <code class="backend-flag-code" id="braveBackendFlagCode">brave://flags/#enable-web-bluetooth-new-permissions-backend</code>
+              <button type="button" class="backend-flag-copy-btn" id="copyBraveBackendFlagBtn" title="Copy Brave backend flag URL">
+                <i data-lucide="copy" width="12" height="12"></i>
+                <span id="copyBraveBackendFlagText" data-i18n="banner.copy">Copy Flag 2</span>
               </button>
             </div>
           </div>

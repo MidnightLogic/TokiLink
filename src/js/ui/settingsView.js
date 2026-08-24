@@ -125,6 +125,7 @@ export class SettingsView {
 
     setupCopyBtn('copyBackendFlagBtn', 'backendFlagCode', 'copyBackendFlagText');
     setupCopyBtn('copyBraveGuideFlagBtn', 'braveGuideFlagCode', 'copyBraveGuideFlagText');
+    setupCopyBtn('copyBraveBackendFlagBtn', 'braveBackendFlagCode', 'copyBraveBackendFlagText');
 
     // Populate initial
     this.populateForm(settingsStore.get());
