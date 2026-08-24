@@ -5,6 +5,10 @@
 
 > 🚀 **Live Web App:** **[https://midnightlogic.github.io/TokiLink/](https://midnightlogic.github.io/TokiLink/)**
 
+<p align="center">
+  <img src="src/demo.gif" alt="TokiLink for Seiko Live Demo" width="680" style="max-width: 100%; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
+</p>
+
 An unofficial, high-precision **Progressive Web App (PWA)** built with **Vanilla JavaScript** and the **Web Bluetooth API** to synchronize and control Bluetooth-enabled Seiko digital and analog clocks directly from any Web Bluetooth-capable browser (Chrome, Edge, Opera, Samsung Internet on Android, Windows, macOS, ChromeOS, and Linux) without requiring proprietary native mobile apps.
 
 > [!NOTE]
