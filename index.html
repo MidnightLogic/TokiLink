@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokiLink for Seiko — Web Bluetooth Time Synchronization</title>
+    <meta name="description" content="Sync your Seiko DL308 / SS501 series Bluetooth clock to accurate time via Web Bluetooth. Free, open-source, no app install needed.">
+    <meta name="theme-color" content="#0a0e17">
+    <meta name="color-scheme" content="dark light">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="TokiLink for Seiko">
+    <meta property="og:description" content="Sync your Seiko Bluetooth clock from your browser.">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="stylesheet" href="/src/css/style.css">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="public/pwa-assets/apple-icon-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2064-2752.jpg" media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2752-2064.jpg" media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1668-2420.jpg" media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2420-1668.jpg" media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2388-1668.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2224-1668.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2048-1536.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1640-2360.jpg" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2360-1640.jpg" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2160-1620.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1488-2266.jpg" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2266-1488.jpg" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1320-2868.jpg" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2868-1320.jpg" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1206-2622.jpg" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2622-1206.jpg" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1260-2736.jpg" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2736-1260.jpg" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1290-2796.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2796-1290.jpg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1179-2556.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2556-1179.jpg" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2532-1170.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2778-1284.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1080-2340.jpg" media="(device-width: 360px) and (device-height: 780px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2340-1080.jpg" media="(device-width: 360px) and (device-height: 780px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2688-1242.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2436-1125.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1792-828.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-2208-1242.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1334-750.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  </head>
+  <body>
+    <div class="app-container">
+
+      <!-- ═══ Header ═══ -->
+      <header class="app-header">
+        <div class="app-logo">
+          <i data-lucide="clock"></i>
+          <div class="app-title-group">
+            <h1 class="app-title" data-i18n="app.title">TokiLink</h1>
+            <span class="app-tagline" data-i18n="app.forSeiko">for Seiko</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn hidden" id="pwaInstallBtn" aria-label="Install App" title="Install as App">
+            <i data-lucide="download"></i>
+          </button>
+          <button class="icon-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Dark / Light Theme">
+            <i data-lucide="sun"></i>
+          </button>
+          <button class="icon-btn" id="settingsOpenBtn" aria-label="Settings" title="Settings">
+            <i data-lucide="settings"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- ═══ Standard Compatibility Banner ═══ -->
+      <div class="compat-banner hidden" id="compatBanner">
+        <i data-lucide="alert-triangle"></i>
+        <div>
+          <strong data-i18n="banner.unsupported">Unsupported Browser.</strong> <span data-i18n="banner.desc">Web Bluetooth
+          requires Google Chrome, Microsoft Edge, or Opera. Safari and Firefox are not supported natively.</span>
+        </div>
+      </div>
+
+      <!-- ═══ Browser Permission Blocked Banner (Chrome / Edge / Opera) ═══ -->
+      <div class="permission-blocked-banner hidden" id="permissionBlockedBanner">
+        <div class="permission-banner-header">
+          <div class="permission-banner-icon-badge">
+            <i data-lucide="lock" class="permission-banner-icon"></i>
+          </div>
+          <div class="permission-banner-title-wrap">
+            <h3 class="permission-banner-title" data-i18n="banner.permBlockedTitle">Bluetooth Permission Blocked</h3>
+            <p class="permission-banner-desc" data-i18n="banner.permBlockedDesc">Your browser has blocked Bluetooth access
+              for this site. To re-enable:</p>
+          </div>
+        </div>
+        <div class="permission-steps-container">
+          <div class="permission-step-row">
+            <span class="permission-step-num">1</span>
+            <span data-i18n="banner.permStep1">Click the 🔒 lock or 🎛️ tune icon in your browser address bar.</span>
+          </div>
+          <div class="permission-step-row">
+            <span class="permission-step-num">2</span>
+            <span data-i18n="banner.permStep2">Find Bluetooth (or Site settings) and set it to 'Ask' or 'Allow'.</span>
+          </div>
+          <div class="permission-step-row">
+            <span class="permission-step-num">3</span>
+            <span data-i18n="banner.permStep3">Refresh this page to connect to your Seiko clock.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Brave Browser Bluetooth Setup Banner ═══ -->
+      <div class="brave-compat-banner hidden" id="braveCompatBanner">
+        <div class="brave-banner-header">
+          <div class="brave-banner-icon-badge">
+            <i data-lucide="shield-alert" class="brave-banner-icon"></i>
+          </div>
+          <div class="brave-banner-title-wrap">
+            <h3 class="brave-banner-title" data-i18n="banner.braveTitle">Brave Browser Bluetooth Setup</h3>
+            <p class="brave-banner-desc" data-i18n="banner.braveDesc">Brave disables Web Bluetooth by default for privacy.
+              Enable it in 3 quick steps:</p>
+          </div>
+        </div>
+        <div class="brave-steps-container">
+          <div class="brave-step-row">
+            <span class="brave-step-num">1</span>
+            <div class="brave-step-content">
+              <span data-i18n="banner.braveStep1">Paste into Brave address bar:</span>
+              <div class="brave-flag-copy-wrap">
+                <code class="brave-flag-code" id="braveFlagCode">brave://flags/#brave-web-bluetooth-api</code>
+                <button type="button" class="brave-flag-copy-btn" id="braveCopyFlagBtn" title="Copy flag URL">
+                  <i data-lucide="copy" width="12" height="12"></i>
+                  <span id="braveCopyText" data-i18n="banner.copy">Copy</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="brave-step-row">
+            <span class="brave-step-num">2</span>
+            <div class="brave-step-content">
+              <span data-i18n="banner.braveStep2">Set <strong>Web Bluetooth API</strong> to
+              <strong>Enabled</strong></span>
+            </div>
+          </div>
+          <div class="brave-step-row">
+            <span class="brave-step-num">3</span>
+            <div class="brave-step-content">
+              <span data-i18n="banner.braveStep3">Tap/Click <strong>Relaunch</strong> at the bottom of Brave</span>
+            </div>
+          </div>
+        </div>
+        <div class="brave-banner-hint">
+          <span class="brave-hint-badge">Tip</span>
+          <span data-i18n="banner.bravePermTip">If already enabled, click the 🔒 icon in the address bar → Site settings →
+          set Bluetooth to 'Ask' or 'Allow'.</span>
+        </div>
+      </div>
+
+      <!-- ═══ iOS Safari Web Bluetooth Setup Banner ═══ -->
+      <div class="ios-compat-banner hidden" id="iosCompatBanner">
+        <div class="ios-banner-header">
+          <div class="ios-banner-icon-badge">
+            <i data-lucide="bluetooth" class="ios-banner-icon"></i>
+          </div>
+          <div class="ios-banner-title-wrap">
+            <h3 class="ios-banner-title" data-i18n="banner.iosTitle">iOS Safari Bluetooth Setup</h3>
+            <p class="ios-banner-desc" data-i18n="banner.iosDesc">Safari lacks built-in Web Bluetooth. Choose an option
+              below to connect:</p>
+          </div>
+        </div>
+        <div class="ios-cards-container">
+
+          <!-- Method 1: Bluefy App -->
+          <div class="ios-method-card ios-method-recommended">
+            <div class="ios-method-header">
+              <div class="ios-method-info">
+                <span class="ios-method-tag" data-i18n="banner.recommended">Fastest Setup</span>
+                <span class="ios-method-name" data-i18n="banner.iosBluefy">Bluefy Browser</span>
+              </div>
+            </div>
+            <p class="ios-method-desc" data-i18n="banner.bluefyDesc">Zero extension setup required · Works inside Bluefy
+              browser (bookmarks only)</p>
+            <div class="ios-method-btn-group">
+              <a href="#" id="openInBluefyBtn" class="ios-method-btn-primary">
+                <i data-lucide="external-link" width="14" height="14"></i>
+                <span data-i18n="banner.openBluefy">Launch Bluefy</span>
+              </a>
+              <a href="https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055" target="_blank" rel="noopener noreferrer" class="ios-method-btn-secondary">
+                <i data-lucide="download" width="13" height="13"></i>
+                <span data-i18n="banner.getBluefy">Get on App Store</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Method 2: Safari Extension -->
+          <div class="ios-method-card ios-method-pwa">
+            <div class="ios-method-header">
+              <div class="ios-method-info">
+                <span class="ios-method-tag pwa" data-i18n="banner.safariNative">Supports Home Screen PWA</span>
+                <span class="ios-method-name">Safari + Beacio</span>
+              </div>
+            </div>
+            <p class="ios-method-desc" data-i18n="banner.beacioDesc">Enables Bluetooth in Safari &amp; allows Share → 'Add
+              to Home Screen' as a standalone app.</p>
+            <div class="ios-method-btn-group">
+              <a href="https://beacio.com/" target="_blank" rel="noopener noreferrer" class="ios-method-btn-secondary ios-method-btn-full">
+                <i data-lucide="download" width="13" height="13"></i>
+                <span data-i18n="banner.iosBeacio">Install Beacio</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="ios-banner-hint">
+          <span class="ios-hint-badge">Tip</span>
+          <span data-i18n="banner.iosSteps">To install on your Home Screen as an app, use the Safari + Beacio
+          option.</span>
+        </div>
+      </div>
+
+      <!-- ═══ Multi-Device Selector Bar ═══ -->
+      <div class="device-list-container" id="deviceListContainer">
+
+        <!-- Populated dynamically with paired clocks -->
+      </div>
+
+      <!-- ═══ Feature Tabs (SS201/SS501 Only) ═══ -->
+      <nav class="feature-tabs hidden" id="featureTabs">
+        <button class="tab-btn active" data-tab="time" data-i18n="tabs.time">Time</button>
+        <button class="tab-btn" data-tab="alarm" data-i18n="tabs.alarm">Alarm</button>
+        <button class="tab-btn" data-tab="radio" data-i18n="tabs.radio">Radio</button>
+        <button class="tab-btn" data-tab="display" data-i18n="tabs.display">Display</button>
+      </nav>
+
+      <!-- ═══ TIME TAB (Main Clock) ═══ -->
+      <div class="tab-content active" id="tab-time">
+
+        <!-- Clock Display -->
+        <section class="clock-card" id="clockCard">
+          <div class="clock-top-bar">
+            <div class="clock-source-badge" id="clockSourceBadge">
+              <span class="dot"></span>
+              <span class="source-title" data-i18n="clock.syncTitle">Time Sync:</span>
+              <span class="source-val" id="clockSourceText" data-i18n="clock.sourceApi">Automatic (Online)</span>
+            </div>
+          </div>
+          <div class="clock-date" id="clockDate" data-i18n="clock.loading">Loading...</div>
+          <div class="clock-time" id="clockTime">
+            --:--<span class="seconds">--</span>
+          </div>
+          <div class="clock-bottom-bar">
+            <div class="clock-timezone" id="clockTimezone"></div>
+            <div class="clock-manual-toggle-wrap" title="Customize Time / Timezone">
+              <span class="manual-toggle-label" data-i18n="manual.toggleLabel">Customize</span>
+              <div class="toggle-switch small">
+                <input type="checkbox" id="directManualTimeToggle">
+                <label class="toggle-slider" for="directManualTimeToggle"></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Manual Time / World Timezone Override Section -->
+        <section class="manual-time-section hidden" id="manualTimeSection">
+          <div class="manual-time-card">
+
+            <!-- Mode Tabs -->
+            <div class="manual-mode-tabs">
+              <button type="button" class="manual-mode-tab active" id="modeTzBtn" data-mode="timezone">
+                <i data-lucide="globe" width="14" height="14"></i>
+                <span data-i18n="manual.modeTimezone">World</span>
+              </button>
+              <button type="button" class="manual-mode-tab" id="modeExactBtn" data-mode="exact">
+                <i data-lucide="calendar-clock" width="14" height="14"></i>
+                <span data-i18n="manual.modeExact">Custom</span>
+              </button>
+            </div>
+
+            <!-- ─── WORLD TIMEZONE SLIDER MODE ─── -->
+            <div class="tz-mode-view" id="tzModeView">
+              <div class="tz-display-box">
+                <div class="tz-city-row">
+                  <div class="tz-city-main">
+                    <i data-lucide="map-pin" width="16" height="16" class="tz-pin-icon"></i>
+                    <span class="tz-city-name" id="tzCityName">Sydney / Melbourne / Brisbane</span>
+                  </div>
+                  <span class="tz-delta-badge home" id="tzDeltaBadge">Home Time</span>
+                </div>
+                <div class="tz-meta-row">
+                  <span class="tz-offset-pill" id="tzOffsetPill">AEST (UTC+10:00)</span>
+                  <span class="tz-live-badge"><span class="pulse-dot"></span> Live Clock</span>
+                </div>
+              </div>
+
+              <!-- Slider and Steppers -->
+              <div class="tz-slider-row">
+                <button type="button" class="tz-step-btn" id="tzStepDownBtn" title="Previous Timezone (West)">
+                  <i data-lucide="minus" width="14" height="14"></i>
+                </button>
+                <div class="tz-slider-track-wrap">
+                  <input type="range" id="tzSlider" class="tz-range-slider" min="0" max="37" step="1" value="31">
+                  <div class="tz-slider-labels">
+                    <span class="tz-limit-label">UTC-12</span>
+                    <span class="tz-home-label" id="tzHomeLabel">Home</span>
+                    <span class="tz-limit-label">UTC+14</span>
+                  </div>
+                </div>
+                <button type="button" class="tz-step-btn" id="tzStepUpBtn" title="Next Timezone (East)">
+                  <i data-lucide="plus" width="14" height="14"></i>
+                </button>
+              </div>
+
+              <!-- Reset to Home Button -->
+              <div class="tz-actions-row">
+                <button type="button" class="tz-reset-btn" id="tzResetHomeBtn">
+                  <i data-lucide="rotate-ccw" width="12" height="12"></i>
+                  <span data-i18n="manual.resetHome">Reset to My Timezone</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ─── EXACT TIMESTAMP MODE ─── -->
+            <div class="exact-mode-view hidden" id="exactModeView">
+              <div class="manual-time-controls">
+                <div class="manual-time-input-wrap">
+                  <i data-lucide="calendar-clock" width="16" height="16" class="manual-time-input-icon"></i>
+                  <input type="datetime-local" id="manualTimeInput" class="manual-time-input" step="1">
+                </div>
+                <button type="button" class="manual-time-now-btn" id="manualTimeNowBtn" title="Set to current time">
+                  <i data-lucide="rotate-ccw" width="14" height="14"></i>
+                  <span data-i18n="manual.now">Now</span>
+                </button>
+              </div>
+              <div class="manual-time-hint" data-i18n="manual.hint">This exact fixed timestamp will be sent to the clock
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sync Section -->
+        <section class="sync-section">
+          <div class="sync-plasma-wrap">
+            <canvas class="plasma-canvas" id="plasmaCanvas" width="176" height="176"></canvas>
+            <button class="sync-btn" id="syncBtn" aria-label="Sync Clock">
+              <span id="syncIconWrap"><i data-lucide="bluetooth"></i></span>
+              <span class="sync-btn-label" id="syncBtnLabel" data-i18n="sync.btn.sync">Sync</span>
+            </button>
+          </div>
+          <div class="sync-status" id="syncStatus" data-i18n="sync.status.idle">Press to sync your Seiko clock</div>
+        </section>
+
+        <!-- Paired Device Pill Card -->
+        <div class="device-card hidden" id="deviceCard">
+          <div class="device-left">
+            <div class="device-icon">
+              <i data-lucide="bluetooth"></i>
+            </div>
+            <div class="device-info">
+              <div class="device-name-row">
+                <span class="device-name" id="deviceName">—</span>
+                <span class="device-tag" data-i18n="device.tag">BLE Clock</span>
+              </div>
+              <div class="device-status-pill disconnected" id="deviceStatus">
+                <span class="status-dot"></span>
+                <span id="deviceStatusText">Not Connected</span>
+              </div>
+              <div class="device-id hidden" id="deviceId">—</div>
+            </div>
+          </div>
+          <button class="forget-btn" id="forgetDeviceBtn" data-i18n="device.forget">Forget</button>
+        </div>
+
+        <!-- Sync Log -->
+        <section class="log-section" id="logSection">
+          <div class="log-header">
+            <span class="log-title" data-i18n="log.title">Sync History</span>
+            <button class="log-clear-btn" id="logClearBtn" data-i18n="log.clear">Clear</button>
+          </div>
+          <div class="log-entries" id="logEntries">
+            <div class="log-empty" id="logEmpty" data-i18n="log.empty">No sync attempts yet</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ═══ ALARM TAB CONTENT ═══ -->
+      <div class="tab-content" id="tab-alarm">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title">
+              <i data-lucide="bell"></i>
+              <span data-i18n="ss201.alarm.title">Alarm Settings</span>
+            </div>
+            <button class="action-chip-btn" id="addAlarmBtn">
+              <i data-lucide="plus" width="14" height="14"></i>
+              <span data-i18n="ss201.alarm.add">Add Alarm</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Alarm List -->
+          <div class="alarm-list" id="alarmList">
+
+            <!-- Populated dynamically by AlarmView -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ RADIO TAB CONTENT ═══ -->
+      <div class="tab-content" id="tab-radio">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title">
+              <i data-lucide="radio"></i>
+              <span data-i18n="ss201.radio.title">FM Radio</span>
+            </div>
+            <div class="toggle-switch">
+              <input type="checkbox" id="radioPowerToggle" checked="">
+              <label class="toggle-slider" for="radioPowerToggle"></label>
+            </div>
+          </div>
+
+          <!-- Digital Radio Tuner Dial with Steppers -->
+          <div class="radio-tuner-card">
+            <div class="radio-freq-display">
+              <input type="number" id="radioFreqInput" step="0.1" min="76.0" max="108.0" value="89.5" class="radio-freq-input" title="Type to enter frequency directly">
+              <span class="radio-freq-unit">MHz FM</span>
+            </div>
+            <div class="radio-tuner-controls">
+              <button class="tuner-btn" id="radioSeekDownBtn" title="Hold to scan down"><i data-lucide="chevrons-left"></i> -0.1</button>
+              <input type="range" id="radioFreqSlider" min="76.0" max="108.0" step="0.1" value="89.5" class="tuner-slider">
+              <button class="tuner-btn" id="radioSeekUpBtn" title="Hold to scan up">+0.1 <i data-lucide="chevrons-right"></i></button>
+            </div>
+          </div>
+
+          <!-- Preset Channels -->
+          <div class="control-group">
+            <div class="control-label-row">
+              <label class="control-label" data-i18n="ss201.radio.presets">Preset Channels</label>
+              <button class="action-chip-btn" id="editPresetsBtn" data-i18n="ss201.radio.editPresets">Edit
+                Presets</button>
+            </div>
+            <div class="preset-grid" id="presetGrid">
+
+              <!-- Populated dynamically by RadioView -->
+            </div>
+          </div>
+
+          <!-- Volume Control -->
+          <div class="control-group">
+            <div class="control-label-row">
+              <label class="control-label" data-i18n="ss201.radio.volume">Volume</label>
+              <span class="control-value-badge" id="radioVolumeVal">12</span>
+            </div>
+            <div class="slider-with-icons">
+              <i data-lucide="volume-1" class="slider-icon"></i>
+              <input type="range" id="radioVolumeSlider" min="0" max="30" value="12" class="range-slider">
+              <i data-lucide="volume-2" class="slider-icon"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DISPLAY & AUDIO TAB CONTENT ═══ -->
+      <div class="tab-content" id="tab-display">
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-card-title">
+              <i data-lucide="sun"></i>
+              <span data-i18n="ss201.display.title">Display &amp; Sound Settings</span>
+            </div>
+          </div>
+
+          <!-- Brightness Slider -->
+          <div class="control-group">
+            <div class="control-label-row">
+              <label class="control-label" data-i18n="ss201.display.brightness">Display Brightness</label>
+              <span class="control-value-badge" id="brightnessVal">Level 3</span>
+            </div>
+            <div class="segmented-control brightness-segments">
+              <button class="segment-btn" data-brightness="0"><i data-lucide="moon" width="14" height="14"></i> 0</button>
+              <button class="segment-btn" data-brightness="1">1</button>
+              <button class="segment-btn" data-brightness="2">2</button>
+              <button class="segment-btn active" data-brightness="3">3</button>
+              <button class="segment-btn" data-brightness="4"><i data-lucide="sun" width="14" height="14"></i> 4</button>
+            </div>
+          </div>
+
+          <!-- Bass Boost -->
+          <div class="control-group">
+            <div class="control-label-row">
+              <label class="control-label" data-i18n="ss201.display.bass">Bass Boost</label>
+              <span class="control-value-badge" id="bassVal">OFF</span>
+            </div>
+            <div class="segmented-control bass-segments">
+              <button class="segment-btn active" data-bass="0" data-i18n="ss201.display.off">OFF</button>
+              <button class="segment-btn" data-bass="1">+1</button>
+              <button class="segment-btn" data-bass="2">+2</button>
+              <button class="segment-btn" data-bass="3">+3</button>
+            </div>
+          </div>
+
+          <!-- Auto Power Off -->
+          <div class="control-group">
+            <div class="control-label-row">
+              <label class="control-label" data-i18n="ss201.display.autoPowerOff">Auto Power Off</label>
+            </div>
+            <select id="autoPowerOffSelect" class="lang-select">
+              <option value="0" data-i18n="ss201.display.never">Never (Always On)</option>
+              <option value="15">15 min</option>
+              <option value="30">30 min</option>
+              <option value="45">45 min</option>
+              <option value="60">60 min</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Footer ═══ -->
+      <footer class="app-footer">
+        <div class="footer-brand">
+          <span class="footer-title" data-i18n="footer.title">TokiLink for Seiko</span>
+          <span class="footer-dot">·</span>
+          <a href="https://github.com/MidnightLogic/TokiLink" target="_blank" rel="noopener noreferrer" class="footer-github-link" title="TokiLink on GitHub">
+            <svg class="footer-github-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+        <span class="footer-disclaimer" data-i18n="footer.disclaimer">Independent open-source project. Not affiliated with Seiko Group Corporation.</span>
+      </footer>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+       Modals
+       ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- ═══ ALARM EDIT MODAL ═══ -->
+    <div class="modal-overlay hidden" id="alarmModalOverlay">
+      <div class="modal-card" id="alarmModal">
+        <div class="modal-header">
+          <h3 id="alarmModalTitle" data-i18n="modal.alarm.editTitle">Edit Alarm</h3>
+          <button class="modal-close-btn" id="alarmModalCloseBtn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label data-i18n="modal.alarm.time">Alarm Time</label>
+            <input type="time" id="alarmModalTimeInput" class="modal-time-input" required="">
+          </div>
+          <div class="modal-field">
+            <label data-i18n="modal.alarm.repeat">Repeat Days</label>
+            <div class="modal-days-grid" id="modalDaysGrid">
+              <button type="button" class="day-chip" data-day="1">M</button>
+              <button type="button" class="day-chip" data-day="2">T</button>
+              <button type="button" class="day-chip" data-day="3">W</button>
+              <button type="button" class="day-chip" data-day="4">T</button>
+              <button type="button" class="day-chip" data-day="5">F</button>
+              <button type="button" class="day-chip" data-day="6">S</button>
+              <button type="button" class="day-chip" data-day="0">S</button>
+            </div>
+          </div>
+          <div class="modal-field">
+            <label data-i18n="modal.alarm.sound">Alarm Sound</label>
+            <select id="alarmModalSoundSelect" class="modal-select">
+              <option value="0" data-i18n="ss201.alarm.sound0">Melody 1 (Classic Chime)</option>
+              <option value="1" data-i18n="ss201.alarm.sound1">Melody 2 (Gentle Wake)</option>
+              <option value="2" data-i18n="ss201.alarm.sound2">Melody 3 (Upbeat Rhythm)</option>
+              <option value="3" data-i18n="ss201.alarm.sound3">FM Radio Preset 1</option>
+              <option value="4" data-i18n="ss201.alarm.sound4">FM Radio Preset 2</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <div class="control-label-row">
+              <label data-i18n="modal.alarm.volume">Volume</label>
+              <span class="control-value-badge" id="alarmModalVolVal">15</span>
+            </div>
+            <input type="range" id="alarmModalVolSlider" min="0" max="30" value="15" class="range-slider">
+          </div>
+          <div class="modal-field-checkbox">
+            <input type="checkbox" id="alarmModalSnoozeInput" checked="">
+            <label for="alarmModalSnoozeInput" data-i18n="ss201.alarm.snooze">Snooze (5 min)</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-btn-delete" id="alarmModalDeleteBtn" data-i18n="modal.delete">Delete</button>
+          <div class="modal-actions-right">
+            <button type="button" class="modal-btn-cancel" id="alarmModalCancelBtn" data-i18n="modal.cancel">Cancel</button>
+            <button type="button" class="modal-btn-save" id="alarmModalSaveBtn" data-i18n="modal.save">Save Alarm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PRESET EDIT MODAL ═══ -->
+    <div class="modal-overlay hidden" id="presetModalOverlay">
+      <div class="modal-card" id="presetModal">
+        <div class="modal-header">
+          <h3 id="presetModalTitle" data-i18n="modal.preset.title">Edit Preset Channel</h3>
+          <button class="modal-close-btn" id="presetModalCloseBtn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label data-i18n="modal.preset.stationName">Station Name</label>
+            <input type="text" id="presetModalNameInput" class="modal-text-input" maxlength="18" placeholder="e.g. J-WAVE, BBC 1">
+          </div>
+          <div class="modal-field">
+            <label data-i18n="modal.preset.frequency">Frequency (76.0 – 108.0 MHz)</label>
+            <div style="display:flex;gap:8px;">
+              <input type="number" id="presetModalFreqInput" step="0.1" min="76.0" max="108.0" class="modal-number-input">
+              <button type="button" class="action-chip-btn" id="presetUseCurrentFreqBtn" data-i18n="modal.preset.useTuner">Use Tuner Freq</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-btn-cancel" id="presetModalCancelBtn" data-i18n="modal.cancel">Cancel</button>
+          <button type="button" class="modal-btn-save" id="presetModalSaveBtn" data-i18n="modal.save">Save Preset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+       Settings Overlay & Panel
+       ═══════════════════════════════════════════════════════════════ -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+    <aside class="settings-panel" id="settingsPanel">
+      <div class="settings-panel-header">
+        <h2 data-i18n="settings.title">Settings</h2>
+        <button class="settings-close-btn" id="settingsCloseBtn" aria-label="Close Settings">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title" data-i18n="settings.appearance">Appearance</div>
+        <div class="settings-row">
+          <div>
+            <label for="themeSelect" data-i18n="settings.theme">Theme</label>
+            <div class="settings-desc" data-i18n="settings.theme.desc">Choose Dark or Light theme</div>
+          </div>
+          <div>
+            <select id="themeSelect" class="theme-select">
+              <option value="dark" data-i18n="settings.theme.dark">Dark Mode</option>
+              <option value="light" data-i18n="settings.theme.light">Light Mode</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <label for="languageSelect" data-i18n="settings.language">Language</label>
+            <div class="settings-desc" data-i18n="settings.language.desc">Choose your preferred language</div>
+          </div>
+          <div>
+            <select id="languageSelect" class="lang-select">
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+              <option value="fr">Français</option>
+              <option value="es">Español</option>
+              <option value="de">Deutsch</option>
+              <option value="zh">简体中文</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title" data-i18n="settings.timeSource">Time Source</div>
+        <div class="settings-row">
+          <div>
+            <label for="useApiToggle" data-i18n="settings.useApi">Use online time API</label>
+            <div class="settings-desc" data-i18n="settings.useApi.desc">Fetch high-precision NTP time from online time
+              servers</div>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="useApiToggle" checked="">
+            <label class="toggle-slider" for="useApiToggle"></label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <label for="manualTimeToggle" data-i18n="settings.manualOverride">Manual time override</label>
+            <div class="settings-desc" data-i18n="settings.manualOverride.desc">Set a custom time to sync instead of
+              current time</div>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="manualTimeToggle">
+            <label class="toggle-slider" for="manualTimeToggle"></label>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title" data-i18n="settings.display">Display</div>
+        <div class="settings-row">
+          <div>
+            <label for="use24hToggle" data-i18n="settings.24h">24-hour format</label>
+            <div class="settings-desc" data-i18n="settings.24h.desc">Show time in 24-hour format instead of AM/PM</div>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="use24hToggle" checked="">
+            <label class="toggle-slider" for="use24hToggle"></label>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title" data-i18n="settings.diagnostics">Diagnostics</div>
+        <div class="settings-row">
+          <div>
+            <label for="debugToggle" data-i18n="settings.debug">Debug logging</label>
+            <div class="settings-desc" data-i18n="settings.debug.desc">Log BLE payload bytes and timing to browser console
+            </div>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="debugToggle">
+            <label class="toggle-slider" for="debugToggle"></label>
+          </div>
+        </div>
+        <div class="settings-tip-box">
+          <div class="settings-tip-header">
+            <i data-lucide="info" width="13" height="13"></i>
+            <span data-i18n="settings.persistentTipTitle">1-Click Desktop Sync Tip</span>
+          </div>
+          <p class="settings-tip-text" data-i18n="settings.persistentTipDesc">
+            On Desktop Chrome/Brave/Edge, enabling <code>#enable-web-bluetooth-new-permissions-backend</code> in flags
+            allows 1-click sync without repeating the device chooser dialog.
+          </p>
+        </div>
+      </div>
+      <div class="settings-version">
+        <span data-i18n="settings.version">TokiLink for Seiko v2.0.0</span><br>
+        <span data-i18n="settings.versionSub">Unofficial Web Bluetooth · Open Source</span><br>
+        <a href="https://github.com/MidnightLogic/TokiLink" target="_blank" rel="noopener noreferrer" class="settings-github-link">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>MidnightLogic/TokiLink</span>
+        </a>
+      </div>
+    </aside>
+    <pwa-install id="pwaInstall" manifest-url="./manifest.webmanifest" name="TokiLink for Seiko" description="Sync your Seiko Bluetooth clock from your browser." icon="./pwa-192x192.png"></pwa-install>
+    <script type="module" src="/src/js/app.js"></script>
+  </body>
+</html>

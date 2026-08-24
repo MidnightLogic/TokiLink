@@ -1,0 +1,35 @@
+{
+  "name": "TokiLink-for-seiko",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "serve": "vite build && vite preview",
+    "preview": "vite preview",
+    "tunnel": "concurrently -n \"vite,cf\" -c \"cyan,magenta\" \"vite\" \"npx cloudflared tunnel --url http://127.0.0.1:5173\"",
+    "tunnel:cf": "concurrently -n \"vite,cf\" -c \"cyan,magenta\" \"vite\" \"npx cloudflared tunnel --url http://127.0.0.1:5173\"",
+    "tunnel:prod": "npm run build:fast && concurrently -n \"preview,cf\" -c \"cyan,magenta\" \"vite preview --port 5173\" \"npx cloudflared tunnel --url http://127.0.0.1:5173\"",
+    "tunnel:lt": "concurrently -n \"vite,lt\" -c \"cyan,yellow\" \"vite\" \"lt --port 5173 --local-host 127.0.0.1\"",
+    "build": "npm run generate:pwa && vite build",
+    "build:fast": "vite build",
+    "generate:pwa": "npx -y pwa-asset-generator public/pwa-512x512.png public/pwa-assets --background \"#0a0e17\" --index index.html"
+  },
+  "keywords": [],
+  "author": "MidnightLogic",
+  "license": "Apache-2.0",
+  "description": "TokiLink for Seiko — Unofficial Web Bluetooth Time Synchronization PWA",
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "concurrently": "^10.0.5",
+    "localtunnel": "^2.0.2",
+    "lucide": "^1.33.0",
+    "vite": "^8.2.2",
+    "vite-plugin-pwa": "^1.3.0"
+  },
+  "dependencies": {
+    "@khmyznikov/pwa-install": "^0.6.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "nanostores": "^1.5.2",
+    "tailwindcss": "^4.3.3"
+  }
+}

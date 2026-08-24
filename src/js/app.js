@@ -1,0 +1,594 @@
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  TokiLink for Seiko — Application Orchestrator
+ *  Decoupled Architecture with Nano Stores & Web Bluetooth Service
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+import {
+  createIcons,
+  Clock, Settings as SettingsIcon, AlertTriangle, Pencil,
+  Bluetooth, Bell, Radio, Sun, X, Loader2, Check,
+  XCircle, CheckCircle2, Plus, Moon, Volume1, Volume2,
+  ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
+  PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
+  Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
+  Lock, Info
+} from 'lucide';
+
+import { registerSW } from 'virtual:pwa-register';
+import '@khmyznikov/pwa-install';
+
+// Register Service Worker for PWA
+try {
+  registerSW({ immediate: true });
+} catch (e) {
+  console.warn('[PWA] SW register error:', e);
+}
+
+function isDebug() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    return !!(settingsStore?.get()?.debug || urlParams.get('debug') === 'true');
+  } catch (e) {
+    return false;
+  }
+}
+
+// Direct beforeinstallprompt holder for instant native install
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (isDebug()) console.log('[PWA] Native beforeinstallprompt captured!');
+});
+
+import { BluetoothService, bleService } from './services/bluetooth.js';
+import { PlatformService } from './services/platform.js';
+import { DeviceProtocol } from './services/protocol.js';
+import { timeService } from './services/time.js';
+import {
+  pairedDevicesStore,
+  activeDeviceIdStore,
+  activeDeviceStore,
+  connectionStateStore,
+  connectionStatusTextStore,
+  settingsStore,
+  syncLogStore,
+  DeviceActions
+} from './store.js';
+
+import { ClockView } from './ui/clockView.js';
+import { DeviceView } from './ui/deviceView.js';
+import { AlarmView } from './ui/alarmView.js';
+import { RadioView } from './ui/radioView.js';
+import { DisplayView } from './ui/displayView.js';
+import { SettingsView } from './ui/settingsView.js';
+import { i18n } from './i18n.js';
+
+const LUCIDE_ICONS = {
+  Clock, Settings: SettingsIcon, AlertTriangle, Pencil,
+  Bluetooth, Bell, Radio, Sun, X, Loader2, Check,
+  XCircle, CheckCircle2, Plus, Moon, Volume1, Volume2,
+  ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
+  PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
+  Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
+  Lock, Info
+};
+
+export function renderIcons() {
+  createIcons({ icons: LUCIDE_ICONS });
+}
+
+// ─── Application Bootstrap ─────────────────────────────────────
+
+class App {
+  constructor() {
+    this.dom = {};
+    this.diagnostics = null;
+  }
+
+  cacheDom() {
+    this.dom = {
+      // Header
+      themeToggleBtn: document.getElementById('themeToggleBtn'),
+      pwaInstallBtn: document.getElementById('pwaInstallBtn'),
+      pwaInstall: document.getElementById('pwaInstall'),
+      settingsOpenBtn: document.getElementById('settingsOpenBtn'),
+      compatBanner: document.getElementById('compatBanner'),
+      permissionBlockedBanner: document.getElementById('permissionBlockedBanner'),
+      braveCompatBanner: document.getElementById('braveCompatBanner'),
+      iosCompatBanner: document.getElementById('iosCompatBanner'),
+
+      // Multi-device
+      deviceListContainer: document.getElementById('deviceListContainer'),
+      deviceCard: document.getElementById('deviceCard'),
+      deviceName: document.getElementById('deviceName'),
+      deviceId: document.getElementById('deviceId'),
+      deviceStatus: document.getElementById('deviceStatus'),
+      deviceStatusText: document.getElementById('deviceStatusText'),
+      pairNewBtn: document.getElementById('pairNewBtn'),
+      forgetDeviceBtn: document.getElementById('forgetDeviceBtn'),
+
+      // Feature Tabs
+      featureTabs: document.getElementById('featureTabs'),
+      tabBtns: document.querySelectorAll('.tab-btn'),
+      tabContents: document.querySelectorAll('.tab-content'),
+
+      // Clock View
+      clockCard: document.getElementById('clockCard'),
+      clockSourceBadge: document.getElementById('clockSourceBadge'),
+      clockSourceText: document.getElementById('clockSourceText'),
+      clockDate: document.getElementById('clockDate'),
+      clockTime: document.getElementById('clockTime'),
+      clockTimezone: document.getElementById('clockTimezone'),
+      manualTimeSection: document.getElementById('manualTimeSection'),
+      manualTimeInput: document.getElementById('manualTimeInput'),
+      manualTimeNowBtn: document.getElementById('manualTimeNowBtn'),
+      modeTzBtn: document.getElementById('modeTzBtn'),
+      modeExactBtn: document.getElementById('modeExactBtn'),
+      tzModeView: document.getElementById('tzModeView'),
+      exactModeView: document.getElementById('exactModeView'),
+      tzCityName: document.getElementById('tzCityName'),
+      tzDeltaBadge: document.getElementById('tzDeltaBadge'),
+      tzOffsetPill: document.getElementById('tzOffsetPill'),
+      tzSlider: document.getElementById('tzSlider'),
+      tzStepDownBtn: document.getElementById('tzStepDownBtn'),
+      tzStepUpBtn: document.getElementById('tzStepUpBtn'),
+      tzResetHomeBtn: document.getElementById('tzResetHomeBtn'),
+      tzHomeLabel: document.getElementById('tzHomeLabel'),
+      directManualTimeToggle: document.getElementById('directManualTimeToggle'),
+      plasmaCanvas: document.getElementById('plasmaCanvas'),
+      syncBtn: document.getElementById('syncBtn'),
+      syncBtnLabel: document.getElementById('syncBtnLabel'),
+      syncStatus: document.getElementById('syncStatus'),
+
+      // Sync Log
+      logSection: document.getElementById('logSection'),
+      logClearBtn: document.getElementById('logClearBtn'),
+      logEntries: document.getElementById('logEntries'),
+
+      // Alarms View
+      alarmList: document.getElementById('alarmList'),
+      addAlarmBtn: document.getElementById('addAlarmBtn'),
+      alarmModalOverlay: document.getElementById('alarmModalOverlay'),
+      alarmModalTitle: document.getElementById('alarmModalTitle'),
+      alarmModalCloseBtn: document.getElementById('alarmModalCloseBtn'),
+      alarmModalTimeInput: document.getElementById('alarmModalTimeInput'),
+      modalDaysGrid: document.getElementById('modalDaysGrid'),
+      alarmModalSoundSelect: document.getElementById('alarmModalSoundSelect'),
+      alarmModalVolSlider: document.getElementById('alarmModalVolSlider'),
+      alarmModalVolVal: document.getElementById('alarmModalVolVal'),
+      alarmModalSnoozeInput: document.getElementById('alarmModalSnoozeInput'),
+      alarmModalDeleteBtn: document.getElementById('alarmModalDeleteBtn'),
+      alarmModalCancelBtn: document.getElementById('alarmModalCancelBtn'),
+      alarmModalSaveBtn: document.getElementById('alarmModalSaveBtn'),
+
+      // Radio View
+      radioPowerToggle: document.getElementById('radioPowerToggle'),
+      radioFreqInput: document.getElementById('radioFreqInput'),
+      radioFreqSlider: document.getElementById('radioFreqSlider'),
+      radioSeekDownBtn: document.getElementById('radioSeekDownBtn'),
+      radioSeekUpBtn: document.getElementById('radioSeekUpBtn'),
+      radioVolumeSlider: document.getElementById('radioVolumeSlider'),
+      radioVolumeVal: document.getElementById('radioVolumeVal'),
+      presetGrid: document.getElementById('presetGrid'),
+      editPresetsBtn: document.getElementById('editPresetsBtn'),
+      presetModalOverlay: document.getElementById('presetModalOverlay'),
+      presetModalTitle: document.getElementById('presetModalTitle'),
+      presetModalCloseBtn: document.getElementById('presetModalCloseBtn'),
+      presetModalNameInput: document.getElementById('presetModalNameInput'),
+      presetModalFreqInput: document.getElementById('presetModalFreqInput'),
+      presetUseCurrentFreqBtn: document.getElementById('presetUseCurrentFreqBtn'),
+      presetModalCancelBtn: document.getElementById('presetModalCancelBtn'),
+      presetModalSaveBtn: document.getElementById('presetModalSaveBtn'),
+
+      // Display View
+      brightnessBtns: document.querySelectorAll('.brightness-segments .segment-btn'),
+      brightnessVal: document.getElementById('brightnessVal'),
+      bassBtns: document.querySelectorAll('.bass-segments .segment-btn'),
+      bassVal: document.getElementById('bassVal'),
+      autoPowerOffSelect: document.getElementById('autoPowerOffSelect'),
+
+      // Settings View
+      settingsOverlay: document.getElementById('settingsOverlay'),
+      settingsPanel: document.getElementById('settingsPanel'),
+      settingsCloseBtn: document.getElementById('settingsCloseBtn'),
+      themeSelect: document.getElementById('themeSelect'),
+      useApiToggle: document.getElementById('useApiToggle'),
+      manualTimeToggle: document.getElementById('manualTimeToggle'),
+      use24hToggle: document.getElementById('use24hToggle'),
+      debugToggle: document.getElementById('debugToggle'),
+      languageSelect: document.getElementById('languageSelect'),
+    };
+  }
+
+  async init() {
+    this.cacheDom();
+
+    // Comprehensive platform & Web Bluetooth diagnostics
+    const diagnostics = await PlatformService.getDiagnostics();
+    this.diagnostics = diagnostics;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const bannerPreview = urlParams.get('banner')?.toLowerCase();
+
+    if (bannerPreview === 'brave' || (!bannerPreview && diagnostics.diagnostic === 'brave_blocked')) {
+      this.dom.braveCompatBanner?.classList.remove('hidden');
+    } else if (bannerPreview === 'ios' || (!bannerPreview && diagnostics.diagnostic === 'ios_safari')) {
+      this.dom.iosCompatBanner?.classList.remove('hidden');
+    } else if (bannerPreview === 'blocked' || (!bannerPreview && diagnostics.diagnostic === 'permission_blocked')) {
+      this.dom.permissionBlockedBanner?.classList.remove('hidden');
+    } else if (bannerPreview === 'unsupported' || bannerPreview === 'standard' || (!bannerPreview && diagnostics.diagnostic === 'unsupported')) {
+      this.dom.compatBanner?.classList.remove('hidden');
+    }
+
+    // Setup Copy button for Brave Flag
+    const braveCopyBtn = document.getElementById('braveCopyFlagBtn');
+    const braveFlagCode = document.getElementById('braveFlagCode');
+    const braveCopyText = document.getElementById('braveCopyText');
+    if (braveCopyBtn && braveFlagCode) {
+      braveCopyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(braveFlagCode.textContent.trim());
+          if (braveCopyText) braveCopyText.textContent = i18n.t('banner.copied') || 'Copied!';
+          setTimeout(() => {
+            if (braveCopyText) braveCopyText.textContent = i18n.t('banner.copy') || 'Copy';
+          }, 2000);
+        } catch (err) {
+          console.warn('[Brave] Clipboard error:', err);
+        }
+      });
+    }
+
+    // Setup Open in Bluefy Deep Link for iOS
+    const openInBluefyBtn = document.getElementById('openInBluefyBtn');
+    if (openInBluefyBtn) {
+      openInBluefyBtn.href = `bluefy://open?url=${encodeURIComponent(window.location.href)}`;
+    }
+
+    // Initialize multi-language
+    i18n.init();
+    renderIcons();
+
+    // Clean up any stale duplicate devices from localStorage
+    DeviceActions.deduplicateDevices();
+
+    // Initialize UI Views
+    this.clockView = new ClockView(this.dom);
+    this.deviceView = new DeviceView(this.dom, () => this.pairNewClock(true));
+    this.alarmView = new AlarmView(this.dom, renderIcons);
+    this.radioView = new RadioView(this.dom, renderIcons);
+    this.displayView = new DisplayView(this.dom, renderIcons);
+    this.settingsView = new SettingsView(this.dom, () => syncLogStore.set([]));
+
+    this.initTabs();
+    this.bindSyncAction();
+    renderIcons();
+
+    i18n.onLocaleChange(() => {
+      if (connectionStateStore.get() === 'disconnected') {
+        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+      }
+      renderIcons();
+    });
+
+    // Fetch initial time
+    if (settingsStore.get().useApi) {
+      timeService.fetchApiTime();
+    }
+
+    // PWA Install Prompt Button
+    if (this.dom.pwaInstallBtn && this.dom.pwaInstall) {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || !!window.navigator.standalone
+        || document.referrer.includes('android-app://')
+        || window.location.search.includes('standalone=true');
+
+      // Strict capability check: Only offer PWA installation if Web Bluetooth is supported (Chrome/Edge/Opera or Safari WITH Beacio extension active).
+      // Hide on Bluefy (uses in-app bookmarks) and Safari without Beacio (cannot use BLE).
+      const isSimulatedIOS = bannerPreview === 'ios';
+      const isRealIOSWithoutBLE = this.diagnostics?.diagnostic === 'ios_safari';
+      const isBluefy = this.diagnostics?.browser?.isBluefy || /Bluefy/i.test(navigator.userAgent);
+      const hasBleWorking = this.diagnostics?.bluetooth?.isSupported;
+
+      const canInstallPwaWithBle = hasBleWorking && !isSimulatedIOS && !isRealIOSWithoutBLE && !isBluefy;
+
+      const pwaEl = this.dom.pwaInstall;
+      const btn = this.dom.pwaInstallBtn;
+
+      if (isStandalone || !canInstallPwaWithBle) {
+        btn.classList.add('hidden');
+        if (pwaEl) pwaEl.style.display = 'none';
+      } else {
+        btn.classList.remove('hidden');
+        if (pwaEl) pwaEl.style.display = '';
+      }
+
+      btn.addEventListener('click', async () => {
+        if (!canInstallPwaWithBle) return;
+        if (deferredInstallPrompt) {
+          try {
+            await deferredInstallPrompt.prompt();
+            const choice = await deferredInstallPrompt.userChoice;
+            console.log('[PWA] User choice:', choice);
+            if (choice.outcome === 'accepted') {
+              deferredInstallPrompt = null;
+              btn.classList.add('hidden');
+              if (pwaEl) pwaEl.style.display = 'none';
+            }
+            return;
+          } catch (err) {
+            console.warn('[PWA] Prompt error:', err);
+          }
+        }
+
+        try {
+          if (pwaEl.isInstallAvailable) {
+            await pwaEl.install();
+          } else {
+            pwaEl.showDialog(true);
+          }
+        } catch (err) {
+          console.warn('[PWA] Native install prompt bypassed or failed:', err);
+          pwaEl.showDialog(true);
+        }
+      });
+
+      pwaEl.addEventListener('pwa-install-available-event', () => {
+        if (!isStandalone && canInstallPwaWithBle) {
+          btn.classList.remove('hidden');
+          pwaEl.style.display = '';
+        } else {
+          btn.classList.add('hidden');
+          pwaEl.style.display = 'none';
+        }
+      });
+
+      pwaEl.addEventListener('pwa-install-success-event', () => {
+        btn.classList.add('hidden');
+        if (pwaEl) pwaEl.style.display = 'none';
+      });
+    }
+
+    // Look up previously permitted Bluetooth devices on page load
+    await this.loadPermittedDevices();
+  }
+
+  initTabs() {
+    this.dom.tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.dom.tabBtns.forEach(b => b.classList.remove('active'));
+        this.dom.tabContents.forEach(c => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        const targetId = `tab-${btn.dataset.tab}`;
+        const targetContent = document.getElementById(targetId);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+      });
+    });
+  }
+
+  async loadPermittedDevices() {
+    try {
+      const permitted = await bleService.getPermittedDevices();
+      if (isDebug()) console.log(`[App] Found ${permitted.length} previously permitted device(s) on origin.`);
+      permitted.forEach(d => {
+        const model = DeviceProtocol.detectModel(d.name);
+        DeviceActions.addOrUpdateDevice({
+          id: d.id,
+          name: d.name || 'Seiko Clock',
+          model: model.type,
+        });
+      });
+    } catch (err) {
+      console.warn('[App] Error loading permitted devices:', err);
+    }
+  }
+
+  async pairNewClock(isExplicitNew = false) {
+    connectionStateStore.set('searching');
+    connectionStatusTextStore.set(i18n.t('sync.status.searching'));
+
+    try {
+      const device = await bleService.requestDevice();
+      const model = DeviceProtocol.detectModel(device.name);
+      DeviceActions.addOrUpdateDevice({
+        id: device.id,
+        name: device.name || 'Seiko Clock',
+        model: model.type,
+        isExplicitNew
+      });
+      DeviceActions.setActiveDevice(device.id);
+      return device;
+    } catch (err) {
+      connectionStateStore.set('disconnected');
+      const isBlocked = err.name === 'NotAllowedError' || /blocked|denied|permission/i.test(err.message || '');
+      if (isBlocked) {
+        connectionStatusTextStore.set(i18n.t('sync.status.blocked'));
+        if (this.diagnostics?.browser?.isBrave) {
+          this.dom.braveCompatBanner?.classList.remove('hidden');
+        } else {
+          this.dom.permissionBlockedBanner?.classList.remove('hidden');
+        }
+      } else {
+        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+      }
+      if (err.name !== 'NotFoundError' && !isBlocked) {
+        console.error('[App] Error pairing new clock:', err);
+      }
+      return null;
+    }
+  }
+
+  bindSyncAction() {
+    this.dom.syncBtn?.addEventListener('click', () => this.performSync());
+  }
+
+  async performSync() {
+    let activeDevice = activeDeviceStore.get();
+    let permittedDevices = await bleService.getPermittedDevices();
+    let targetDevice = permittedDevices.find(d => activeDevice && (d.id === activeDevice.id || (d.name && d.name === activeDevice.name)));
+
+    // If no exact match but permitted devices exist in Chrome, use the permitted device directly
+    if (!targetDevice && permittedDevices.length > 0) {
+      targetDevice = permittedDevices[0];
+      const model = DeviceProtocol.detectModel(targetDevice.name);
+      DeviceActions.addOrUpdateDevice({
+        id: targetDevice.id,
+        name: targetDevice.name || 'Seiko Clock',
+        model: model.type,
+      });
+      DeviceActions.setActiveDevice(targetDevice.id);
+    }
+
+    // If a scanning/picker popup will be shown, display "SEARCHING" with animated spinner
+    if (!targetDevice) {
+      connectionStateStore.set('searching');
+      connectionStatusTextStore.set(i18n.t('sync.status.searching'));
+    }
+
+    // If we have a stored device from localStorage but no live BluetoothDevice reference,
+    // use reconnectStoredDevice (narrow picker filtered to this specific device name).
+    // After the first picker confirmation, the device is session-cached and subsequent
+    // syncs won't show a popup at all.
+    if (!targetDevice && activeDevice) {
+      try {
+        targetDevice = await bleService.reconnectStoredDevice(activeDevice);
+        if (targetDevice) {
+          const model = DeviceProtocol.detectModel(targetDevice.name);
+          DeviceActions.addOrUpdateDevice({
+            id: targetDevice.id,
+            name: targetDevice.name || 'Seiko Clock',
+            model: model.type,
+          });
+          DeviceActions.setActiveDevice(targetDevice.id);
+        }
+      } catch (err) {
+        if (err.name === 'NotFoundError') {
+          // User cancelled the picker
+          connectionStateStore.set('disconnected');
+          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+          return;
+        }
+        const isBlocked = err.name === 'NotAllowedError' || /blocked|denied|permission/i.test(err.message || '');
+        if (isBlocked) {
+          connectionStateStore.set('disconnected');
+          connectionStatusTextStore.set(i18n.t('sync.status.blocked'));
+          if (this.diagnostics?.browser?.isBrave) {
+            this.dom.braveCompatBanner?.classList.remove('hidden');
+          } else {
+            this.dom.permissionBlockedBanner?.classList.remove('hidden');
+          }
+          return;
+        }
+        console.warn('[Sync] Reconnect failed, falling back to full picker:', err.message);
+      }
+    }
+
+    // Only show full picker dialog if no stored or permitted device exists at all
+    if (!targetDevice) {
+      targetDevice = await this.pairNewClock();
+      if (!targetDevice) {
+        return;
+      }
+    }
+
+    const config = DeviceProtocol.getConfig(targetDevice.name || '');
+
+    try {
+      connectionStateStore.set('connecting');
+      connectionStatusTextStore.set(`${i18n.t('sync.btn.connecting')} ${targetDevice.name || 'clock'}...`);
+
+      // 1. Fetch fresh atomic time FIRST (prior to opening BLE GATT connection)
+      if (settingsStore.get().useApi) {
+        try {
+          await timeService.fetchApiTime();
+        } catch (e) {
+          console.warn('[Sync] Time API pre-fetch warning, continuing:', e);
+        }
+      }
+
+      // 2. Pre-compute target time & payload BEFORE connecting so there is zero idle sleep while connected
+      const targetDate = this.clockView.getImmediateSyncTarget();
+      const payload = DeviceProtocol.buildTimePayload(targetDate);
+
+      // 3. Connect to GATT
+      await bleService.connect(targetDevice);
+
+      connectionStateStore.set('syncing');
+      connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
+
+      // 4. Write Time Payload IMMEDIATELY upon connect (zero idle delay)
+      if (isDebug()) console.log(`[Sync] Writing Time Payload to ${config.timeWriteCharUUID}:`, DeviceProtocol.formatPayload(payload));
+      await bleService.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
+      await new Promise(r => setTimeout(r, 60));
+      try {
+        await bleService.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
+      } catch (e) {
+        // First packet already sent successfully
+      }
+      await new Promise(r => setTimeout(r, 80));
+      if (isDebug()) console.log(`[Sync] SUCCESS! Transmitted time packet to ${targetDevice.name}`);
+
+      // 5. Explicit clean GATT disconnect so Seiko clock immediately exits BLE sync mode and renders the new time
+      try {
+        await bleService.disconnect();
+      } catch (e) {
+        // Safe to ignore if already dropped by peripheral
+      }
+
+      // 6. Update Success State
+      const syncTimeStr = targetDate.toLocaleTimeString();
+      connectionStateStore.set('connected');
+      connectionStatusTextStore.set(`${i18n.t('sync.status.synced')} ${syncTimeStr} → ${targetDevice.name}`);
+
+      DeviceActions.updateSyncTimestamp(targetDevice.id);
+
+      // Log entry
+      const log = syncLogStore.get();
+      syncLogStore.set([{
+        timestamp: Date.now(),
+        success: true,
+        device: targetDevice.name || 'Seiko Clock',
+        timeSynced: syncTimeStr
+      }, ...log.slice(0, 29)]);
+
+      setTimeout(() => {
+        if (connectionStateStore.get() === 'connected') {
+          connectionStateStore.set('disconnected');
+          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        }
+      }, 3500);
+
+    } catch (err) {
+      console.error('[Sync] Failed:', err);
+      connectionStateStore.set('error');
+      connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
+
+      const log = syncLogStore.get();
+      syncLogStore.set([{
+        timestamp: Date.now(),
+        success: false,
+        detail: `${targetDevice?.name || 'Device'}: ${err.message}`
+      }, ...log.slice(0, 29)]);
+
+      setTimeout(() => {
+        if (connectionStateStore.get() === 'error') {
+          connectionStateStore.set('disconnected');
+          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        }
+      }, 4000);
+    }
+  }
+}
+
+// Kick off on load
+const app = new App();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => app.init());
+} else {
+  app.init();
+}
