@@ -4034,6 +4034,12 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   font-weight: 600;
 }
 
+.diagnostic-badge.warning {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
 .diagnostic-meta-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -4061,6 +4067,7 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 .diagnostic-meta-val.success { color: var(--success); }
 .diagnostic-meta-val.warning { color: var(--warning); }
+.diagnostic-meta-val.danger { color: #f87171; }
 
 .diagnostic-section-title {
   display: flex;

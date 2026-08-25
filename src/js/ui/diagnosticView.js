@@ -154,7 +154,16 @@ export class DiagnosticView {
     const emailBtn = document.getElementById('diagEmailDevBtn');
 
     if (nameEl) nameEl.textContent = report.device?.name || 'Unknown Clock';
-    if (modelEl) modelEl.textContent = `Model: ${report.device?.detectedModel?.type || 'Auto-detect'}`;
+    
+    if (modelEl) {
+      if (report.seikoRecognition?.isSeikoHardware) {
+        modelEl.textContent = `Model: ${report.device?.detectedModel?.type || 'Auto-detect'}`;
+        modelEl.className = 'diagnostic-badge';
+      } else {
+        modelEl.textContent = 'Non-Seiko Peripheral';
+        modelEl.className = 'diagnostic-badge warning';
+      }
+    }
 
     let totalChars = 0;
     (report.services || []).forEach(s => {
@@ -170,9 +179,12 @@ export class DiagnosticView {
       if (successfulProbes.length > 0) {
         probeStatusEl.textContent = `${successfulProbes.length} Match(es)`;
         probeStatusEl.className = 'diagnostic-meta-val success';
-      } else {
-        probeStatusEl.textContent = 'Custom Stack';
+      } else if (report.seikoRecognition?.isSeikoHardware) {
+        probeStatusEl.textContent = 'Custom Seiko';
         probeStatusEl.className = 'diagnostic-meta-val warning';
+      } else {
+        probeStatusEl.textContent = 'Non-Seiko';
+        probeStatusEl.className = 'diagnostic-meta-val danger';
       }
     }
 

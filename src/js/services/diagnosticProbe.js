@@ -217,6 +217,25 @@ export class DiagnosticProbeService {
       report.probeResults.push(probe);
     }
 
+    // Evaluate Seiko hardware authenticity
+    const hasSeikoServices = report.services.some(s => {
+      const u = (s.uuid || '').toLowerCase();
+      return u.includes('fff0') || u.includes('1806') || u.includes('5301') || u.includes('ffe0') || u.includes('ffe1');
+    });
+    const matchedProbes = report.probeResults.filter(p => p.serviceFound);
+
+    report.seikoRecognition = {
+      isSeikoHardware: hasSeikoServices || matchedProbes.length > 0,
+      confidence: matchedProbes.length > 0 
+        ? 'VERIFIED_SEIKO_CLOCK' 
+        : (hasSeikoServices ? 'PROBABLE_SEIKO' : 'UNRECOGNIZED_NON_SEIKO_PERIPHERAL'),
+      assessment: matchedProbes.length > 0 
+        ? 'Matches known Seiko clock GATT hardware stack.'
+        : (hasSeikoServices 
+            ? 'Contains Seiko GATT signature services, but write characteristic may be custom or proprietary.'
+            : 'Warning: No Seiko GATT services or clock protocols detected. This peripheral appears to be a non-Seiko Bluetooth device.')
+    };
+
     onProgress({ step: 5, text: 'Diagnostic scan complete.' });
 
     return report;
@@ -237,6 +256,7 @@ Here is my Seiko clock diagnostic report for device "${deviceName}":
 
 Clock Name: ${report.device?.name}
 Detected Model: ${report.device?.detectedModel?.type || 'Unknown'}
+Hardware Status: ${report.seikoRecognition?.confidence} (${report.seikoRecognition?.isSeikoHardware ? 'Seiko Compatible' : 'NON-SEIKO DEVICE'})
 Platform: ${report.environment?.userAgent}
 Discovered Services (${report.services?.length || 0}):
 ${(report.services || []).map(s => ` - ${s.label} (${s.uuid}) [${s.characteristics.length} chars]`).join('\n')}
