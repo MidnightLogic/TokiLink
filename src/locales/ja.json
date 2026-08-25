@@ -137,7 +137,7 @@
   "ss201.alarm.sound4": "FMラジオ プリセット 2",
   "ss201.radio.title": "FMラジオ",
   "ss201.radio.presets": "プリセット局",
-  "ss201.radio.editPresets": "プリセット編集",
+  "ss201.radio.editPreset": "プリセット編集",
   "ss201.radio.preset": "プリセット",
   "ss201.radio.volume": "音量",
   "ss201.display.title": "画面表示設定",

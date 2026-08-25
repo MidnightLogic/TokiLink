@@ -139,7 +139,7 @@
   "ss201.alarm.sound4": "FM Radio Preset 2",
   "ss201.radio.title": "FM Radio",
   "ss201.radio.presets": "Preset Channels",
-  "ss201.radio.editPresets": "Edit Presets",
+  "ss201.radio.editPreset": "Edit Preset",
   "ss201.radio.preset": "Preset",
   "ss201.radio.volume": "Volume",
   "ss201.display.title": "Display Settings",

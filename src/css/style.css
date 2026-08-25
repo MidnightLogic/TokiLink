@@ -2712,10 +2712,20 @@ body::after {
   font-family: var(--font-mono);
   font-size: 3.2rem;
   font-weight: 700;
-  width: 160px;
+  min-width: 190px;
+  width: 5.5ch;
+  max-width: 230px;
   text-align: center;
   outline: none;
   transition: border-color var(--transition-fast);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.radio-freq-input::-webkit-outer-spin-button,
+.radio-freq-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .radio-freq-input:focus {
