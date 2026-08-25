@@ -11,17 +11,16 @@
 
 export const DeviceProtocol = {
   NAME_FILTERS: [
-    'STCC', 'stcc', 'Stcc',
-    'DL', 'dl', 'Dl',
-    'SS', 'ss', 'Ss',
-    'SS201', 'SS501', 'SSUSE',
-    'SQ', 'sq', 'SQ820', 'SQ821',
-    'ZS', 'zs', 'ZS450', 'ZS451', 'ZS250', 'ZS251', 'ZS252', 'ZS253', 'ZS254', 'ZS255', 'ZS256',
-    'QHB', 'qhb',
-    'NGAN', 'ngan',
-    'OPTEK', 'optek',
-    'SEIKO', 'Seiko', 'seiko',
-    'Clock', 'clock', 'CLOCK'
+    'STCC',
+    'DL',
+    'SS',
+    'SQ',
+    'ZS',
+    'QHB',
+    'NGAN',
+    'OPTEK',
+    'SEIKO',
+    'Clock'
   ],
 
   SERIES: {

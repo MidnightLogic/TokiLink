@@ -327,6 +327,16 @@ export class BluetoothService {
       this._characteristics.set(key, characteristic);
       return characteristic;
     } catch (err) {
+      // If service or characteristic does not exist on this peripheral, do NOT reconnect GATT!
+      const isNotFound = err.name === 'NotFoundError' || (err.message && (
+        err.message.includes('not found') ||
+        err.message.includes('No Services matching') ||
+        err.message.includes('No Characteristics matching')
+      ));
+      if (isNotFound) {
+        throw err;
+      }
+
       debug.log('[BLE Debug] Stale socket detected, re-establishing fresh channel...');
       await new Promise(r => setTimeout(r, 150));
       this._server = await this._device.gatt.connect();
@@ -368,43 +378,37 @@ export class BluetoothService {
 
     if (characteristic.writeValueWithResponse) {
       await characteristic.writeValueWithResponse(buffer);
-    } else {
+    } else if (characteristic.writeValue) {
       await characteristic.writeValue(buffer);
     }
   }
 
-  /**
-   * Universal Clock Time Sync method supporting all Seiko clock series:
-   *  - Multi-Sound Series (SS501, SS201)
-   *  - Series C3 (DL308K)
-   *  - Standard Digital SQ Series (SQ820, SQ821)
-   *  - NexTime Hybrid Series (ZS450, ZS451, ZS250..256, QHB201)
-   *  - Generic / Custom-named Seiko Bluetooth Clocks (Adaptive Multi-Protocol Probing)
-   */
-  async syncClockTime(device, targetDate = new Date()) {
-    const config = DeviceProtocol.getConfig(device?.name || '');
-    debug.log(`[BLE Sync] Starting sync for "${device?.name || 'clock'}" (detected: ${config.type}, protocol: ${config.protocol})`);
+  // ─── Adaptive Protocol Synchronization Engine ─────────────────
 
-    // Build ordered list of candidate protocols to try:
-    // If the device name matched a specific protocol, place it first, followed by all fallback candidates.
-    const candidates = [];
-    if (config.protocol && config.protocol !== 'auto_detect') {
-      const preferred = DeviceProtocol.CANDIDATE_PROTOCOLS.find(p => p.id === config.protocol);
-      if (preferred) candidates.push(preferred);
+  /**
+   * Performs high-speed clock synchronization with adaptive protocol probing.
+   */
+  async syncTime(device, targetDate = new Date()) {
+    let bleDevice = this._device;
+
+    if (!this.isConnected || this._device?.id !== device.id) {
+      if (this._sessionDeviceCache.has(device.id)) {
+        bleDevice = this._sessionDeviceCache.get(device.id);
+        await this.connect(bleDevice);
+      } else {
+        bleDevice = await this.reconnectStoredDevice(device);
+        await this.connect(bleDevice);
+      }
     }
 
-    DeviceProtocol.CANDIDATE_PROTOCOLS.forEach(cand => {
-      if (!candidates.some(c => c.id === cand.id)) {
-        candidates.push(cand);
-      }
-    });
+    const config = DeviceProtocol.getConfig(device.name);
+    const candidates = DeviceProtocol.getCandidateProtocols(config.protocol);
 
     let lastError = null;
 
-    // Probe candidate protocols in sequence until a matching GATT service & characteristic succeeds
     for (const proto of candidates) {
       try {
-        debug.log(`[BLE Sync] Attempting synchronization via ${proto.name} (${proto.timeServiceUUID})...`);
+        debug.log(`[BLE Sync] Attempting time sync via protocol: ${proto.name}...`);
 
         if (proto.payloadType === 'nexTime_8byte') {
           // NexTime LPWISE 8-byte write
@@ -434,13 +438,8 @@ export class BluetoothService {
           await new Promise(r => setTimeout(r, 100));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
-          // Read battery telemetry while GATT connection is active
-          try {
-            await Promise.race([
-              this.readBatteryLevel(device),
-              new Promise(r => setTimeout(r, 350))
-            ]);
-          } catch (e) {}
+          // Background battery telemetry query
+          this.readBatteryLevel(device).catch(() => {});
 
           return { success: true, protocol: proto.id, series: proto.series, payload };
         } else {
@@ -450,13 +449,8 @@ export class BluetoothService {
           await new Promise(r => setTimeout(r, 60));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
-          // Read battery telemetry while GATT connection is active
-          try {
-            await Promise.race([
-              this.readBatteryLevel(device),
-              new Promise(r => setTimeout(r, 350))
-            ]);
-          } catch (e) {}
+          // Background battery telemetry query
+          this.readBatteryLevel(device).catch(() => {});
 
           return { success: true, protocol: proto.id, series: proto.series, payload };
         }
@@ -473,7 +467,7 @@ export class BluetoothService {
    * Safely reads battery level percentage from standard Bluetooth Battery Service (0x180F / 0x2A19).
    */
   async readBatteryLevel(device) {
-    if (!device) return null;
+    if (!device || !this.isConnected) return null;
     try {
       const char = await this.getCharacteristic('0000180f-0000-1000-8000-00805f9b34fb', '00002a19-0000-1000-8000-00805f9b34fb');
       if (char && char.readValue) {
@@ -498,7 +492,7 @@ export class BluetoothService {
         }
       }
     } catch (e) {
-      debug.warn('[BLE] Battery level read skipped:', e.message);
+      // Expected for clocks without battery service
     }
     return null;
   }

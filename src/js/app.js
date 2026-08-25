@@ -7,14 +7,14 @@
 
 import {
   createIcons,
-  Clock, Settings as SettingsIcon, AlertTriangle, Pencil,
+  Clock, Settings as SettingsIcon, AlertTriangle, AlertCircle, Pencil,
   Bluetooth, Bell, Radio, Sun, X, Loader2, Check,
   XCircle, CheckCircle2, Plus, Moon, Volume1, Volume2,
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
   Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight,
-  Cpu, ScanSearch, Play, Layers, Send, Mail
+  Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark
 } from 'lucide';
 
 import { registerSW } from 'virtual:pwa-register';
@@ -70,14 +70,14 @@ import { DiagnosticView } from './ui/diagnosticView.js';
 import { i18n } from './i18n.js';
 
 const LUCIDE_ICONS = {
-  Clock, Settings: SettingsIcon, AlertTriangle, Pencil,
+  Clock, Settings: SettingsIcon, AlertTriangle, AlertCircle, Pencil,
   Bluetooth, Bell, Radio, Sun, X, Loader2, Check,
   XCircle, CheckCircle2, Plus, Moon, Volume1, Volume2,
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
   Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight,
-  Cpu, ScanSearch, Play, Layers, Send, Mail
+  Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark
 };
 
 export function renderIcons() {
