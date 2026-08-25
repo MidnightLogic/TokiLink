@@ -712,20 +712,6 @@
             <label class="toggle-slider" for="use24hToggle"></label>
           </div>
         </div>
-      </div>
-      <div class="settings-group">
-        <div class="settings-group-title" data-i18n="settings.diagnostics">Diagnostics</div>
-        <div class="settings-row">
-          <div>
-            <label for="debugToggle" data-i18n="settings.debug">Debug logging</label>
-            <div class="settings-desc" data-i18n="settings.debug.desc">Log BLE payload bytes and timing to browser console
-            </div>
-          </div>
-          <div class="toggle-switch">
-            <input type="checkbox" id="debugToggle">
-            <label class="toggle-slider" for="debugToggle"></label>
-          </div>
-        </div>
         <div class="settings-tip-box">
           <div class="settings-tip-header">
             <div class="settings-tip-title-wrap">
@@ -739,6 +725,23 @@
           </div>
           <p class="settings-tip-text" data-i18n="settings.persistentTipDesc">
             Enable persistent Bluetooth permissions in your browser to remember your clock permanently across reloads for instant 1-click sync.
+          </p>
+        </div>
+
+        <!-- Diagnostic & Hardware Support -->
+        <div class="settings-tip-box" style="margin-top: var(--space-sm); border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.08);">
+          <div class="settings-tip-header">
+            <div class="settings-tip-title-wrap" style="color: #38bdf8;">
+              <i data-lucide="cpu" width="14" height="14" style="color: #38bdf8;"></i>
+              <span data-i18n="settings.diagnosticTipTitle">Hardware Diagnostic</span>
+            </div>
+            <button type="button" class="settings-tip-btn" id="openDiagnosticModalBtn" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+              <span data-i18n="settings.inspectClock">Inspect Clock</span>
+              <i data-lucide="chevron-right" width="13" height="13"></i>
+            </button>
+          </div>
+          <p class="settings-tip-text" data-i18n="settings.diagnosticTipDesc">
+            Run a deep GATT hardware scan on any Seiko clock to inspect services &amp; characteristics, test compatibility, and export a support package.
           </p>
         </div>
       </div>
@@ -769,18 +772,16 @@
               <i data-lucide="zap" width="18" height="18"></i>
             </div>
             <div>
-              <h3 class="modal-title" data-i18n="guide.modalTitle">1-Click Fast Sync Setup</h3>
-              <span class="backend-guide-sub" data-i18n="guide.modalSubtitle">Enable permanent device remembering in Chrome / Brave / Edge</span>
+              <h3 data-i18n="guide.title">1-Click Fast Sync Setup</h3>
+              <span class="backend-guide-sub" data-i18n="guide.sub">Enable persistent Web Bluetooth permissions</span>
             </div>
           </div>
-          <button class="modal-close-btn" id="backendGuideModalCloseBtn">
-            <i data-lucide="x" width="18" height="18"></i>
-          </button>
+          <button class="modal-close-btn" id="backendGuideModalCloseBtn"><i data-lucide="x"></i></button>
         </div>
 
         <div class="backend-guide-body">
           <p class="backend-guide-intro" data-i18n="guide.intro">
-            By default, desktop browsers ask you to select your clock each time. Enabling this Chrome flag allows TokiLink to remember your clock permanently across reloads for instant 1-click sync without repeating the device chooser dialog.
+            By default, desktop browsers prompt a device picker on each page reload. Follow these 2 quick steps in Chrome, Edge, Brave, or Opera to allow seamless, instant 1-click sync without repeating dialogs:
           </p>
 
           <div class="backend-guide-steps">
@@ -788,12 +789,12 @@
             <div class="backend-guide-step">
               <span class="backend-step-badge">1</span>
               <div class="backend-step-content">
-                <span class="backend-step-label" data-i18n="guide.step1">Copy and paste this URL into your browser address bar:</span>
+                <span class="backend-step-label" data-i18n="guide.step1Label">Copy and paste this flag URL into your address bar:</span>
                 <div class="backend-flag-copy-wrap">
-                  <code class="backend-flag-code" id="backendFlagCode">chrome://flags/#enable-web-bluetooth-new-permissions-backend</code>
-                  <button type="button" class="backend-flag-copy-btn" id="copyBackendFlagBtn" title="Copy flag URL">
+                  <code class="backend-flag-code" id="backendGuideFlagCode">chrome://flags/#enable-web-bluetooth-new-permissions-backend</code>
+                  <button type="button" class="backend-flag-copy-btn" id="copyBackendGuideFlagBtn" title="Copy flag URL">
                     <i data-lucide="copy" width="12" height="12"></i>
-                    <span id="copyBackendFlagText" data-i18n="banner.copy">Copy</span>
+                    <span id="copyBackendGuideFlagText" data-i18n="banner.copy">Copy Flag</span>
                   </button>
                 </div>
               </div>
@@ -803,47 +804,154 @@
             <div class="backend-guide-step">
               <span class="backend-step-badge">2</span>
               <div class="backend-step-content">
-                <span class="backend-step-label" data-i18n="guide.step2">Set <strong>Use the new permissions backend for Web Bluetooth</strong> to <strong>Enabled</strong>.</span>
-              </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="backend-guide-step">
-              <span class="backend-step-badge">3</span>
-              <div class="backend-step-content">
-                <span class="backend-step-label" data-i18n="guide.step3">Click the blue <strong>Relaunch</strong> button at the bottom of your browser window.</span>
+                <span class="backend-step-label" data-i18n="guide.step2Label">Set the flag dropdown to <strong>Enabled</strong>, then click <strong>Relaunch</strong>.</span>
               </div>
             </div>
           </div>
 
-          <!-- Brave Note -->
-          <div class="backend-brave-box">
-            <div class="backend-brave-header">
-              <i data-lucide="shield-alert" width="13" height="13"></i>
-              <span>Brave Browser Users</span>
-            </div>
-            <p class="backend-brave-text" data-i18n="guide.braveNote">
-              In Brave, enable both the Web Bluetooth API and the New Permissions Backend flags:
-            </p>
-            <div class="backend-flag-copy-wrap">
-              <code class="backend-flag-code" id="braveGuideFlagCode">brave://flags/#brave-web-bluetooth-api</code>
-              <button type="button" class="backend-flag-copy-btn" id="copyBraveGuideFlagBtn" title="Copy Brave Bluetooth flag URL">
-                <i data-lucide="copy" width="12" height="12"></i>
-                <span id="copyBraveGuideFlagText" data-i18n="banner.copy">Copy Flag 1</span>
-              </button>
-            </div>
-            <div class="backend-flag-copy-wrap" style="margin-top: 4px;">
-              <code class="backend-flag-code" id="braveBackendFlagCode">brave://flags/#enable-web-bluetooth-new-permissions-backend</code>
-              <button type="button" class="backend-flag-copy-btn" id="copyBraveBackendFlagBtn" title="Copy Brave backend flag URL">
-                <i data-lucide="copy" width="12" height="12"></i>
-                <span id="copyBraveBackendFlagText" data-i18n="banner.copy">Copy Flag 2</span>
-              </button>
+          <!-- Note for Brave -->
+          <div class="backend-guide-step" style="border-color: rgba(249, 115, 22, 0.3); background: rgba(249, 115, 22, 0.08);">
+            <div class="backend-step-badge" style="background: #f97316;">★</div>
+            <div class="backend-step-content">
+              <span class="backend-step-label" style="color: var(--text-primary);" data-i18n="guide.braveNote">
+                <strong>Brave Browser Users:</strong> Make sure both the Web Bluetooth API and New Permissions Backend flags are enabled:
+              </span>
+              <div class="backend-flag-copy-wrap" style="margin-top: 4px;">
+                <code class="backend-flag-code" id="braveApiFlagCode">brave://flags/#brave-web-bluetooth-api</code>
+                <button type="button" class="backend-flag-copy-btn" id="copyBraveGuideFlagBtn" title="Copy Brave Bluetooth flag URL">
+                  <i data-lucide="copy" width="12" height="12"></i>
+                  <span id="copyBraveGuideFlagText" data-i18n="banner.copy">Copy Flag 1</span>
+                </button>
+              </div>
+              <div class="backend-flag-copy-wrap" style="margin-top: 4px;">
+                <code class="backend-flag-code" id="braveBackendFlagCode">brave://flags/#enable-web-bluetooth-new-permissions-backend</code>
+                <button type="button" class="backend-flag-copy-btn" id="copyBraveBackendFlagBtn" title="Copy Brave backend flag URL">
+                  <i data-lucide="copy" width="12" height="12"></i>
+                  <span id="copyBraveBackendFlagText" data-i18n="banner.copy">Copy Flag 2</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="modal-footer" style="padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--border);">
           <button type="button" class="modal-btn-save" id="backendGuideModalGotItBtn" data-i18n="guide.close" style="width: 100%;">Got It</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Bluetooth Hardware Diagnostic & Support Inspector Modal ═══ -->
+    <div class="modal-overlay hidden" id="diagnosticModalOverlay">
+      <div class="modal-card diagnostic-modal-card">
+        <div class="modal-header">
+          <div class="diagnostic-title-wrap">
+            <div class="diagnostic-icon-badge">
+              <i data-lucide="cpu" width="18" height="18"></i>
+            </div>
+            <div>
+              <h3 data-i18n="diagnostic.title">Hardware Diagnostic &amp; Support</h3>
+              <span class="diagnostic-modal-sub" data-i18n="diagnostic.sub">GATT Service Inspector &amp; Support Package</span>
+            </div>
+          </div>
+          <button class="modal-close-btn" id="diagnosticModalCloseBtn"><i data-lucide="x"></i></button>
+        </div>
+
+        <div class="diagnostic-modal-body" id="diagnosticModalBody">
+          <!-- Step 1: Idle / Initial Trigger State -->
+          <div class="diagnostic-idle-view" id="diagnosticIdleView">
+            <div class="diagnostic-intro-card">
+              <div class="diagnostic-intro-icon">
+                <i data-lucide="scan-search" width="32" height="32"></i>
+              </div>
+              <h4 data-i18n="diagnostic.introTitle">Inspect Clock &amp; Export Diagnostic Package</h4>
+              <p data-i18n="diagnostic.introDesc">
+                Connect and deeply scan your Seiko clock to inspect its hardware GATT services, read descriptors, test protocol compatibility, and generate a support package for the developers.
+              </p>
+              <button type="button" class="diagnostic-run-btn" id="startDiagnosticScanBtn">
+                <i data-lucide="play" width="15" height="15"></i>
+                <span data-i18n="diagnostic.startScan">Start Diagnostic Scan</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Scanning Progress State -->
+          <div class="diagnostic-progress-view hidden" id="diagnosticProgressView">
+            <div class="diagnostic-spinner-wrap">
+              <div class="diagnostic-spinner"></div>
+              <i data-lucide="bluetooth" class="diagnostic-spinner-icon" width="22" height="22"></i>
+            </div>
+            <div class="diagnostic-progress-status" id="diagnosticProgressText">Connecting to clock...</div>
+            <div class="diagnostic-progress-bar-wrap">
+              <div class="diagnostic-progress-bar-fill" id="diagnosticProgressBarFill" style="width: 20%;"></div>
+            </div>
+          </div>
+
+          <!-- Step 3: Scan Results & Report View -->
+          <div class="diagnostic-results-view hidden" id="diagnosticResultsView">
+            <!-- Summary Banner -->
+            <div class="diagnostic-summary-card">
+              <div class="diagnostic-summary-header">
+                <div class="diagnostic-device-title" id="diagDeviceName">Seiko Clock</div>
+                <span class="diagnostic-badge" id="diagDeviceModel">Detected: Auto-detect</span>
+              </div>
+              <div class="diagnostic-meta-grid">
+                <div class="diagnostic-meta-item">
+                  <span class="diagnostic-meta-label">Services Discovered</span>
+                  <span class="diagnostic-meta-val" id="diagServicesCount">0</span>
+                </div>
+                <div class="diagnostic-meta-item">
+                  <span class="diagnostic-meta-label">Characteristics</span>
+                  <span class="diagnostic-meta-val" id="diagCharsCount">0</span>
+                </div>
+                <div class="diagnostic-meta-item">
+                  <span class="diagnostic-meta-label">NTP Offset</span>
+                  <span class="diagnostic-meta-val" id="diagNtpOffset">0 ms</span>
+                </div>
+                <div class="diagnostic-meta-item">
+                  <span class="diagnostic-meta-label">Probe Status</span>
+                  <span class="diagnostic-meta-val success" id="diagProbeStatus">Probed</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Discovered GATT Tree -->
+            <div class="diagnostic-section-title">
+              <i data-lucide="layers" width="14" height="14"></i>
+              <span>GATT Hardware Tree</span>
+            </div>
+            <div class="diagnostic-tree-container" id="diagGattTree">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Export / Support Actions -->
+            <div class="diagnostic-section-title">
+              <i data-lucide="send" width="14" height="14"></i>
+              <span>Send Support Package</span>
+            </div>
+            <div class="diagnostic-actions-panel">
+              <a href="#" class="diag-action-btn primary" id="diagEmailDevBtn" target="_blank" rel="noopener noreferrer">
+                <i data-lucide="mail" width="15" height="15"></i>
+                <span>Email Package to Developer</span>
+              </a>
+              <div class="diag-sub-actions-row">
+                <button type="button" class="diag-action-btn secondary" id="diagCopyJsonBtn">
+                  <i data-lucide="copy" width="14" height="14"></i>
+                  <span id="diagCopyJsonText">Copy JSON Report</span>
+                </button>
+                <button type="button" class="diag-action-btn secondary" id="diagDownloadJsonBtn">
+                  <i data-lucide="download" width="14" height="14"></i>
+                  <span>Download .json</span>
+                </button>
+                <button type="button" class="diag-action-btn tertiary" id="diagRescanBtn" title="Rescan Clock">
+                  <i data-lucide="refresh-cw" width="14" height="14"></i>
+                </button>
+              </div>
+              <div class="diag-support-email-note">
+                <span class="diag-email-tag">Support Email:</span>
+                <code>midnightlogicsoftware@protonmail.com</code>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

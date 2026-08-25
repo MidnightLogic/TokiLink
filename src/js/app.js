@@ -13,7 +13,8 @@ import {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight
+  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight,
+  Cpu, ScanSearch, Play, Layers, Send, Mail
 } from 'lucide';
 
 import { registerSW } from 'virtual:pwa-register';
@@ -65,6 +66,7 @@ import { AlarmView } from './ui/alarmView.js';
 import { RadioView } from './ui/radioView.js';
 import { DisplayView } from './ui/displayView.js';
 import { SettingsView } from './ui/settingsView.js';
+import { DiagnosticView } from './ui/diagnosticView.js';
 import { i18n } from './i18n.js';
 
 const LUCIDE_ICONS = {
@@ -74,7 +76,8 @@ const LUCIDE_ICONS = {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight
+  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight,
+  Cpu, ScanSearch, Play, Layers, Send, Mail
 };
 
 export function renderIcons() {
@@ -262,6 +265,7 @@ class App {
     this.radioView = new RadioView(this.dom, renderIcons);
     this.displayView = new DisplayView(this.dom, renderIcons);
     this.settingsView = new SettingsView(this.dom, () => syncLogStore.set([]), renderIcons);
+    this.diagnosticView = new DiagnosticView(this.dom, renderIcons);
 
     this.initTabs();
     this.bindSyncAction();
