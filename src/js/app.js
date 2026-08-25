@@ -13,7 +13,7 @@ import {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight,
+  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight, ChevronDown,
   Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark
 } from 'lucide';
 
@@ -76,7 +76,7 @@ const LUCIDE_ICONS = {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight,
+  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight, ChevronDown,
   Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark
 };
 

@@ -105,6 +105,7 @@
   "diagnostic.introDesc": "セイコー時計に接続してGATTサービスと特性を解析し、プロトコル互換性をテストして開発者に共有できるサポートパッケージを出力します。",
   "diagnostic.noticeTitle": "⚠️ ディープスキャンに関するご注意:",
   "diagnostic.noticeDesc": "通常このスキャンは不要です。Bluetoothフィルターを解除して周囲のすべての機器（スマホ、テレビ、ビーコン等）を表示するため、端末名の取得に時間がかかります。通常の高速スキャンで時計が見つからない場合のみご利用ください。",
+  "diagnostic.advancedOptions": "高度なスキャンオプション",
   "diagnostic.deepDiscoveryLabel": "ディープスキャン（周囲のすべてのBluetooth機器を表示）",
   "diagnostic.filteredTip": "高速スキャン: セイコーのプレフィックス（DL, SS, SQ, ZS, STCC等）で絞り込み、電波混雑を防いで瞬時にペアリングします。",
   "diagnostic.startScan": "診断スキャンを開始",

@@ -50,15 +50,23 @@ export class DiagnosticView {
     const retryBtn = document.getElementById('diagRetryBtn');
     const cancelBtn = document.getElementById('diagCancelBtn');
 
-    startScanBtn?.addEventListener('click', () => this.runScan());
-    rescanBtn?.addEventListener('click', () => this.runScan());
+    startScanBtn?.addEventListener('click', () => {
+      this.cachedDiagnosticDevice = null;
+      this.runScan();
+    });
+    rescanBtn?.addEventListener('click', () => {
+      this.cachedDiagnosticDevice = null;
+      this.runScan();
+    });
     retryBtn?.addEventListener('click', () => this.runScan());
     cancelBtn?.addEventListener('click', () => this.resetToIdle());
 
-    // Deep Discovery Checkbox Toggle
+    // Deep Discovery Checkbox Toggle & Accordion
     const deepToggle = document.getElementById('diagDeepDiscoveryToggle');
     const unfilteredNotice = document.getElementById('diagUnfilteredNotice');
     const filteredTip = document.getElementById('diagFilteredTip');
+    const accordion = document.getElementById('diagAdvancedAccordion');
+
     deepToggle?.addEventListener('change', (e) => {
       if (e.target.checked) {
         unfilteredNotice?.classList.remove('hidden');
@@ -67,6 +75,11 @@ export class DiagnosticView {
         unfilteredNotice?.classList.add('hidden');
         filteredTip?.classList.remove('hidden');
       }
+      this.renderIcons();
+    });
+
+    accordion?.addEventListener('toggle', () => {
+      this.renderIcons();
     });
 
     // Copy JSON Report Handler
@@ -101,6 +114,8 @@ export class DiagnosticView {
     const errorActions = document.getElementById('diagnosticErrorActions');
     const spinnerWrap = document.getElementById('diagnosticSpinnerWrap');
     const progressWrap = document.getElementById('diagnosticProgressBarWrap');
+
+    this.cachedDiagnosticDevice = null;
 
     idleView?.classList.remove('hidden');
     progressView?.classList.add('hidden');

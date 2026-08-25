@@ -105,6 +105,7 @@
   "diagnostic.introDesc": "连接并深度扫描您的精工时钟，检查 GATT 硬件服务，读取描述符，测试协议兼容性，并生成可直接分享给开发团队的支持数据包。",
   "diagnostic.noticeTitle": "⚠️ 深度搜索模式注意事项：",
   "diagnostic.noticeDesc": "通常不需要开启深度搜索。此模式会关闭所有蓝牙过滤规则，列出周围所有的蓝牙设备（手机、电视、信标等），检索设备名称需要数秒时间。仅在默认的快速扫描无法搜索到您的精工时钟时使用。",
+  "diagnostic.advancedOptions": "高级扫描选项",
   "diagnostic.deepDiscoveryLabel": "深度搜索模式（扫描附近所有蓝牙设备）",
   "diagnostic.filteredTip": "快速扫描：自动按精工已知前缀（DL、SS、SQ、ZS、STCC等）筛选，即时配对并避免蓝牙空中信道拥堵。",
   "diagnostic.startScan": "开始诊断扫描",

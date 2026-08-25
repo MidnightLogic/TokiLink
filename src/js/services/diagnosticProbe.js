@@ -165,6 +165,10 @@ export class DiagnosticProbeService {
       } catch (err) {
         lastConnectError = err;
         report.errors.push(`GATT connection attempt ${attempt} failed: ${err.message}`);
+        // If device origin permission is revoked / unauthorised, don't retry
+        if (err.name === 'SecurityError' || (err.message && /not authori[sz]ed|not permitted/i.test(err.message))) {
+          break;
+        }
         if (attempt < maxRetries) {
           onProgress({ step: 1, text: `Retrying connection in ${attempt * 300}ms...` });
           await new Promise(r => setTimeout(r, attempt * 300));

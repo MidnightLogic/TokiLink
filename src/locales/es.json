@@ -105,6 +105,7 @@
   "diagnostic.introDesc": "Conecte y analice su reloj Seiko para inspeccionar sus servicios GATT, leer descriptores y generar un paquete de soporte para los desarrolladores.",
   "diagnostic.noticeTitle": "⚠️ Advertencia de Búsqueda Profunda:",
   "diagnostic.noticeDesc": "El escaneo profundo generalmente no es necesario. Desactiva los filtros y muestra todos los dispositivos cercanos (móviles, televisores, balizas). La carga de nombres puede tardar varios segundos. Úselo únicamente si el escaneo rápido no encuentra su reloj.",
+  "diagnostic.advancedOptions": "Opciones avanzadas de análisis",
   "diagnostic.deepDiscoveryLabel": "Modo Búsqueda Profunda (Escanear todos los dispositivos Bluetooth)",
   "diagnostic.filteredTip": "Escaneo rápido: Filtra automáticamente prefijos Seiko conocidos (DL, SS, SQ, ZS, STCC, etc.) para emparejar al instante sin congestión.",
   "diagnostic.startScan": "Iniciar diagnóstico",
