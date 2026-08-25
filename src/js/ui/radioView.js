@@ -85,7 +85,16 @@ export class RadioView {
       () => this.flushBleVolume()
     );
 
-    // Preset Modal Controls
+    // Preset Controls & Modal
+    this.dom.radioSavePresetBtn?.addEventListener('click', () => {
+      const state = radioStore.get();
+      this.openPresetModal(state.activePreset || 0, true);
+    });
+
+    this.dom.editPresetsBtn?.addEventListener('click', () => {
+      this.openPresetModal(radioStore.get().activePreset || 0, false);
+    });
+
     this.dom.presetModalCloseBtn?.addEventListener('click', () => this.closePresetModal());
     this.dom.presetModalCancelBtn?.addEventListener('click', () => this.closePresetModal());
     this.dom.presetModalSaveBtn?.addEventListener('click', () => this.savePresetFromModal());
@@ -94,8 +103,11 @@ export class RadioView {
       if (this.dom.presetModalFreqInput) this.dom.presetModalFreqInput.value = current;
     });
 
-    this.dom.editPresetsBtn?.addEventListener('click', () => {
-      this.openPresetModal(radioStore.get().activePreset || 0);
+    document.querySelectorAll('#presetModalSlotPicker .segment-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const slot = Number(btn.dataset.slot) || 0;
+        this.switchModalPresetSlot(slot);
+      });
     });
   }
 
@@ -286,13 +298,15 @@ export class RadioView {
     this.sendToBle(payload);
   }
 
-  openPresetModal(chIndex) {
+  openPresetModal(chIndex, useCurrentFreq = false) {
     const state = radioStore.get();
-    const preset = state.presets[chIndex] || { ch: chIndex + 1, freq: '89.5', name: '' };
     this.currentEditingPresetIdx = chIndex;
+    const preset = state.presets[chIndex] || { ch: chIndex + 1, freq: '89.5', name: '' };
 
     const modal = this.dom.presetModalOverlay;
     if (!modal) return;
+
+    this.updateModalSlotPicker(chIndex);
 
     const presetPrefix = i18n.t('ss201.radio.preset') || 'Preset';
     const isDefault = !preset.name || /^(Preset|Station|Préréglage|Speicher|Presintonía|プリセット|预设)\s*\d+$/i.test(preset.name);
@@ -303,9 +317,32 @@ export class RadioView {
       this.dom.presetModalTitle.textContent = `${editTitleTemplate} (CH ${chIndex + 1})`;
     }
     if (this.dom.presetModalNameInput) this.dom.presetModalNameInput.value = defaultName;
-    if (this.dom.presetModalFreqInput) this.dom.presetModalFreqInput.value = preset.freq || '89.5';
+    if (this.dom.presetModalFreqInput) {
+      this.dom.presetModalFreqInput.value = useCurrentFreq ? (state.frequency || '89.5') : (preset.freq || '89.5');
+    }
 
     modal.classList.remove('hidden');
+  }
+
+  switchModalPresetSlot(slotIdx) {
+    this.currentEditingPresetIdx = slotIdx;
+    this.updateModalSlotPicker(slotIdx);
+    const state = radioStore.get();
+    const preset = state.presets[slotIdx] || { ch: slotIdx + 1, freq: '89.5', name: '' };
+    const presetPrefix = i18n.t('ss201.radio.preset') || 'Preset';
+    const isDefault = !preset.name || /^(Preset|Station|Préréglage|Speicher|Presintonía|プリセット|预设)\s*\d+$/i.test(preset.name);
+    if (this.dom.presetModalTitle) {
+      const editTitleTemplate = i18n.t('modal.preset.title') || 'Edit Preset Channel';
+      this.dom.presetModalTitle.textContent = `${editTitleTemplate} (CH ${slotIdx + 1})`;
+    }
+    if (this.dom.presetModalNameInput) this.dom.presetModalNameInput.value = isDefault ? `${presetPrefix} ${slotIdx + 1}` : preset.name;
+    if (this.dom.presetModalFreqInput) this.dom.presetModalFreqInput.value = preset.freq || '89.5';
+  }
+
+  updateModalSlotPicker(slotIdx) {
+    document.querySelectorAll('#presetModalSlotPicker .segment-btn').forEach(b => {
+      b.classList.toggle('active', Number(b.dataset.slot) === slotIdx);
+    });
   }
 
   closePresetModal() {
@@ -337,6 +374,29 @@ export class RadioView {
       const channelPayload = DeviceProtocol.buildSS201FMChannelSave(this.currentEditingPresetIdx, freq);
       this.sendToBle(channelPayload);
     }, 100);
+  }
+
+  async quickSaveCurrentFreqToPreset(slotIdx) {
+    const state = radioStore.get();
+    const currentFreq = parseFloat(state.frequency || '89.5').toFixed(1);
+    const presets = [...state.presets];
+    const existing = presets[slotIdx] || { ch: slotIdx + 1, freq: currentFreq, name: '' };
+    presets[slotIdx] = { ...existing, freq: currentFreq };
+
+    radioStore.set({ ...state, presets, activePreset: slotIdx });
+
+    // Flash the preset button visually
+    const grid = this.dom.presetGrid;
+    if (grid) {
+      const btn = grid.querySelectorAll('.preset-btn')[slotIdx];
+      if (btn) {
+        btn.classList.add('preset-saved-flash');
+        setTimeout(() => btn.classList.remove('preset-saved-flash'), 1200);
+      }
+    }
+
+    const channelPayload = DeviceProtocol.buildSS201FMChannelSave(slotIdx, currentFreq);
+    await this.sendToBle(channelPayload);
   }
 
   renderRadio(radio) {
@@ -395,14 +455,39 @@ export class RadioView {
       const btn = document.createElement('button');
       btn.className = `preset-btn ${isCurrent ? 'active' : ''}`;
       btn.dataset.freq = pFreq;
+      btn.title = 'Tap to tune, hold to save current station';
       btn.innerHTML = `
         <span class="preset-num">CH ${idx + 1}</span>
         <span class="preset-freq">${p.freq}</span>
         <span class="preset-name">${displayName}</span>
       `;
-      btn.addEventListener('click', () => {
-        this.selectPreset(idx);
+
+      let holdTimer = null;
+      let isHold = false;
+
+      btn.addEventListener('pointerdown', (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        isHold = false;
+        holdTimer = setTimeout(() => {
+          isHold = true;
+          this.quickSaveCurrentFreqToPreset(idx);
+        }, 850);
       });
+
+      const clearHold = () => {
+        if (holdTimer) clearTimeout(holdTimer);
+        holdTimer = null;
+      };
+
+      btn.addEventListener('pointerup', () => {
+        clearHold();
+        if (!isHold) {
+          this.selectPreset(idx);
+        }
+      });
+      btn.addEventListener('pointercancel', clearHold);
+      btn.addEventListener('contextmenu', (e) => e.preventDefault());
+
       grid.appendChild(btn);
     });
   }

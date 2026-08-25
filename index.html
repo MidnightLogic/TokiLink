@@ -503,7 +503,13 @@
           <div class="control-group">
             <div class="control-label-row">
               <label class="control-label" data-i18n="ss201.radio.presets">Preset Channels</label>
-              <button class="action-chip-btn" id="editPresetsBtn" data-i18n="ss201.radio.editPreset">Edit Preset</button>
+              <div class="preset-header-actions">
+                <button type="button" class="action-chip-btn" id="radioSavePresetBtn" data-i18n="ss201.radio.saveAsPreset">
+                  <i data-lucide="bookmark" width="12" height="12"></i>
+                  <span>Save as Preset</span>
+                </button>
+                <button type="button" class="action-chip-btn" id="editPresetsBtn" data-i18n="ss201.radio.editPreset">Edit Preset</button>
+              </div>
             </div>
             <div class="preset-grid" id="presetGrid">
 
@@ -679,6 +685,16 @@
           <button class="modal-close-btn" id="presetModalCloseBtn"><i data-lucide="x"></i></button>
         </div>
         <div class="modal-body">
+          <div class="modal-field">
+            <label data-i18n="modal.preset.channel">Preset Slot</label>
+            <div class="segmented-control preset-slot-segments" id="presetModalSlotPicker">
+              <button type="button" class="segment-btn active" data-slot="0">CH 1</button>
+              <button type="button" class="segment-btn" data-slot="1">CH 2</button>
+              <button type="button" class="segment-btn" data-slot="2">CH 3</button>
+              <button type="button" class="segment-btn" data-slot="3">CH 4</button>
+              <button type="button" class="segment-btn" data-slot="4">CH 5</button>
+            </div>
+          </div>
           <div class="modal-field">
             <label data-i18n="modal.preset.stationName">Station Name</label>
             <input type="text" id="presetModalNameInput" class="modal-text-input" maxlength="18" placeholder="e.g. J-WAVE, BBC 1">
