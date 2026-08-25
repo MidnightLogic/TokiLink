@@ -105,6 +105,8 @@
   "diagnostic.sub": "GATT Service Inspector & Support Package",
   "diagnostic.introTitle": "Inspect Clock & Export Diagnostic Package",
   "diagnostic.introDesc": "Connect and deeply scan your Seiko clock to inspect its hardware GATT services, read descriptors, test protocol compatibility, and generate a support package for the developers.",
+  "diagnostic.noticeTitle": "Device Selection Note:",
+  "diagnostic.noticeDesc": "Device name filters are disabled for this deep diagnostic scan so uncatalogued or rare Seiko models can be inspected. All Bluetooth devices in your vicinity will appear in the browser picker. Please choose your Seiko clock from the list (it may take a few moments for the browser to retrieve peripheral names).",
   "diagnostic.startScan": "Start Diagnostic Scan",
   "guide.modalTitle": "1-Click Fast Sync Setup",
   "guide.modalSubtitle": "Enable permanent device remembering in Chrome / Brave / Edge",

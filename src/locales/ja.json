@@ -103,6 +103,8 @@
   "diagnostic.sub": "GATT サービスインスペクター ＆ サポートパッケージ",
   "diagnostic.introTitle": "時計のハードウェア診断パッケージを生成",
   "diagnostic.introDesc": "セイコー時計に接続してGATTサービスと特性を解析し、プロトコル互換性をテストして開発者に共有できるサポートパッケージを出力します。",
+  "diagnostic.noticeTitle": "デバイス選択に関するご注意:",
+  "diagnostic.noticeDesc": "未登録または特殊なセイコーモデルを検出するため、デバイス名フィルターを解除しています。周囲のすべてのBluetooth機器が一覧に表示されます。一覧からお使いのセイコー時計を選択してください（端末名が表示されるまで数秒かかる場合があります）。",
   "diagnostic.startScan": "診断スキャンを開始",
   "guide.modalTitle": "1クリック同期の設定ガイド",
   "guide.modalSubtitle": "Chrome / Brave / Edge で時計の恒久的記憶を有効化",

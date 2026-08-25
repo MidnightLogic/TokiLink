@@ -103,6 +103,8 @@
   "diagnostic.sub": "Inspecteur GATT & Package de Support",
   "diagnostic.introTitle": "Inspecter l'horloge & Exporter le diagnostic",
   "diagnostic.introDesc": "Connectez et analysez votre horloge Seiko pour inspecter ses services GATT, lire ses descripteurs et générer un rapport de support pour les développeurs.",
+  "diagnostic.noticeTitle": "Remarque sur la sélection du périphérique :",
+  "diagnostic.noticeDesc": "Les filtres de nom sont désactivés pour détecter tous les modèles Seiko. Tous les appareils Bluetooth à proximité apparaîtront dans la liste. Veuillez sélectionner votre horloge Seiko (l'affichage des noms peut prendre quelques secondes).",
   "diagnostic.startScan": "Démarrer l'inspection",
   "guide.modalTitle": "Configuration de la synchro 1-Clic",
   "guide.modalSubtitle": "Activer la mémorisation permanente dans Chrome / Brave / Edge",

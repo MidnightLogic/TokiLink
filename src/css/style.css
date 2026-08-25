@@ -4199,8 +4199,42 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-secondary);
-  max-width: 400px;
   margin: 0 auto;
+}
+
+.diagnostic-unfiltered-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
+  margin: var(--space-md) auto;
+  max-width: 440px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.diagnostic-notice-icon {
+  color: #38bdf8;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.diagnostic-notice-content strong {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 2px;
+}
+
+.diagnostic-notice-content p {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
 }
 
 .diagnostic-run-btn {

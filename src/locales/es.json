@@ -103,6 +103,8 @@
   "diagnostic.sub": "Inspector de Servicios GATT & Paquete de Soporte",
   "diagnostic.introTitle": "Inspeccionar reloj & Exportar paquete",
   "diagnostic.introDesc": "Conecte y analice su reloj Seiko para inspeccionar sus servicios GATT, leer descriptores y generar un paquete de soporte para los desarrolladores.",
+  "diagnostic.noticeTitle": "Nota sobre la selección de dispositivos:",
+  "diagnostic.noticeDesc": "Los filtros de nombre están desactivados para detectar modelos Seiko desconocidos. Todos los dispositivos Bluetooth cercanos aparecerán en el selector. Seleccione su reloj Seiko de la lista (puede tardar unos segundos en cargar los nombres).",
   "diagnostic.startScan": "Iniciar diagnóstico",
   "guide.modalTitle": "Configurar sincronización en 1 Clic",
   "guide.modalSubtitle": "Recordar dispositivo de forma permanente en Chrome / Brave / Edge",

@@ -966,6 +966,20 @@
               <p data-i18n="diagnostic.introDesc">
                 Connect and deeply scan your Seiko clock to inspect its hardware GATT services, read descriptors, test protocol compatibility, and generate a support package for the developers.
               </p>
+
+              <!-- Device Discovery Notice -->
+              <div class="diagnostic-unfiltered-notice">
+                <div class="diagnostic-notice-icon">
+                  <i data-lucide="info" width="16" height="16"></i>
+                </div>
+                <div class="diagnostic-notice-content">
+                  <strong data-i18n="diagnostic.noticeTitle">Device Selection Note:</strong>
+                  <p data-i18n="diagnostic.noticeDesc">
+                    Device name filters are disabled for this deep diagnostic scan so uncatalogued or rare Seiko models can be inspected. All Bluetooth devices in your vicinity will appear in the browser picker. Please choose your Seiko clock from the list (it may take a few moments for the browser to retrieve peripheral names).
+                  </p>
+                </div>
+              </div>
+
               <button type="button" class="diagnostic-run-btn" id="startDiagnosticScanBtn">
                 <i data-lucide="play" width="15" height="15"></i>
                 <span data-i18n="diagnostic.startScan">Start Diagnostic Scan</span>
