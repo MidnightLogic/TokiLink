@@ -290,6 +290,23 @@ class App {
       renderIcons();
     });
 
+    // Listen for OS-level Bluetooth on/off changes
+    bleService.on('availabilitychanged', ({ available }) => {
+      if (!available) {
+        const curState = connectionStateStore.get();
+        if (curState === 'connecting' || curState === 'syncing' || curState === 'searching') {
+          connectionStateStore.set('error');
+          connectionStatusTextStore.set(i18n.t('sync.status.bluetoothOff'));
+          setTimeout(() => {
+            if (connectionStateStore.get() === 'error') {
+              connectionStateStore.set('disconnected');
+              connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+            }
+          }, 3500);
+        }
+      }
+    });
+
     // Fetch initial time
     if (settingsStore.get().useApi) {
       timeService.fetchApiTime();
@@ -471,6 +488,20 @@ class App {
   }
 
   async performSync() {
+    // 0. Pre-flight Bluetooth Adapter State Check
+    const isBtAvailable = await BluetoothService.isAvailable();
+    if (!isBtAvailable) {
+      connectionStateStore.set('error');
+      connectionStatusTextStore.set(i18n.t('sync.status.bluetoothOff'));
+      setTimeout(() => {
+        if (connectionStateStore.get() === 'error') {
+          connectionStateStore.set('disconnected');
+          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        }
+      }, 4000);
+      return;
+    }
+
     let activeDevice = activeDeviceStore.get();
     let permittedDevices = await bleService.getPermittedDevices();
     let targetDevice = permittedDevices.find(d => activeDevice && (d.id === activeDevice.id || (d.name && d.name === activeDevice.name)));
@@ -566,6 +597,8 @@ class App {
 
       targetDevice = await this.pairNewClock(false);
       if (!targetDevice) {
+        connectionStateStore.set('disconnected');
+        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
         return;
       }
 

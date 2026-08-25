@@ -52,6 +52,7 @@
   "sync.status.synced": "Synced to",
   "sync.status.error": "Sync failed. Try again.",
   "sync.status.blocked": "Bluetooth blocked in browser settings",
+  "sync.status.bluetoothOff": "Bluetooth is disabled. Please turn on Bluetooth on your device.",
   "device.paired": "Paired Clock",
   "device.tag": "BLE Clock",
   "series.multiSound": "Multi-Sound Clock",

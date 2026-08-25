@@ -31,10 +31,30 @@ export class BluetoothService {
     this._characteristics = new Map();
     this._listeners = new Map();
     this._sessionDeviceCache = new Map(); // id -> BluetoothDevice, survives within a single session
+
+    if (typeof navigator !== 'undefined' && navigator.bluetooth && typeof navigator.bluetooth.addEventListener === 'function') {
+      try {
+        navigator.bluetooth.addEventListener('availabilitychanged', (e) => {
+          debug.log('[BLE] Bluetooth adapter availability changed:', e.value);
+          this.emit('availabilitychanged', { available: e.value });
+        });
+      } catch (err) {}
+    }
   }
 
   static isSupported() {
     return typeof navigator !== 'undefined' && !!navigator.bluetooth;
+  }
+
+  static async isAvailable() {
+    if (typeof navigator !== 'undefined' && navigator.bluetooth && typeof navigator.bluetooth.getAvailability === 'function') {
+      try {
+        return await navigator.bluetooth.getAvailability();
+      } catch (e) {
+        return true;
+      }
+    }
+    return true;
   }
 
   // ─── Event Emitter ───────────────────────────────────────────
@@ -210,7 +230,7 @@ export class BluetoothService {
     return !!(this._server && this._server.connected);
   }
 
-  async connect(device) {
+  async connect(device, timeoutMs = 6000) {
     if (!device) throw new Error('No device provided for connection.');
 
     this._device = device;
@@ -227,16 +247,29 @@ export class BluetoothService {
     // Allow 200ms settling window for OS Bluetooth HCI controller between rapid reconnects
     await new Promise(r => setTimeout(r, 200));
 
+    const connectWithTimeout = (targetDevice, ms) => {
+      let timer;
+      const timeoutPromise = new Promise((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`GATT connection timed out after ${ms / 1000}s. Check if clock is in range and Bluetooth is on.`));
+        }, ms);
+      });
+      return Promise.race([
+        targetDevice.gatt.connect(),
+        timeoutPromise
+      ]).finally(() => clearTimeout(timer));
+    };
+
     try {
       debug.log(`[BLE Debug] Connecting to GATT server for: ${device.name || device.id}...`);
-      this._server = await device.gatt.connect();
+      this._server = await connectWithTimeout(device, timeoutMs);
       debug.log('[BLE Debug] GATT connected successfully.');
       this.emit('connected', { device });
       return this._server;
     } catch (err) {
-      debug.log(`[BLE Debug] Initial connect caught busy socket (${err.message}), retrying in 250ms...`);
+      debug.log(`[BLE Debug] Initial connect caught busy socket or timeout (${err.message}), retrying in 250ms...`);
       await new Promise(r => setTimeout(r, 250));
-      this._server = await device.gatt.connect();
+      this._server = await connectWithTimeout(device, timeoutMs);
       debug.log('[BLE Debug] GATT connected on retry.');
       this.emit('connected', { device });
       return this._server;

@@ -52,6 +52,7 @@
   "sync.status.synced": "Synchronisiert mit",
   "sync.status.error": "Sync fehlgeschlagen. Erneut versuchen.",
   "sync.status.blocked": "Bluetooth in Browsereinstellungen blockiert",
+  "sync.status.bluetoothOff": "Bluetooth ist deaktiviert. Bitte schalten Sie Bluetooth ein.",
   "device.paired": "Gekoppelte Uhr",
   "device.tag": "BLE-Uhr",
   "series.multiSound": "Multi-Sound-Uhr",

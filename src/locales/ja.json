@@ -52,6 +52,7 @@
   "sync.status.synced": "同期完了:",
   "sync.status.error": "同期に失敗しました。再試行してください。",
   "sync.status.blocked": "ブラウザ設定で Bluetooth が拒否されています",
+  "sync.status.bluetoothOff": "Bluetoothがオフです。端末のBluetoothをオンにしてください。",
   "device.paired": "ペアリング済み時計",
   "device.tag": "BLE時計",
   "series.multiSound": "マルチサウンドクロック",
