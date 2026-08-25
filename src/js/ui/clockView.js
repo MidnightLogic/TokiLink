@@ -106,8 +106,8 @@ export class ClockView {
       this.dom.tzSlider.addEventListener('change', onSliderMove);
     }
 
-    // Step Buttons
-    this.dom.tzStepDownBtn?.addEventListener('click', () => {
+    // Step Buttons with PointerEvents continuous hold
+    this.setupHoldAction(this.dom.tzStepDownBtn, () => {
       if (this.selectedTzIdx > 0) {
         this.selectedTzIdx--;
         if (this.dom.tzSlider) this.dom.tzSlider.value = String(this.selectedTzIdx);
@@ -118,7 +118,7 @@ export class ClockView {
       }
     });
 
-    this.dom.tzStepUpBtn?.addEventListener('click', () => {
+    this.setupHoldAction(this.dom.tzStepUpBtn, () => {
       if (this.selectedTzIdx < TIMEZONE_CITIES.length - 1) {
         this.selectedTzIdx++;
         if (this.dom.tzSlider) this.dom.tzSlider.value = String(this.selectedTzIdx);
@@ -141,6 +141,65 @@ export class ClockView {
 
     // Setup home indicator house marker position
     this.updateHomeMarkerPosition();
+  }
+
+  setupHoldAction(btn, stepFn) {
+    if (!btn) return;
+    let interval = null;
+    let timeout = null;
+    let activePointerId = null;
+
+    const stop = () => {
+      if (activePointerId === null) return;
+      if (btn.hasPointerCapture && btn.hasPointerCapture(activePointerId)) {
+        try {
+          btn.releasePointerCapture(activePointerId);
+        } catch (err) {}
+      }
+      activePointerId = null;
+      if (timeout) clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+      timeout = null;
+      interval = null;
+      btn.classList.remove('active-pressed');
+    };
+
+    const start = (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      if (activePointerId !== null) stop();
+
+      activePointerId = e.pointerId;
+      if (btn.setPointerCapture) {
+        try {
+          btn.setPointerCapture(e.pointerId);
+        } catch (err) {}
+      }
+
+      if (e.cancelable) e.preventDefault();
+      btn.classList.add('active-pressed');
+      stepFn();
+
+      timeout = setTimeout(() => {
+        if (activePointerId === null) return;
+        interval = setInterval(() => {
+          if (activePointerId !== null) {
+            stepFn();
+          } else {
+            stop();
+          }
+        }, 110);
+      }, 300);
+    };
+
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', stop);
+    btn.addEventListener('pointercancel', stop);
+    btn.addEventListener('lostpointercapture', stop);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    window.addEventListener('pointerup', stop, { passive: true });
+    window.addEventListener('pointercancel', stop, { passive: true });
+    window.addEventListener('blur', stop, { passive: true });
   }
 
   updateHomeMarkerPosition() {

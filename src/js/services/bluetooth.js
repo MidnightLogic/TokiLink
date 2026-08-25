@@ -495,26 +495,44 @@ export class BluetoothService {
 
   /**
    * Sends SS201 / SS501 control packet (Characteristic 0xFFE3, Service 0xFFE0)
+   * Serializes GATT writes and coalesces rapid requests to protect BLE stack bandwidth.
    */
   async sendControlPayload(device, payload) {
     const config = DeviceProtocol.getConfig(device?.name || '');
     if (!config.controlWriteCharUUID) {
-      console.warn(`[BLE] Device ${device?.name} does not support control payloads.`);
       return;
     }
 
-    let bleDevice = this._device;
-    if (!this.isConnected || this._device?.id !== device.id) {
-      if (this._sessionDeviceCache.has(device.id)) {
-        bleDevice = this._sessionDeviceCache.get(device.id);
-        await this.connect(bleDevice);
-      } else {
-        bleDevice = await this.reconnectStoredDevice(device);
-        await this.connect(bleDevice);
-      }
+    if (this._isControlWriting) {
+      // Coalesce into next pending write
+      this._pendingControlPayload = { device, payload };
+      return;
     }
 
-    await this.write(config.controlServiceUUID, config.controlWriteCharUUID, payload);
+    this._isControlWriting = true;
+    try {
+      let bleDevice = this._device;
+      if (!this.isConnected || this._device?.id !== device.id) {
+        if (this._sessionDeviceCache.has(device.id)) {
+          bleDevice = this._sessionDeviceCache.get(device.id);
+          await this.connect(bleDevice);
+        } else {
+          bleDevice = await this.reconnectStoredDevice(device);
+          await this.connect(bleDevice);
+        }
+      }
+
+      await this.write(config.controlServiceUUID, config.controlWriteCharUUID, payload);
+    } catch (err) {
+      debug.warn('[BLE] sendControlPayload warning:', err);
+    } finally {
+      this._isControlWriting = false;
+      if (this._pendingControlPayload) {
+        const next = this._pendingControlPayload;
+        this._pendingControlPayload = null;
+        this.sendControlPayload(next.device, next.payload);
+      }
+    }
   }
 }
 

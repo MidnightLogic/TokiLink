@@ -34,29 +34,56 @@ export class RadioView {
 
     // Direct typed frequency input
     this.dom.radioFreqInput?.addEventListener('change', (e) => {
-      this.setFrequency(e.target.value);
+      this.setFrequency(e.target.value, false);
+      this.flushBleFrequency();
     });
 
-    // Slider input
+    // Slider input (immediate UI + throttled BLE during drag, flushed on change)
     this.dom.radioFreqSlider?.addEventListener('input', (e) => {
-      this.setFrequency(e.target.value);
+      this.setFrequency(e.target.value, true);
+    });
+    this.dom.radioFreqSlider?.addEventListener('change', (e) => {
+      this.setFrequency(e.target.value, false);
+      this.flushBleFrequency();
     });
 
-    // Stepper continuous seek on hold
-    this.setupHoldAction(this.dom.radioSeekDownBtn, () => this.stepFrequency(false));
-    this.setupHoldAction(this.dom.radioSeekUpBtn, () => this.stepFrequency(true));
+    // Stepper continuous seek on hold with PointerEvents + release flush
+    this.setupHoldAction(
+      this.dom.radioSeekDownBtn,
+      () => this.stepFrequency(false),
+      () => this.flushBleFrequency()
+    );
+    this.setupHoldAction(
+      this.dom.radioSeekUpBtn,
+      () => this.stepFrequency(true),
+      () => this.flushBleFrequency()
+    );
 
-    // Volume slider
+    // Volume slider (immediate UI + throttled BLE during drag, flushed on change)
     this.dom.radioVolumeSlider?.addEventListener('input', (e) => {
       const val = Number(e.target.value);
       if (val > 0) this.lastNonZeroVolume = val;
-      this.setVolume(val);
+      this.setVolume(val, true);
+    });
+    this.dom.radioVolumeSlider?.addEventListener('change', (e) => {
+      const val = Number(e.target.value);
+      if (val > 0) this.lastNonZeroVolume = val;
+      this.setVolume(val, false);
+      this.flushBleVolume();
     });
 
-    // Volume steppers with press-and-hold support & Mute
+    // Volume steppers with press-and-hold PointerEvents + release flush & Mute
     this.dom.radioMuteBtn?.addEventListener('click', () => this.toggleMute());
-    this.setupHoldAction(this.dom.radioVolDownBtn, () => this.stepVolume(-1));
-    this.setupHoldAction(this.dom.radioVolUpBtn, () => this.stepVolume(1));
+    this.setupHoldAction(
+      this.dom.radioVolDownBtn,
+      () => this.stepVolume(-1),
+      () => this.flushBleVolume()
+    );
+    this.setupHoldAction(
+      this.dom.radioVolUpBtn,
+      () => this.stepVolume(1),
+      () => this.flushBleVolume()
+    );
 
     // Preset Modal Controls
     this.dom.presetModalCloseBtn?.addEventListener('click', () => this.closePresetModal());
@@ -75,73 +102,87 @@ export class RadioView {
   stepFrequency(isUp) {
     const current = parseFloat(radioStore.get().frequency || '89.5');
     const next = isUp ? Math.min(108.0, current + 0.1) : Math.max(76.0, current - 0.1);
-    this.setFrequency(next);
+    this.setFrequency(next, true);
   }
 
   stepVolume(delta) {
     const cur = radioStore.get().volume || 0;
     const next = Math.max(0, Math.min(30, cur + delta));
     if (next > 0) this.lastNonZeroVolume = next;
-    this.setVolume(next);
+    this.setVolume(next, true);
   }
 
   toggleMute() {
     const current = radioStore.get().volume || 0;
     if (current > 0) {
       this.lastNonZeroVolume = current;
-      this.setVolume(0);
+      this.setVolume(0, false);
+      this.flushBleVolume();
     } else {
-      this.setVolume(this.lastNonZeroVolume || 12);
+      this.setVolume(this.lastNonZeroVolume || 12, false);
+      this.flushBleVolume();
     }
   }
 
-  setupHoldAction(btn, actionFn) {
+  setupHoldAction(btn, stepFn, onRelease) {
     if (!btn) return;
     let interval = null;
     let timeout = null;
-    let isPressed = false;
+    let activePointerId = null;
 
-    const stop = () => {
-      if (!isPressed) return;
-      isPressed = false;
+    const stop = (e) => {
+      if (activePointerId === null) return;
+      if (btn.hasPointerCapture && btn.hasPointerCapture(activePointerId)) {
+        try {
+          btn.releasePointerCapture(activePointerId);
+        } catch (err) {}
+      }
+      activePointerId = null;
       if (timeout) clearTimeout(timeout);
       if (interval) clearInterval(interval);
       timeout = null;
       interval = null;
       btn.classList.remove('active-pressed');
+      if (onRelease) onRelease();
     };
 
     const start = (e) => {
-      if (isPressed) return;
-      isPressed = true;
+      // Ignore right clicks or secondary touches
+      if (e.button !== undefined && e.button !== 0) return;
+      if (activePointerId !== null) stop();
+
+      activePointerId = e.pointerId;
+      if (btn.setPointerCapture) {
+        try {
+          btn.setPointerCapture(e.pointerId);
+        } catch (err) {}
+      }
+
       if (e.cancelable) e.preventDefault();
       btn.classList.add('active-pressed');
-      actionFn();
+      stepFn();
 
       timeout = setTimeout(() => {
-        if (!isPressed) return;
+        if (activePointerId === null) return;
         interval = setInterval(() => {
-          if (isPressed) {
-            actionFn();
+          if (activePointerId !== null) {
+            stepFn();
           } else {
             stop();
           }
-        }, 90);
-      }, 300);
+        }, 85);
+      }, 280);
     };
 
-    btn.addEventListener('mousedown', start);
-    btn.addEventListener('touchstart', start, { passive: false });
-    btn.addEventListener('mouseup', stop);
-    btn.addEventListener('mouseleave', stop);
-    btn.addEventListener('touchend', stop);
-    btn.addEventListener('touchcancel', stop);
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', stop);
+    btn.addEventListener('pointercancel', stop);
+    btn.addEventListener('lostpointercapture', stop);
     btn.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    // Window-level safety listeners to guarantee stop even if finger slides off element
-    window.addEventListener('mouseup', stop, { passive: true });
-    window.addEventListener('touchend', stop, { passive: true });
-    window.addEventListener('touchcancel', stop, { passive: true });
+    // Window-level safety listeners
+    window.addEventListener('pointerup', stop, { passive: true });
+    window.addEventListener('pointercancel', stop, { passive: true });
     window.addEventListener('blur', stop, { passive: true });
   }
 
@@ -165,20 +206,72 @@ export class RadioView {
     this.sendToBle(payload);
   }
 
-  setFrequency(freqFloat) {
+  setFrequency(freqFloat, throttleBle = false) {
     const val = Math.max(76.0, Math.min(108.0, parseFloat(freqFloat))).toFixed(1);
     const state = radioStore.get();
     radioStore.set({ ...state, frequency: val });
 
+    if (throttleBle) {
+      this.throttleBleFrequency(val);
+    }
+  }
+
+  throttleBleFrequency(val) {
+    const now = Date.now();
+    this._pendingBleFreq = val;
+
+    if (!this._lastBleFreqTime || now - this._lastBleFreqTime >= 220) {
+      this._lastBleFreqTime = now;
+      const payload = DeviceProtocol.buildSS201FMTuning(val);
+      this.sendToBle(payload);
+    } else {
+      if (this._freqBleTimeout) clearTimeout(this._freqBleTimeout);
+      this._freqBleTimeout = setTimeout(() => {
+        this._lastBleFreqTime = Date.now();
+        const payload = DeviceProtocol.buildSS201FMTuning(this._pendingBleFreq);
+        this.sendToBle(payload);
+      }, 220);
+    }
+  }
+
+  flushBleFrequency() {
+    if (this._freqBleTimeout) clearTimeout(this._freqBleTimeout);
+    const val = radioStore.get().frequency || '89.5';
     const payload = DeviceProtocol.buildSS201FMTuning(val);
     this.sendToBle(payload);
   }
 
-  setVolume(volume) {
+  setVolume(volume, throttleBle = false) {
     const v = Math.max(0, Math.min(30, volume));
     const state = radioStore.get();
     radioStore.set({ ...state, volume: v });
 
+    if (throttleBle) {
+      this.throttleBleVolume(v);
+    }
+  }
+
+  throttleBleVolume(v) {
+    const now = Date.now();
+    this._pendingBleVol = v;
+
+    if (!this._lastBleVolTime || now - this._lastBleVolTime >= 200) {
+      this._lastBleVolTime = now;
+      const payload = DeviceProtocol.buildSS201Volume(v);
+      this.sendToBle(payload);
+    } else {
+      if (this._volBleTimeout) clearTimeout(this._volBleTimeout);
+      this._volBleTimeout = setTimeout(() => {
+        this._lastBleVolTime = Date.now();
+        const payload = DeviceProtocol.buildSS201Volume(this._pendingBleVol);
+        this.sendToBle(payload);
+      }, 200);
+    }
+  }
+
+  flushBleVolume() {
+    if (this._volBleTimeout) clearTimeout(this._volBleTimeout);
+    const v = radioStore.get().volume || 0;
     const payload = DeviceProtocol.buildSS201Volume(v);
     this.sendToBle(payload);
   }
