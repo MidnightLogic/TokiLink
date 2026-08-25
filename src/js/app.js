@@ -293,16 +293,27 @@ class App {
     // Listen for OS-level Bluetooth on/off changes
     bleService.on('availabilitychanged', ({ available }) => {
       if (!available) {
+        bleService.clearSessionCache();
         const curState = connectionStateStore.get();
         if (curState === 'connecting' || curState === 'syncing' || curState === 'searching') {
-          connectionStateStore.set('error');
-          connectionStatusTextStore.set(i18n.t('sync.status.bluetoothOff'));
-          setTimeout(() => {
-            if (connectionStateStore.get() === 'error') {
-              connectionStateStore.set('disconnected');
-              connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-            }
-          }, 3500);
+          connectionStateStore.set('disconnected');
+          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        }
+      }
+    });
+
+    // Page Visibility Change (user switched apps to toggle Bluetooth or power cycle clock)
+    document.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible') {
+        const isBtOn = await BluetoothService.isAvailable();
+        if (!isBtOn) {
+          bleService.clearSessionCache();
+        }
+        // Auto-heal any stuck non-idle states
+        const curState = connectionStateStore.get();
+        if (curState === 'connecting' || curState === 'syncing' || curState === 'searching' || curState === 'error') {
+          connectionStateStore.set('disconnected');
+          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
         }
       }
     });
@@ -488,20 +499,6 @@ class App {
   }
 
   async performSync() {
-    // 0. Pre-flight Bluetooth Adapter State Check
-    const isBtAvailable = await BluetoothService.isAvailable();
-    if (!isBtAvailable) {
-      connectionStateStore.set('error');
-      connectionStatusTextStore.set(i18n.t('sync.status.bluetoothOff'));
-      setTimeout(() => {
-        if (connectionStateStore.get() === 'error') {
-          connectionStateStore.set('disconnected');
-          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-        }
-      }, 4000);
-      return;
-    }
-
     let activeDevice = activeDeviceStore.get();
     let permittedDevices = await bleService.getPermittedDevices();
     let targetDevice = permittedDevices.find(d => activeDevice && (d.id === activeDevice.id || (d.name && d.name === activeDevice.name)));
@@ -534,8 +531,8 @@ class App {
           }
         }
 
-        // 2. Connect to GATT
-        await bleService.connect(device);
+        // 2. Connect to GATT with a crisp timeout (4.5s)
+        await bleService.connect(device, 4500);
 
         connectionStateStore.set('syncing');
         connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
@@ -579,48 +576,54 @@ class App {
       }
     };
 
+    let directConnectSucceeded = false;
+
     // Phase 1: Try direct connection with cached/permitted device (for 1-click zero-dialog sync)
     if (targetDevice) {
       try {
         await executeSync(targetDevice);
+        directConnectSucceeded = true;
         return;
       } catch (err) {
-        console.warn(`[Sync] Direct connect to cached device (${targetDevice.name || targetDevice.id}) failed: ${err.message}. Falling back to device picker to re-establish permission...`);
+        console.warn(`[Sync] Direct connect to cached device (${targetDevice.name || targetDevice.id}) failed: ${err.message}. Clearing stale session and recovering via device picker...`);
+        bleService.clearSessionCache(targetDevice.id);
+        targetDevice = null;
       }
     }
 
-    // Phase 2: If no permitted device or direct connection failed (e.g. permission flag changed ID or device reset),
-    // automatically open the native device picker to let the user select/refresh their clock
-    try {
-      connectionStateStore.set('searching');
-      connectionStatusTextStore.set(i18n.t('sync.status.searching'));
+    // Phase 2: Live Discovery Fallback (if no permitted device, direct reconnect timed out, or peripheral restarted)
+    if (!directConnectSucceeded) {
+      try {
+        connectionStateStore.set('searching');
+        connectionStatusTextStore.set(i18n.t('sync.status.searching'));
 
-      targetDevice = await this.pairNewClock(false);
-      if (!targetDevice) {
-        connectionStateStore.set('disconnected');
-        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-        return;
-      }
-
-      await executeSync(targetDevice);
-    } catch (err) {
-      console.error('[Sync] Failed:', err);
-      connectionStateStore.set('error');
-      connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
-
-      const log = syncLogStore.get();
-      syncLogStore.set([{
-        timestamp: Date.now(),
-        success: false,
-        detail: `${targetDevice?.name || 'Device'}: ${err.message}`
-      }, ...log.slice(0, 29)]);
-
-      setTimeout(() => {
-        if (connectionStateStore.get() === 'error') {
+        const freshDevice = await this.pairNewClock(false);
+        if (!freshDevice) {
           connectionStateStore.set('disconnected');
           connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+          return;
         }
-      }, 4000);
+
+        await executeSync(freshDevice);
+      } catch (err) {
+        console.error('[Sync] Failed:', err);
+        connectionStateStore.set('error');
+        connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
+
+        const log = syncLogStore.get();
+        syncLogStore.set([{
+          timestamp: Date.now(),
+          success: false,
+          detail: `Sync error: ${err.message}`
+        }, ...log.slice(0, 29)]);
+
+        setTimeout(() => {
+          if (connectionStateStore.get() === 'error') {
+            connectionStateStore.set('disconnected');
+            connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+          }
+        }, 4000);
+      }
     }
   }
 }

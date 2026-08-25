@@ -299,6 +299,24 @@ export class BluetoothService {
   }
 
   /**
+   * Clears in-memory session device references and resets GATT socket maps.
+   */
+  clearSessionCache(deviceId = null) {
+    if (deviceId) {
+      this._sessionDeviceCache.delete(deviceId);
+      if (this._device && this._device.id === deviceId) {
+        this._device = null;
+      }
+    } else {
+      this._sessionDeviceCache.clear();
+      this._device = null;
+    }
+    this._server = null;
+    this._services.clear();
+    this._characteristics.clear();
+  }
+
+  /**
    * Forgets a device, disconnecting GATT, invoking BluetoothDevice.forget()
    * in the browser permissions database, and clearing all local caches.
    */
