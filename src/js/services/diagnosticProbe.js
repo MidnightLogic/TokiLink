@@ -170,6 +170,12 @@ export class DiagnosticProbeService {
               const bytes = new Uint8Array(valDataView.buffer);
               charEntry.readValueHex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
               
+              // If this is standard Battery Level (0x2A19), parse percentage
+              if (char.uuid.toLowerCase().includes('2a19') && bytes.length >= 1) {
+                charEntry.batteryLevelPercent = bytes[0];
+                report.device.batteryLevel = `${bytes[0]}%`;
+              }
+
               // Safe ASCII decoder
               let asciiStr = '';
               for (let b of bytes) {
@@ -182,7 +188,7 @@ export class DiagnosticProbeService {
           }
 
           // Enumerate Descriptors if supported (e.g. 0x2901 User Description)
-          if (char.getDescriptors) {
+          if (char.getDescriptors && server.connected) {
             try {
               const descriptors = await char.getDescriptors();
               for (const desc of descriptors) {
@@ -191,7 +197,7 @@ export class DiagnosticProbeService {
                   valueHex: null,
                   valueAscii: null,
                 };
-                if (desc.readValue) {
+                if (desc.readValue && server.connected) {
                   try {
                     const descVal = await desc.readValue();
                     const dBytes = new Uint8Array(descVal.buffer);
@@ -206,26 +212,6 @@ export class DiagnosticProbeService {
             }
           }
 
-          // If characteristic supports notify/indicate, capture any immediate push packets
-          if ((props.notify || props.indicate) && char.startNotifications) {
-            try {
-              const onNotify = (event) => {
-                const nBytes = new Uint8Array(event.target.value.buffer);
-                charEntry.capturedNotifications.push({
-                  timestamp: Date.now(),
-                  hex: Array.from(nBytes).map(b => b.toString(16).padStart(2, '0')).join(' '),
-                });
-              };
-              char.addEventListener('characteristicvaluechanged', onNotify);
-              await char.startNotifications();
-              // Brief listen window
-              await new Promise(r => setTimeout(r, 250));
-              char.removeEventListener('characteristicvaluechanged', onNotify);
-            } catch (notifErr) {
-              // Notification listen optional
-            }
-          }
-
           serviceEntry.characteristics.push(charEntry);
         }
       } catch (charEnumErr) {
@@ -236,6 +222,15 @@ export class DiagnosticProbeService {
     }
 
     onProgress({ step: 4, text: 'Running protocol write probes...' });
+
+    // Ensure connection is still active before probing candidate protocols
+    if (!bluetoothDevice.gatt.connected) {
+      try {
+        server = await bluetoothDevice.gatt.connect();
+      } catch (reconErr) {
+        debug.warn('[Diagnostic] Reconnect before probe failed:', reconErr);
+      }
+    }
 
     // Test protocol probing capabilities
     for (const cand of DeviceProtocol.CANDIDATE_PROTOCOLS) {
@@ -251,6 +246,9 @@ export class DiagnosticProbeService {
       };
 
       try {
+        if (!bluetoothDevice.gatt.connected) {
+          server = await bluetoothDevice.gatt.connect();
+        }
         const s = await server.getPrimaryService(cand.timeServiceUUID);
         probe.serviceFound = true;
         const c = await s.getCharacteristic(cand.timeWriteCharUUID);
