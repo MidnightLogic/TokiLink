@@ -958,49 +958,46 @@
         <div class="diagnostic-modal-body" id="diagnosticModalBody">
           <!-- Step 1: Idle / Initial Trigger State -->
           <div class="diagnostic-idle-view" id="diagnosticIdleView">
-            <div class="diagnostic-intro-card">
+            <div class="diagnostic-idle-hero">
               <div class="diagnostic-intro-icon">
-                <i data-lucide="scan-search" width="32" height="32"></i>
+                <i data-lucide="scan-search" width="28" height="28"></i>
               </div>
               <h4 data-i18n="diagnostic.introTitle">Inspect Clock &amp; Export Diagnostic Package</h4>
               <p data-i18n="diagnostic.introDesc">
                 Connect and deeply scan your Seiko clock to inspect its hardware GATT services, read descriptors, test protocol compatibility, and generate a support package for the developers.
               </p>
+            </div>
 
-              <button type="button" class="diagnostic-run-btn" id="startDiagnosticScanBtn">
-                <i data-lucide="play" width="15" height="15"></i>
-                <span data-i18n="diagnostic.startScan">Start Diagnostic Scan</span>
-              </button>
+            <button type="button" class="diagnostic-run-btn" id="startDiagnosticScanBtn">
+              <i data-lucide="play" width="15" height="15"></i>
+              <span data-i18n="diagnostic.startScan">Start Diagnostic Scan</span>
+            </button>
 
-              <!-- Collapsible Advanced Options Accordion -->
-              <details class="diagnostic-advanced-accordion" id="diagAdvancedAccordion">
-                <summary class="diagnostic-advanced-summary">
-                  <i data-lucide="settings" width="13" height="13"></i>
-                  <span data-i18n="diagnostic.advancedOptions">Advanced Scan Options</span>
-                  <i data-lucide="chevron-down" class="accordion-arrow" width="13" height="13"></i>
-                </summary>
-                <div class="diagnostic-advanced-content">
-                  <label class="diagnostic-toggle-label">
-                    <input type="checkbox" id="diagDeepDiscoveryToggle">
-                    <span data-i18n="diagnostic.deepDiscoveryLabel">Deep Discovery Mode (Scan all nearby Bluetooth devices)</span>
-                  </label>
-                  <p id="diagDeepDiscoveryDesc" class="diagnostic-tip-text" data-i18n="diagnostic.deepDiscoverySub">
-                    Disables name filters to discover uncatalogued or custom-renamed Seiko hardware.
-                  </p>
-                  <div class="diagnostic-unfiltered-notice warning hidden" id="diagUnfilteredNotice">
-                    <div class="diagnostic-notice-icon">
-                      <i data-lucide="alert-triangle" width="16" height="16"></i>
-                    </div>
-                    <div class="diagnostic-notice-content">
-                      <strong data-i18n="diagnostic.noticeTitle">⚠️ Deep Discovery Warning:</strong>
-                      <p data-i18n="diagnostic.noticeDesc">
-                        Deep scan is generally not needed. It turns off all Bluetooth filters and lists every device in your vicinity (smartphones, TVs, beacons). It may take several seconds for the browser to retrieve names. Use only if your Seiko clock is not found using the default Fast Scan.
-                      </p>
-                    </div>
+            <!-- Collapsible Advanced Options Accordion -->
+            <details class="diagnostic-advanced-accordion" id="diagAdvancedAccordion">
+              <summary class="diagnostic-advanced-summary">
+                <i data-lucide="settings" width="13" height="13"></i>
+                <span data-i18n="diagnostic.advancedOptions">Advanced Scan Options</span>
+                <i data-lucide="chevron-down" class="accordion-arrow" width="13" height="13"></i>
+              </summary>
+              <div class="diagnostic-advanced-content">
+                <label class="diagnostic-toggle-label">
+                  <input type="checkbox" id="diagDeepDiscoveryToggle">
+                  <span data-i18n="diagnostic.deepDiscoveryLabel">Deep Discovery Mode (Scan all nearby Bluetooth devices)</span>
+                </label>
+                <div class="diagnostic-unfiltered-notice warning" id="diagUnfilteredNotice">
+                  <div class="diagnostic-notice-icon">
+                    <i data-lucide="alert-triangle" width="16" height="16"></i>
+                  </div>
+                  <div class="diagnostic-notice-content">
+                    <strong data-i18n="diagnostic.noticeTitle">⚠️ Deep Discovery Warning:</strong>
+                    <p data-i18n="diagnostic.noticeDesc">
+                      Deep scan is generally not needed. It turns off all Bluetooth filters and lists every device in your vicinity (smartphones, TVs, beacons). It may take several seconds for the browser to retrieve names. Use only if your Seiko clock is not found using the default Fast Scan.
+                    </p>
                   </div>
                 </div>
-              </details>
-            </div>
+              </div>
+            </details>
           </div>
 
           <!-- Step 2: Scanning Progress State -->

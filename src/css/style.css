@@ -4163,21 +4163,28 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* Idle Intro State */
-.diagnostic-intro-card {
-  background: var(--bg-glass);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl) var(--space-lg);
-  text-align: center;
+.diagnostic-idle-view {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
+  text-align: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  width: 100%;
+}
+
+.diagnostic-idle-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  max-width: 480px;
+  width: 100%;
 }
 
 .diagnostic-intro-icon {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: rgba(99, 102, 241, 0.15);
   border: 1px solid rgba(99, 102, 241, 0.35);
@@ -4188,18 +4195,18 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   margin-bottom: var(--space-xs);
 }
 
-.diagnostic-intro-card h4 {
+.diagnostic-idle-hero h4 {
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
 }
 
-.diagnostic-intro-card p {
+.diagnostic-idle-hero p {
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-secondary);
-  margin: 0 auto;
+  margin: 0;
 }
 
 .diagnostic-unfiltered-notice {
@@ -4210,15 +4217,15 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   border: 1px solid rgba(56, 189, 248, 0.25);
   border-radius: var(--radius-md);
   padding: 0.75rem 0.85rem;
-  margin: var(--space-md) auto;
-  max-width: 440px;
+  margin: 0.6rem 0 0 0;
+  width: 100%;
   text-align: left;
   box-sizing: border-box;
 }
 
 .diagnostic-unfiltered-notice.warning {
-  background: rgba(245, 158, 11, 0.09);
-  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
 .diagnostic-unfiltered-notice.warning .diagnostic-notice-icon {
@@ -4251,17 +4258,14 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .diagnostic-advanced-accordion {
-  margin-top: 1.1rem;
+  margin-top: var(--space-xs);
   text-align: left;
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   transition: all 0.2s ease;
   width: 100%;
-  max-width: 440px;
-  margin-left: auto;
-  margin-right: auto;
   box-sizing: border-box;
 }
 

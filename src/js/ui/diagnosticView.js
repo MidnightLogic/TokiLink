@@ -63,20 +63,7 @@ export class DiagnosticView {
 
     // Deep Discovery Checkbox Toggle & Accordion
     const deepToggle = document.getElementById('diagDeepDiscoveryToggle');
-    const unfilteredNotice = document.getElementById('diagUnfilteredNotice');
-    const deepDesc = document.getElementById('diagDeepDiscoveryDesc');
     const accordion = document.getElementById('diagAdvancedAccordion');
-
-    deepToggle?.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        unfilteredNotice?.classList.remove('hidden');
-        deepDesc?.classList.add('hidden');
-      } else {
-        unfilteredNotice?.classList.add('hidden');
-        deepDesc?.classList.remove('hidden');
-      }
-      this.renderIcons();
-    });
 
     accordion?.addEventListener('toggle', () => {
       this.renderIcons();
