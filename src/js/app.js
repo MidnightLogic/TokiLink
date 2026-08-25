@@ -13,7 +13,7 @@ import {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info, Sparkles, RefreshCw
+  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight
 } from 'lucide';
 
 import { registerSW } from 'virtual:pwa-register';
@@ -74,7 +74,7 @@ const LUCIDE_ICONS = {
   ChevronsLeft, ChevronsRight, Trash2, Edit2, Download,
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
-  Lock, Info, Sparkles, RefreshCw
+  Lock, Info, Sparkles, RefreshCw, Zap, ChevronRight
 };
 
 export function renderIcons() {
@@ -261,7 +261,7 @@ class App {
     this.alarmView = new AlarmView(this.dom, renderIcons);
     this.radioView = new RadioView(this.dom, renderIcons);
     this.displayView = new DisplayView(this.dom, renderIcons);
-    this.settingsView = new SettingsView(this.dom, () => syncLogStore.set([]));
+    this.settingsView = new SettingsView(this.dom, () => syncLogStore.set([]), renderIcons);
 
     this.initTabs();
     this.bindSyncAction();

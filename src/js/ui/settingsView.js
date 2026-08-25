@@ -10,9 +10,10 @@ import { i18n } from '../i18n.js';
 import { pwaUpdateService } from '../services/pwaUpdate.js';
 
 export class SettingsView {
-  constructor(dom, onSyncLogClear) {
+  constructor(dom, onSyncLogClear, renderIcons) {
     this.dom = dom;
     this.onSyncLogClear = onSyncLogClear;
+    this.renderIcons = renderIcons;
     this.init();
   }
 
@@ -87,7 +88,7 @@ export class SettingsView {
     const openGuideModal = () => {
       if (guideOverlay) {
         guideOverlay.classList.remove('hidden');
-        if (window.lucide) window.lucide.createIcons();
+        if (this.renderIcons) this.renderIcons();
       }
     };
 
