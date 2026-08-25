@@ -79,6 +79,11 @@ function scanJsFiles(dir) {
       if (dynamicDeviceStatusRegex.test(content)) {
         ['connected', 'syncing', 'connecting', 'ready', 'disconnected'].forEach(s => usedKeysInJs.add(`device.status.${s}`));
       }
+
+      const dynamicNoticeRegex = /notice\.(alarmCompat|radioCompat|displayCompat|modelNotice)/g;
+      if (dynamicNoticeRegex.test(content)) {
+        ['alarmCompat', 'radioCompat', 'displayCompat', 'modelNotice'].forEach(n => usedKeysInJs.add(`notice.${n}`));
+      }
     }
   }
 }

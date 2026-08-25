@@ -90,16 +90,20 @@ export class DeviceView {
         if (showTabs) {
           tabs.classList.remove('hidden');
           const isDigitalModel = !isMultiSound && !isMock;
-          const noticeEls = [
-            document.getElementById('modelCompatNoticeAlarm'),
-            document.getElementById('modelCompatNoticeRadio'),
-            document.getElementById('modelCompatNoticeDisplay'),
+          const clockName = device.name || model.type || 'Digital Model';
+          const notices = [
+            { id: 'modelCompatNoticeAlarm', key: 'notice.alarmCompat' },
+            { id: 'modelCompatNoticeRadio', key: 'notice.radioCompat' },
+            { id: 'modelCompatNoticeDisplay', key: 'notice.displayCompat' }
           ];
-          noticeEls.forEach(el => {
+          notices.forEach(({ id, key }) => {
+            const el = document.getElementById(id);
             if (el) {
               el.classList.toggle('hidden', !isDigitalModel);
-              const nameSpan = el.querySelector('.notice-clock-name');
-              if (nameSpan) nameSpan.textContent = device.name || model.type || 'Digital Model';
+              const textSpan = el.querySelector('.notice-text') || el.querySelector('span');
+              if (textSpan) {
+                textSpan.innerHTML = `<strong>${i18n.t('notice.modelNotice')}</strong> ${i18n.t(key, { name: clockName })}`;
+              }
             }
           });
         } else {

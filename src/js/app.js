@@ -264,6 +264,7 @@ class App {
 
     // Initialize multi-language
     i18n.init();
+    connectionStatusTextStore.set(i18n.t('sync.status.idle'));
     renderIcons();
 
     // Clean up any stale duplicate devices from localStorage
