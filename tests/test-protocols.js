@@ -91,4 +91,33 @@ assert(nexTimePayload[5] === 8, 'NexTime month is 8');
 assert(nexTimePayload[6] === 26, 'NexTime 2-digit year is 26');
 assert(nexTimePayload[7] === 0x64, 'NexTime trailing constant is 0x64 (100)');
 
-console.log('\n🎉 ALL PROTOCOL TESTS PASSED!');
+console.log('\n--- Testing Multi-Sound Control Payloads ---');
+
+// Volume packet
+const volPayload = DeviceProtocol.buildSS201Volume(20);
+assert(volPayload[0] === 1 && volPayload[1] === 20 && volPayload[4] === 20, 'Volume command 1 builds 5 uniform bytes');
+
+// FM Tuning packet: 89.5 MHz -> 895 (0x037F)
+const fmPayload = DeviceProtocol.buildSS201FMTuning(89.5);
+assert(fmPayload[0] === 9, 'FM Tuning command header is 9');
+assert(fmPayload[1] === ((895 >> 8) & 0xFF), 'FM Tuning MSB matches 89.5MHz');
+assert(fmPayload[2] === (895 & 0xFF), 'FM Tuning LSB matches 89.5MHz');
+
+// FM Save Preset packet: Channel 3 (index 2) -> 101.1 MHz -> 1011 (0x03F3)
+const savePresetPayload = DeviceProtocol.buildSS201FMChannelSave(2, 101.1);
+assert(savePresetPayload[0] === 22, 'Preset save command header is 22');
+assert(savePresetPayload[1] === 3, 'Preset channel 1-indexed is 3');
+assert(savePresetPayload[2] === ((1011 >> 8) & 0xFF) && savePresetPayload[3] === (1011 & 0xFF), 'Preset frequency 101.1MHz packed');
+
+// Dimmer packet
+const brightPayload = DeviceProtocol.buildSS201Brightness(3);
+assert(brightPayload[0] === 2 && brightPayload[1] === 4, 'Brightness level 3 maps to value 4 with command 2');
+
+console.log('\n--- Testing Service UUID & Discovery Engine ---');
+const allUuids = DeviceProtocol.allServiceUUIDs();
+assert(Array.isArray(allUuids) && allUuids.length >= 10, 'Universal service UUID pool contains >= 10 GATT services');
+assert(allUuids.includes('0000fff0-0000-1000-8000-00805f9b34fb'), 'Includes Series C3 & SQ primary service 0xFFF0');
+assert(allUuids.includes('00001806-0000-1000-8000-00805f9b34fb'), 'Includes Multi-Sound CTS service 0x1806');
+assert(allUuids.includes('00005301-0000-0041-4c50-574953450000'), 'Includes NexTime LPWISE service 0x5301');
+
+console.log('\n🎉 ALL PROTOCOL & ENGINE TESTS PASSED!');

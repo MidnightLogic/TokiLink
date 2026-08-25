@@ -447,7 +447,7 @@ class App {
       return device;
     } catch (err) {
       connectionStateStore.set('disconnected');
-      const isBlocked = err.name === 'NotAllowedError' || /blocked|denied|permission/i.test(err.message || '');
+      const isBlocked = err.name === 'SecurityError' || (err.message && /permission.*blocked|access.*denied.*permanently/i.test(err.message));
       if (isBlocked) {
         connectionStatusTextStore.set(i18n.t('sync.status.blocked'));
         if (this.diagnostics?.browser?.isBrave) {
@@ -459,7 +459,7 @@ class App {
         connectionStatusTextStore.set(i18n.t('sync.status.idle'));
       }
       if (err.name !== 'NotFoundError' && !isBlocked) {
-        console.error('[App] Error pairing new clock:', err);
+        console.warn('[App] BLE pairing cancelled or peripheral busy:', err.message || err);
       }
       return null;
     }
@@ -501,14 +501,14 @@ class App {
         }
       }
 
-      // 2. Pre-compute target time BEFORE connecting so zero idle delay while connected
-      const targetDate = this.clockView.getImmediateSyncTarget();
-
-      // 3. Connect to GATT
+      // 2. Connect to GATT
       await bleService.connect(device);
 
       connectionStateStore.set('syncing');
       connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
+
+      // 3. Compute target time AT THE EXACT INSTANT OF TRANSMISSION (eliminates GATT connection latency)
+      const targetDate = this.clockView.getImmediateSyncTarget();
 
       // 4. Perform adaptive clock time sync across Multi-Sound / Series C3 / SQ / NexTime
       await bleService.syncClockTime(device, targetDate);

@@ -55,6 +55,20 @@ export class DiagnosticView {
     retryBtn?.addEventListener('click', () => this.runScan());
     cancelBtn?.addEventListener('click', () => this.resetToIdle());
 
+    // Deep Discovery Checkbox Toggle
+    const deepToggle = document.getElementById('diagDeepDiscoveryToggle');
+    const unfilteredNotice = document.getElementById('diagUnfilteredNotice');
+    const filteredTip = document.getElementById('diagFilteredTip');
+    deepToggle?.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        unfilteredNotice?.classList.remove('hidden');
+        filteredTip?.classList.add('hidden');
+      } else {
+        unfilteredNotice?.classList.add('hidden');
+        filteredTip?.classList.remove('hidden');
+      }
+    });
+
     // Copy JSON Report Handler
     const copyBtn = document.getElementById('diagCopyJsonBtn');
     const copyText = document.getElementById('diagCopyJsonText');
@@ -138,11 +152,19 @@ export class DiagnosticView {
       // If still no device, request from user picker with all services enabled
       if (!targetBleDevice) {
         if (progressText) progressText.textContent = 'Select your clock in the device picker...';
+        const isDeepDiscovery = !!document.getElementById('diagDeepDiscoveryToggle')?.checked;
         if (navigator.bluetooth?.requestDevice) {
-          targetBleDevice = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true,
-            optionalServices: DeviceProtocol.allServiceUUIDs()
-          });
+          if (isDeepDiscovery) {
+            targetBleDevice = await navigator.bluetooth.requestDevice({
+              acceptAllDevices: true,
+              optionalServices: DeviceProtocol.allServiceUUIDs()
+            });
+          } else {
+            targetBleDevice = await navigator.bluetooth.requestDevice({
+              filters: DeviceProtocol.NAME_FILTERS.map(name => ({ namePrefix: name })),
+              optionalServices: DeviceProtocol.allServiceUUIDs()
+            });
+          }
         } else {
           targetBleDevice = await bleService.requestDevice();
         }

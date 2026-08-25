@@ -312,7 +312,7 @@ export class BluetoothService {
     }
 
     if (!this._server || !this._server.connected) {
-      if (this._device && this._device.gatt) {
+      if (this.isConnected && this._device && this._device.gatt) {
         debug.log('[BLE Debug] Establishing fresh GATT connection for service...');
         await new Promise(r => setTimeout(r, 100));
         this._server = await this._device.gatt.connect();
@@ -335,6 +335,11 @@ export class BluetoothService {
       ));
       if (isNotFound) {
         throw err;
+      }
+
+      // If device is already disconnected or disconnecting, abort cleanly
+      if (!this.isConnected || !this._device?.gatt?.connected) {
+        throw new Error('GATT Server disconnected.');
       }
 
       debug.log('[BLE Debug] Stale socket detected, re-establishing fresh channel...');
@@ -446,8 +451,12 @@ export class BluetoothService {
           await new Promise(r => setTimeout(r, 60));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
-          // Background battery telemetry query
-          this.readBatteryLevel(device).catch(() => {});
+          // Background battery telemetry query only for battery-supported clock series
+          if (config.series !== 'seriesC3' && config.series !== 'standardDigital') {
+            if (this.isConnected && this._device?.gatt?.connected) {
+              this.readBatteryLevel(device).catch(() => {});
+            }
+          }
 
           return { success: true, protocol: proto.id, series: proto.series, payload };
         } else {
@@ -457,8 +466,12 @@ export class BluetoothService {
           await new Promise(r => setTimeout(r, 60));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
-          // Background battery telemetry query
-          this.readBatteryLevel(device).catch(() => {});
+          // Background battery telemetry query only for battery-supported clock series
+          if (config.series !== 'seriesC3' && config.series !== 'standardDigital') {
+            if (this.isConnected && this._device?.gatt?.connected) {
+              this.readBatteryLevel(device).catch(() => {});
+            }
+          }
 
           return { success: true, protocol: proto.id, series: proto.series, payload };
         }
@@ -482,7 +495,7 @@ export class BluetoothService {
    * Safely reads battery level percentage from standard Bluetooth Battery Service (0x180F / 0x2A19).
    */
   async readBatteryLevel(device) {
-    if (!device || !this.isConnected) return null;
+    if (!device || !this.isConnected || !this._device?.gatt?.connected) return null;
     try {
       const char = await this.getCharacteristic('0000180f-0000-1000-8000-00805f9b34fb', '00002a19-0000-1000-8000-00805f9b34fb');
       if (char && char.readValue) {

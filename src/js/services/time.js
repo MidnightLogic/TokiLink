@@ -43,8 +43,7 @@ export class TimeService {
 
   async fetchApiTime() {
     const endpoints = [
-      'https://timeapi.io/api/time/current/zone?timeZone=UTC',
-      'https://worldtimeapi.org/api/timezone/Etc/UTC',
+      'https://timeapi.io/api/time/current/zone?timeZone=UTC'
     ];
 
     for (const url of endpoints) {
@@ -120,7 +119,7 @@ export class TimeService {
           return true;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     if (isDebug()) {
       console.warn('[TimeService] All online NTP sources unavailable, falling back to local clock.');
