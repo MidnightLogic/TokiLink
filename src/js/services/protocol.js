@@ -272,6 +272,9 @@ export const DeviceProtocol = {
     uuids.add('00001806-0000-1000-8000-00805f9b34fb'); // Reference Time / Seiko Time
     uuids.add('0000180a-0000-1000-8000-00805f9b34fb'); // Device Information (Model, Firmware)
     uuids.add('0000180f-0000-1000-8000-00805f9b34fb'); // Battery Service
+    uuids.add('0000181a-0000-1000-8000-00805f9b34fb'); // Environmental Sensing (Temp, Humidity)
+    uuids.add('00001804-0000-1000-8000-00805f9b34fb'); // Tx Power
+    uuids.add('00001803-0000-1000-8000-00805f9b34fb'); // Link Loss
     uuids.add('0000ffe0-0000-1000-8000-00805f9b34fb'); // Multi-Sound Control
     uuids.add('0000ffe1-0000-1000-8000-00805f9b34fb'); // Multi-Sound Alt / Notify
     uuids.add('0000fff0-0000-1000-8000-00805f9b34fb'); // Series C3 & SQ Time

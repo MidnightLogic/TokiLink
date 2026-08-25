@@ -219,6 +219,9 @@ export class DiagnosticProbeService {
           // If characteristic is readable, read current value safely
           if (props.read && char.readValue) {
             try {
+              if (!bluetoothDevice.gatt.connected) {
+                server = await bluetoothDevice.gatt.connect();
+              }
               const valDataView = await char.readValue();
               const bytes = new Uint8Array(valDataView.buffer);
               charEntry.readValueHex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
@@ -243,7 +246,17 @@ export class DiagnosticProbeService {
                 if (u.includes('2a29')) report.device.manufacturerName = parsed;
               }
             } catch (readErr) {
-              charEntry.readError = readErr.message;
+              // 0x2A00 (Device Name) is often blocklisted for direct GATT reads in Web Bluetooth
+              if (char.uuid.toLowerCase().includes('2a00') && bluetoothDevice.name) {
+                charEntry.readValueAscii = bluetoothDevice.name;
+                charEntry.parsedValue = bluetoothDevice.name;
+              } else {
+                charEntry.readError = readErr.message;
+              }
+              // If read dropped the connection, re-establish for remaining characteristics
+              if (!bluetoothDevice.gatt.connected) {
+                try { server = await bluetoothDevice.gatt.connect(); } catch (e) {}
+              }
             }
           }
 
