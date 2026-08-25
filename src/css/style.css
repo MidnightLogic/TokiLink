@@ -2005,15 +2005,20 @@ body::after {
 .sync-btn-label {
   position: relative;
   z-index: 4;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #ffffff;
   text-shadow: 0 0 8px rgba(192, 132, 252, 0.8);
-  max-width: 96px;
+  max-width: 104px;
   text-align: center;
-  line-height: 1.1;
+  line-height: 1.15;
+  padding: 0 2px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: color var(--transition-fast), text-shadow var(--transition-fast), font-size var(--transition-fast);
 }
 

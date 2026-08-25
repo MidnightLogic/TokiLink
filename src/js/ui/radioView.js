@@ -145,17 +145,25 @@ export class RadioView {
 
   openPresetModal(chIndex) {
     const state = radioStore.get();
-    const preset = state.presets[chIndex] || { ch: chIndex + 1, freq: '89.5', name: `Preset ${chIndex + 1}` };
+    const preset = state.presets[chIndex] || { ch: chIndex + 1, freq: '89.5', name: '' };
     this.currentEditingPresetIdx = chIndex;
 
     const modal = this.dom.presetModalOverlay;
     if (!modal) return;
 
-    if (this.dom.presetModalTitle) this.dom.presetModalTitle.textContent = `Edit Preset CH ${chIndex + 1}`;
-    if (this.dom.presetModalNameInput) this.dom.presetModalNameInput.value = preset.name || `Preset ${chIndex + 1}`;
+    const presetPrefix = i18n.t('ss201.radio.preset') || 'Preset';
+    const isDefault = !preset.name || /^(Preset|Station|Préréglage|Speicher|Presintonía|プリセット|预设)\s*\d+$/i.test(preset.name);
+    const defaultName = isDefault ? `${presetPrefix} ${chIndex + 1}` : preset.name;
+
+    if (this.dom.presetModalTitle) {
+      const editTitleTemplate = i18n.t('modal.preset.title') || 'Edit Preset Channel';
+      this.dom.presetModalTitle.textContent = `${editTitleTemplate} (CH ${chIndex + 1})`;
+    }
+    if (this.dom.presetModalNameInput) this.dom.presetModalNameInput.value = defaultName;
     if (this.dom.presetModalFreqInput) this.dom.presetModalFreqInput.value = preset.freq || '89.5';
 
     modal.classList.remove('hidden');
+    if (this.renderIcons) this.renderIcons();
   }
 
   closePresetModal() {
@@ -164,7 +172,8 @@ export class RadioView {
 
   async savePresetFromModal() {
     const state = radioStore.get();
-    const name = this.dom.presetModalNameInput?.value.trim() || `Preset ${this.currentEditingPresetIdx + 1}`;
+    const presetPrefix = i18n.t('ss201.radio.preset') || 'Preset';
+    const name = this.dom.presetModalNameInput?.value.trim() || `${presetPrefix} ${this.currentEditingPresetIdx + 1}`;
     const freq = Math.max(76.0, Math.min(108.0, parseFloat(this.dom.presetModalFreqInput?.value) || 89.5)).toFixed(1);
 
     const presets = [...state.presets];
@@ -200,15 +209,19 @@ export class RadioView {
 
     grid.innerHTML = '';
     const currentFreq = parseFloat(radio.frequency).toFixed(1);
+    const presetPrefix = i18n.t('ss201.radio.preset') || 'Preset';
 
     radio.presets.forEach((p, idx) => {
       const isCurrent = parseFloat(p.freq).toFixed(1) === currentFreq;
+      const isDefault = !p.name || /^(Preset|Station|Préréglage|Speicher|Presintonía|プリセット|预设)\s*\d+$/i.test(p.name);
+      const displayName = isDefault ? `${presetPrefix} ${idx + 1}` : p.name;
+
       const btn = document.createElement('button');
       btn.className = `preset-btn ${isCurrent ? 'active' : ''}`;
       btn.innerHTML = `
         <span class="preset-num">CH ${idx + 1}</span>
         <span class="preset-freq">${p.freq}</span>
-        <span class="preset-name">${p.name || ''}</span>
+        <span class="preset-name">${displayName}</span>
       `;
       btn.addEventListener('click', () => {
         this.selectPreset(idx);
