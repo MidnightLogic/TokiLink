@@ -77,6 +77,8 @@ export class DeviceView {
 
       const model = DeviceProtocol.detectModel(device.name);
       const isMultiSound = model.hasFeatures || (device.name || '').toUpperCase().includes('SS201') || (device.name || '').toUpperCase().includes('SS501');
+      const settings = settingsStore.get();
+      const showTabs = isMultiSound || isMock || !!settings.forceAllTabs;
 
       const deviceTag = document.querySelector('.device-tag');
       if (deviceTag) {
@@ -85,8 +87,21 @@ export class DeviceView {
       }
 
       if (tabs) {
-        if (isMultiSound || isMock) {
+        if (showTabs) {
           tabs.classList.remove('hidden');
+          const isDigitalModel = !isMultiSound && !isMock;
+          const noticeEls = [
+            document.getElementById('modelCompatNoticeAlarm'),
+            document.getElementById('modelCompatNoticeRadio'),
+            document.getElementById('modelCompatNoticeDisplay'),
+          ];
+          noticeEls.forEach(el => {
+            if (el) {
+              el.classList.toggle('hidden', !isDigitalModel);
+              const nameSpan = el.querySelector('.notice-clock-name');
+              if (nameSpan) nameSpan.textContent = device.name || model.type || 'Digital Model';
+            }
+          });
         } else {
           tabs.classList.add('hidden');
           const activeTabBtn = document.querySelector('.tab-btn.active');

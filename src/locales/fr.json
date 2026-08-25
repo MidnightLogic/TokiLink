@@ -91,6 +91,8 @@
   "settings.diagnostics": "Diagnostics",
   "settings.debug": "Journal de débogage",
   "settings.debug.desc": "Afficher les octets BLE et la précision dans la console",
+  "settings.forceAllTabs": "Afficher tous les onglets",
+  "settings.forceAllTabs.desc": "Afficher les onglets Audio, Radio et Alarme pour n'importe quel modèle",
   "settings.learnMore": "Guide & Flags",
   "settings.persistentTipTitle": "Synchro 1-Clic Rapide",
   "settings.persistentTipDesc": "Activez les autorisations Bluetooth persistantes dans votre navigateur pour mémoriser votre horloge de façon permanente.",

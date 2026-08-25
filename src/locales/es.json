@@ -91,6 +91,8 @@
   "settings.diagnostics": "Diagnósticos",
   "settings.debug": "Registro de depuración",
   "settings.debug.desc": "Registrar bytes de BLE y precisión en la consola",
+  "settings.forceAllTabs": "Mostrar todas las pestañas",
+  "settings.forceAllTabs.desc": "Mostrar pestañas de Audio, Radio y Alarma para cualquier modelo",
   "settings.learnMore": "Guía y Flags",
   "settings.persistentTipTitle": "Sincronización en 1 Clic",
   "settings.persistentTipDesc": "Habilite permisos Bluetooth persistentes en su navegador para recordar su reloj de forma permanente entre recargas.",

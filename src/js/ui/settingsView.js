@@ -62,6 +62,10 @@ export class SettingsView {
       this.updateSetting('debug', e.target.checked);
     });
 
+    this.dom.forceAllTabsToggle?.addEventListener('change', (e) => {
+      this.updateSetting('forceAllTabs', e.target.checked);
+    });
+
     this.dom.manualTimeToggle?.addEventListener('change', (e) => {
       this.updateSetting('manualTime', e.target.checked);
     });
@@ -168,6 +172,7 @@ export class SettingsView {
     if (this.dom.useApiToggle) this.dom.useApiToggle.checked = settings.useApi;
     if (this.dom.use24hToggle) this.dom.use24hToggle.checked = settings.use24h;
     if (this.dom.debugToggle) this.dom.debugToggle.checked = settings.debug;
+    if (this.dom.forceAllTabsToggle) this.dom.forceAllTabsToggle.checked = !!settings.forceAllTabs;
     if (this.dom.manualTimeToggle) this.dom.manualTimeToggle.checked = settings.manualTime;
     if (this.dom.languageSelect) this.dom.languageSelect.value = i18n.locale;
   }

@@ -357,6 +357,7 @@
                       <span id="tzHomeBadgeText">Home</span>
                     </div>
                     <div class="tz-home-arrow"></div>
+                    <div class="tz-home-tick"></div>
                   </div>
                   <input type="range" id="tzSlider" class="tz-range-slider" min="0" max="37" step="1" value="31">
                   <div class="tz-slider-labels">
@@ -444,6 +445,10 @@
       <!-- ═══ ALARM TAB CONTENT ═══ -->
       <div class="tab-content" id="tab-alarm">
         <div class="panel-card">
+          <div class="model-compat-notice hidden" id="modelCompatNoticeAlarm">
+            <i data-lucide="alert-circle" width="16" height="16"></i>
+            <span><strong>Model Notice:</strong> Your clock (<span class="notice-clock-name">Digital Model</span>) is a digital LED/LCD display unit. Alarm sound playback &amp; schedules are supported on Seiko SS501 / SS201 Multi-Sound hardware.</span>
+          </div>
           <div class="panel-card-header">
             <div class="panel-card-title">
               <i data-lucide="bell"></i>
@@ -466,6 +471,10 @@
       <!-- ═══ RADIO TAB CONTENT ═══ -->
       <div class="tab-content" id="tab-radio">
         <div class="panel-card">
+          <div class="model-compat-notice hidden" id="modelCompatNoticeRadio">
+            <i data-lucide="alert-circle" width="16" height="16"></i>
+            <span><strong>Model Notice:</strong> Your clock (<span class="notice-clock-name">Digital Model</span>) does not have an FM radio tuner or speaker amplifier. Radio controls are supported on Seiko SS501 / SS201 Multi-Sound hardware.</span>
+          </div>
           <div class="panel-card-header">
             <div class="panel-card-title">
               <i data-lucide="radio"></i>
@@ -516,12 +525,12 @@
               </div>
             </div>
             <div class="slider-with-icons">
-              <button type="button" class="volume-icon-btn" id="radioVolDownBtn" title="Toggle Mute">
-                <i data-lucide="volume-x" class="slider-icon" id="radioVolLeftIcon"></i>
+              <button type="button" class="volume-icon-btn" id="radioVolDownBtn" title="Decrease Volume">
+                <i data-lucide="minus" class="slider-icon" id="radioVolLeftIcon" width="14" height="14"></i>
               </button>
               <input type="range" id="radioVolumeSlider" min="0" max="30" value="12" class="range-slider" aria-label="Radio Volume">
-              <button type="button" class="volume-icon-btn" id="radioVolUpBtn" title="Max Volume">
-                <i data-lucide="volume-2" class="slider-icon"></i>
+              <button type="button" class="volume-icon-btn" id="radioVolUpBtn" title="Increase Volume">
+                <i data-lucide="plus" class="slider-icon" width="14" height="14"></i>
               </button>
             </div>
           </div>
@@ -545,6 +554,10 @@
       <!-- ═══ DISPLAY & POWER TAB CONTENT ═══ -->
       <div class="tab-content" id="tab-display">
         <div class="panel-card">
+          <div class="model-compat-notice hidden" id="modelCompatNoticeDisplay">
+            <i data-lucide="alert-circle" width="16" height="16"></i>
+            <span><strong>Model Notice:</strong> Your clock (<span class="notice-clock-name">Digital Model</span>) manages display dimmer settings directly on its chassis. Remote brightness commands are tailored for SS501 / SS201 units.</span>
+          </div>
           <div class="panel-card-header">
             <div class="panel-card-title">
               <i data-lucide="sun"></i>
@@ -773,6 +786,16 @@
           <div class="toggle-switch">
             <input type="checkbox" id="debugToggle">
             <label class="toggle-slider" for="debugToggle"></label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <label for="forceAllTabsToggle" data-i18n="settings.forceAllTabs">Show all feature tabs</label>
+            <div class="settings-desc" data-i18n="settings.forceAllTabs.desc">Display Audio, Radio &amp; Alarm tabs for any connected clock</div>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="forceAllTabsToggle">
+            <label class="toggle-slider" for="forceAllTabsToggle"></label>
           </div>
         </div>
         <div class="settings-tip-box">

@@ -102,6 +102,7 @@ const DEFAULT_SETTINGS = {
   useApi: true,
   use24h: true,
   debug: false,
+  forceAllTabs: false,
   manualTime: false,
   manualMode: 'timezone', // 'timezone' or 'exact'
   selectedTzIdx: null,

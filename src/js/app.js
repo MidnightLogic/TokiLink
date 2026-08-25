@@ -211,6 +211,7 @@ class App {
       manualTimeToggle: document.getElementById('manualTimeToggle'),
       use24hToggle: document.getElementById('use24hToggle'),
       debugToggle: document.getElementById('debugToggle'),
+      forceAllTabsToggle: document.getElementById('forceAllTabsToggle'),
       languageSelect: document.getElementById('languageSelect'),
     };
   }

@@ -91,6 +91,8 @@
   "settings.diagnostics": "Diagnose",
   "settings.debug": "Debug-Protokollierung",
   "settings.debug.desc": "BLE-Paketdaten und Zeitstempel in der Konsole ausgeben",
+  "settings.forceAllTabs": "Alle Funktions-Tabs anzeigen",
+  "settings.forceAllTabs.desc": "Audio-, Radio- und Wecker-Tabs für jedes Uhrenmodell anzeigen",
   "settings.learnMore": "Anleitung & Flags",
   "settings.persistentTipTitle": "1-Klick-Schnellsynchronisation",
   "settings.persistentTipDesc": "Aktivieren Sie dauerhafte Bluetooth-Berechtigungen im Browser, um Ihre Uhr dauerhaft für den 1-Klick-Sync zu speichern.",

@@ -146,8 +146,9 @@ export class ClockView {
   updateHomeMarkerPosition() {
     if (this.dom.tzHomeMarkerWrap) {
       const maxIdx = TIMEZONE_CITIES.length - 1;
-      const percent = Math.min(96, Math.max(4, (this.localTzIdx / maxIdx) * 100));
-      this.dom.tzHomeMarkerWrap.style.left = `${percent.toFixed(1)}%`;
+      const ratio = Math.max(0, Math.min(1, this.localTzIdx / maxIdx));
+      // Exactly tracks the 20px thumb center (10px radius) across 0%..100% of slider width
+      this.dom.tzHomeMarkerWrap.style.left = `calc(10px + (100% - 20px) * ${ratio.toFixed(4)})`;
 
       const localItem = TIMEZONE_CITIES[this.localTzIdx];
       const offsetFormatted = this.formatOffsetHours(localItem ? localItem.offset : 0);

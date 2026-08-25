@@ -91,6 +91,8 @@
   "settings.diagnostics": "診断とデバッグ",
   "settings.debug": "デバッグログ",
   "settings.debug.desc": "BLE パケットと同期タイミングをコンソールに出力",
+  "settings.forceAllTabs": "すべての機能タブを表示",
+  "settings.forceAllTabs.desc": "接続された時計のモデルに関わらず、オーディオ・ラジオ・アラームタブを表示します",
   "settings.learnMore": "設定ガイド",
   "settings.persistentTipTitle": "1クリック即時同期",
   "settings.persistentTipDesc": "ブラウザで永続的なBluetooth権限を有効にすると、時計が恒久的に記憶され、1クリックで即座に同期できます。",

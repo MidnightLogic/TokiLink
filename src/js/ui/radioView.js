@@ -53,12 +53,19 @@ export class RadioView {
       this.setVolume(val);
     });
 
-    // Mute toggles
+    // Volume steppers & Mute
     this.dom.radioMuteBtn?.addEventListener('click', () => this.toggleMute());
-    this.dom.radioVolDownBtn?.addEventListener('click', () => this.toggleMute());
+    this.dom.radioVolDownBtn?.addEventListener('click', () => {
+      const cur = radioStore.get().volume || 0;
+      const next = Math.max(0, cur - 1);
+      if (next > 0) this.lastNonZeroVolume = next;
+      this.setVolume(next);
+    });
     this.dom.radioVolUpBtn?.addEventListener('click', () => {
       const cur = radioStore.get().volume || 0;
-      this.setVolume(Math.min(30, cur + 3));
+      const next = Math.min(30, cur + 1);
+      this.lastNonZeroVolume = next;
+      this.setVolume(next);
     });
 
     // Preset Modal Controls

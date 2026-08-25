@@ -91,6 +91,8 @@
   "settings.diagnostics": "诊断",
   "settings.debug": "调试日志",
   "settings.debug.desc": "在浏览器控制台打印蓝牙数据包和精确校时时间戳",
+  "settings.forceAllTabs": "显示所有功能标签页",
+  "settings.forceAllTabs.desc": "为任何连接的时钟显示音频、收音机和闹钟标签页",
   "settings.learnMore": "设置指南",
   "settings.persistentTipTitle": "一键即时同步",
   "settings.persistentTipDesc": "在浏览器中启用持久化蓝牙权限，永久记住您的时钟，实现一键免弹窗即时同步。",
