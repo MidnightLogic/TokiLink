@@ -106,6 +106,7 @@
   "diagnostic.noticeTitle": "デバイス選択に関するご注意:",
   "diagnostic.noticeDesc": "未登録または特殊なセイコーモデルを検出するため、デバイス名フィルターを解除しています。周囲のすべてのBluetooth機器が一覧に表示されます。一覧からお使いのセイコー時計を選択してください（端末名が表示されるまで数秒かかる場合があります）。",
   "diagnostic.startScan": "診断スキャンを開始",
+  "diagnostic.retry": "スキャンを再試行",
   "guide.modalTitle": "1クリック同期の設定ガイド",
   "guide.modalSubtitle": "Chrome / Brave / Edge で時計の恒久的記憶を有効化",
   "guide.intro": "通常、デスクトップブラウザは毎回時計の選択ダイアログを表示します。このフラグを有効にすると、ブラウザが時計を永続的に記憶し、ダイアログなしで1クリック同期できるようになります。",

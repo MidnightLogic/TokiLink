@@ -106,6 +106,7 @@
   "diagnostic.noticeTitle": "设备搜索与选择说明：",
   "diagnostic.noticeDesc": "为识别未知或特殊型号的精工时钟，已解除名称过滤。您附近的全部蓝牙设备都将显示在选择列表中。请从中选择您的精工时钟（系统检索设备名称可能需要数秒）。",
   "diagnostic.startScan": "开始诊断扫描",
+  "diagnostic.retry": "重试扫描",
   "guide.modalTitle": "一键即时同步设置指南",
   "guide.modalSubtitle": "在 Chrome / Brave / Edge 中启用设备永久记忆",
   "guide.intro": "默认情况下，桌面端浏览器每次都会弹出选择框要求挑选时钟。启用此 Chrome 标志后，TokiLink 可永久记住您的时钟，实现一键即时同步而无需重复弹窗。",

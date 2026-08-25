@@ -47,9 +47,13 @@ export class DiagnosticView {
     // Start Scan Button Handlers
     const startScanBtn = document.getElementById('startDiagnosticScanBtn');
     const rescanBtn = document.getElementById('diagRescanBtn');
+    const retryBtn = document.getElementById('diagRetryBtn');
+    const cancelBtn = document.getElementById('diagCancelBtn');
 
     startScanBtn?.addEventListener('click', () => this.runScan());
     rescanBtn?.addEventListener('click', () => this.runScan());
+    retryBtn?.addEventListener('click', () => this.runScan());
+    cancelBtn?.addEventListener('click', () => this.resetToIdle());
 
     // Copy JSON Report Handler
     const copyBtn = document.getElementById('diagCopyJsonBtn');
@@ -80,10 +84,19 @@ export class DiagnosticView {
     const idleView = document.getElementById('diagnosticIdleView');
     const progressView = document.getElementById('diagnosticProgressView');
     const resultsView = document.getElementById('diagnosticResultsView');
+    const errorActions = document.getElementById('diagnosticErrorActions');
+    const spinnerWrap = document.getElementById('diagnosticSpinnerWrap');
+    const progressWrap = document.getElementById('diagnosticProgressBarWrap');
 
     idleView?.classList.remove('hidden');
     progressView?.classList.add('hidden');
     resultsView?.classList.add('hidden');
+    if (errorActions) {
+      errorActions.classList.add('hidden');
+      errorActions.style.display = 'none';
+    }
+    if (spinnerWrap) spinnerWrap.style.display = '';
+    if (progressWrap) progressWrap.style.display = '';
   }
 
   async runScan() {
@@ -92,14 +105,23 @@ export class DiagnosticView {
     const resultsView = document.getElementById('diagnosticResultsView');
     const progressText = document.getElementById('diagnosticProgressText');
     const progressBar = document.getElementById('diagnosticProgressBarFill');
+    const errorActions = document.getElementById('diagnosticErrorActions');
+    const spinnerWrap = document.getElementById('diagnosticSpinnerWrap');
+    const progressWrap = document.getElementById('diagnosticProgressBarWrap');
 
     idleView?.classList.add('hidden');
     progressView?.classList.remove('hidden');
     resultsView?.classList.add('hidden');
+    if (errorActions) {
+      errorActions.classList.add('hidden');
+      errorActions.style.display = 'none';
+    }
+    if (spinnerWrap) spinnerWrap.style.display = '';
+    if (progressWrap) progressWrap.style.display = '';
     if (progressBar) progressBar.style.width = '15%';
 
     try {
-      let targetBleDevice = bleService.connectedDevice;
+      let targetBleDevice = this.cachedDiagnosticDevice || bleService.connectedDevice;
 
       // If not connected, check session or permitted devices
       if (!targetBleDevice) {
@@ -126,6 +148,9 @@ export class DiagnosticView {
         }
       }
 
+      // Cache device reference for quick retries
+      this.cachedDiagnosticDevice = targetBleDevice;
+
       const report = await DiagnosticProbeService.runFullDiagnostic(targetBleDevice, (status) => {
         if (progressText) progressText.textContent = status.text;
         if (progressBar) {
@@ -142,11 +167,15 @@ export class DiagnosticView {
       this.renderIcons();
     } catch (err) {
       if (progressText) {
-        progressText.textContent = `Diagnostic error: ${err.message}`;
+        progressText.textContent = `Diagnostic Error: ${err.message}`;
       }
-      setTimeout(() => {
-        this.resetToIdle();
-      }, 3500);
+      if (spinnerWrap) spinnerWrap.style.display = 'none';
+      if (progressWrap) progressWrap.style.display = 'none';
+      if (errorActions) {
+        errorActions.classList.remove('hidden');
+        errorActions.style.display = 'flex';
+      }
+      this.renderIcons();
     }
   }
 

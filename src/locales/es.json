@@ -106,6 +106,7 @@
   "diagnostic.noticeTitle": "Nota sobre la selección de dispositivos:",
   "diagnostic.noticeDesc": "Los filtros de nombre están desactivados para detectar modelos Seiko desconocidos. Todos los dispositivos Bluetooth cercanos aparecerán en el selector. Seleccione su reloj Seiko de la lista (puede tardar unos segundos en cargar los nombres).",
   "diagnostic.startScan": "Iniciar diagnóstico",
+  "diagnostic.retry": "Reintentar análisis",
   "guide.modalTitle": "Configurar sincronización en 1 Clic",
   "guide.modalSubtitle": "Recordar dispositivo de forma permanente en Chrome / Brave / Edge",
   "guide.intro": "Por defecto, los navegadores de escritorio solicitan elegir el reloj cada vez. Al habilitar este flag, TokiLink recordará su reloj permanentemente para sincronizar al instante en 1 solo clic sin cuadros de diálogo repetidos.",

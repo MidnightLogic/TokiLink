@@ -146,16 +146,34 @@ export class DiagnosticProbeService {
     onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'}...` });
 
     let server = null;
-    try {
-      if (bluetoothDevice.gatt.connected) {
-        server = bluetoothDevice.gatt;
-      } else {
-        server = await bluetoothDevice.gatt.connect();
+    const maxRetries = 3;
+    let lastConnectError = null;
+
+    // Allow 250ms settling delay for HCI controller between picker and connect
+    await new Promise(r => setTimeout(r, 250));
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        if (bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
+          server = bluetoothDevice.gatt;
+        } else {
+          onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'} (Attempt ${attempt}/${maxRetries})...` });
+          server = await bluetoothDevice.gatt.connect();
+        }
+        report.device.gattConnected = true;
+        break;
+      } catch (err) {
+        lastConnectError = err;
+        report.errors.push(`GATT connection attempt ${attempt} failed: ${err.message}`);
+        if (attempt < maxRetries) {
+          onProgress({ step: 1, text: `Retrying connection in ${attempt * 300}ms...` });
+          await new Promise(r => setTimeout(r, attempt * 300));
+        }
       }
-      report.device.gattConnected = true;
-    } catch (err) {
-      report.errors.push(`GATT connection failed: ${err.message}`);
-      throw new Error(`Failed to connect to GATT server: ${err.message}`);
+    }
+
+    if (!server || !server.connected) {
+      throw new Error(`Failed to establish GATT connection after ${maxRetries} attempts: ${lastConnectError?.message || 'GATT stack busy'}`);
     }
 
     onProgress({ step: 2, text: 'Enumerating all primary GATT services...' });
@@ -169,13 +187,14 @@ export class DiagnosticProbeService {
       report.errors.push(`getPrimaryServices failed: ${err.message}`);
     }
 
-    // If getPrimaryServices didn't return (some browsers require specific UUIDs), try all known candidate services
+    // If getPrimaryServices didn't return (common on restricted Web Bluetooth platforms), probe all candidates
     if (primaryServices.length === 0) {
-      onProgress({ step: 2, text: 'Scanning candidate Seiko GATT services...' });
-      for (const cand of DeviceProtocol.CANDIDATE_PROTOCOLS) {
+      onProgress({ step: 2, text: 'Scanning candidate Seiko & SIG GATT services...' });
+      const allUuids = DeviceProtocol.allServiceUUIDs();
+      for (const uuid of allUuids) {
         try {
-          const s = await server.getPrimaryService(cand.timeServiceUUID);
-          if (s && !primaryServices.some(existing => existing.uuid === s.uuid)) {
+          const s = await server.getPrimaryService(uuid);
+          if (s && !primaryServices.some(existing => existing.uuid.toLowerCase() === s.uuid.toLowerCase())) {
             primaryServices.push(s);
           }
         } catch (e) {}

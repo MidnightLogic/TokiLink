@@ -106,6 +106,7 @@
   "diagnostic.noticeTitle": "Remarque sur la sélection du périphérique :",
   "diagnostic.noticeDesc": "Les filtres de nom sont désactivés pour détecter tous les modèles Seiko. Tous les appareils Bluetooth à proximité apparaîtront dans la liste. Veuillez sélectionner votre horloge Seiko (l'affichage des noms peut prendre quelques secondes).",
   "diagnostic.startScan": "Démarrer l'inspection",
+  "diagnostic.retry": "Réessayer le scan",
   "guide.modalTitle": "Configuration de la synchro 1-Clic",
   "guide.modalSubtitle": "Activer la mémorisation permanente dans Chrome / Brave / Edge",
   "guide.intro": "Par défaut, les navigateurs de bureau demandent de sélectionner l'horloge à chaque fois. L'activation de ce flag permet à TokiLink de mémoriser votre horloge définitivement pour une synchronisation instantanée en un clic sans boîte de dialogue.",

@@ -108,6 +108,7 @@
   "diagnostic.noticeTitle": "Device Selection Note:",
   "diagnostic.noticeDesc": "Device name filters are disabled for this deep diagnostic scan so uncatalogued or rare Seiko models can be inspected. All Bluetooth devices in your vicinity will appear in the browser picker. Please choose your Seiko clock from the list (it may take a few moments for the browser to retrieve peripheral names).",
   "diagnostic.startScan": "Start Diagnostic Scan",
+  "diagnostic.retry": "Retry Scan",
   "guide.modalTitle": "1-Click Fast Sync Setup",
   "guide.modalSubtitle": "Enable permanent device remembering in Chrome / Brave / Edge",
   "guide.intro": "By default, desktop browsers ask you to select your clock each time. Enabling this Chrome flag allows TokiLink to remember your clock permanently across reloads for instant 1-click sync without repeating the device chooser dialog.",

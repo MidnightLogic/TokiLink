@@ -106,6 +106,7 @@
   "diagnostic.noticeTitle": "Hinweis zur Geräteauswahl:",
   "diagnostic.noticeDesc": "Gerätefilter sind für diesen Hardware-Scan deaktiviert, damit auch unbekannte Seiko-Modelle erkannt werden. Alle Bluetooth-Geräte in Reichweite werden angezeigt. Bitte wählen Sie Ihre Seiko-Uhr aus der Liste (das Laden der Gerätenamen kann einige Sekunden dauern).",
   "diagnostic.startScan": "Diagnose starten",
+  "diagnostic.retry": "Scan wiederholen",
   "guide.modalTitle": "1-Klick-Synchronisation einrichten",
   "guide.modalSubtitle": "Dauerhaftes Gerätespeichern in Chrome / Brave / Edge aktivieren",
   "guide.intro": "Standardmäßig fordert der Desktop-Browser jedes Mal zur Auswahl der Uhr auf. Durch Aktivieren dieses Flags merkt sich der Browser die Uhr dauerhaft für einen sofortigen 1-Klick-Sync ohne Auswahldialog.",
