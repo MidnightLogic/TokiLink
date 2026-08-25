@@ -52,7 +52,6 @@
   "sync.status.synced": "已同步至",
   "sync.status.error": "同步失败，请重试。",
   "sync.status.blocked": "浏览器设置中已阻止蓝牙权限",
-  "sync.status.bluetoothOff": "蓝牙已关闭。请在您的设备上开启蓝牙。",
   "device.paired": "已配对时钟",
   "device.tag": "蓝牙时钟",
   "series.multiSound": "多功能音响时钟",
