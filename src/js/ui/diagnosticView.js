@@ -113,10 +113,17 @@ export class DiagnosticView {
         }
       }
 
-      // If still no device, request from user picker
+      // If still no device, request from user picker with all services enabled
       if (!targetBleDevice) {
-        if (progressText) progressText.textContent = 'Select your Seiko clock in the picker...';
-        targetBleDevice = await bleService.requestDevice();
+        if (progressText) progressText.textContent = 'Select your clock in the device picker...';
+        if (navigator.bluetooth?.requestDevice) {
+          targetBleDevice = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: DeviceProtocol.allServiceUUIDs()
+          });
+        } else {
+          targetBleDevice = await bleService.requestDevice();
+        }
       }
 
       const report = await DiagnosticProbeService.runFullDiagnostic(targetBleDevice, (status) => {

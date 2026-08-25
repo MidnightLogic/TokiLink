@@ -159,6 +159,8 @@ export class DiagnosticProbeService {
             properties: propList,
             readValueHex: null,
             readValueAscii: null,
+            descriptors: [],
+            capturedNotifications: [],
           };
 
           // If characteristic is readable, read current value safely
@@ -176,6 +178,51 @@ export class DiagnosticProbeService {
               charEntry.readValueAscii = asciiStr;
             } catch (readErr) {
               charEntry.readError = readErr.message;
+            }
+          }
+
+          // Enumerate Descriptors if supported (e.g. 0x2901 User Description)
+          if (char.getDescriptors) {
+            try {
+              const descriptors = await char.getDescriptors();
+              for (const desc of descriptors) {
+                const descEntry = {
+                  uuid: desc.uuid,
+                  valueHex: null,
+                  valueAscii: null,
+                };
+                if (desc.readValue) {
+                  try {
+                    const descVal = await desc.readValue();
+                    const dBytes = new Uint8Array(descVal.buffer);
+                    descEntry.valueHex = Array.from(dBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+                    descEntry.valueAscii = new TextDecoder().decode(dBytes).replace(/[^\x20-\x7E]/g, '');
+                  } catch (e) {}
+                }
+                charEntry.descriptors.push(descEntry);
+              }
+            } catch (descErr) {
+              // Descriptors enumeration not supported or restricted on platform
+            }
+          }
+
+          // If characteristic supports notify/indicate, capture any immediate push packets
+          if ((props.notify || props.indicate) && char.startNotifications) {
+            try {
+              const onNotify = (event) => {
+                const nBytes = new Uint8Array(event.target.value.buffer);
+                charEntry.capturedNotifications.push({
+                  timestamp: Date.now(),
+                  hex: Array.from(nBytes).map(b => b.toString(16).padStart(2, '0')).join(' '),
+                });
+              };
+              char.addEventListener('characteristicvaluechanged', onNotify);
+              await char.startNotifications();
+              // Brief listen window
+              await new Promise(r => setTimeout(r, 250));
+              char.removeEventListener('characteristicvaluechanged', onNotify);
+            } catch (notifErr) {
+              // Notification listen optional
             }
           }
 
