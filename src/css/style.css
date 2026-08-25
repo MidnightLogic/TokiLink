@@ -2990,21 +2990,31 @@ body::after {
 }
 
 .volume-icon-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 4px;
-  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  cursor: pointer;
   transition: all var(--transition-fast);
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .volume-icon-btn:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-accent);
   color: var(--accent-light);
-  background: var(--bg-glass);
+  transform: scale(1.05);
+}
+
+.volume-icon-btn:active {
+  transform: scale(0.95);
+  background: rgba(99, 102, 241, 0.2);
 }
 
 .range-slider {
