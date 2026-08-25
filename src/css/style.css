@@ -3137,31 +3137,6 @@ body::after {
   padding: 8px 12px;
 }
 
-.settings-version {
-  margin-top: auto;
-  padding: var(--space-xl) var(--space-lg) max(var(--space-xl), env(safe-area-inset-bottom));
-  text-align: center;
-  border-top: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.18);
-  font-size: 0.76rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
-
-:root.light .settings-version {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.settings-version span:first-child {
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.settings-version span:last-child {
-  font-size: 0.72rem;
-  opacity: 0.8;
-}
-
 /* ---------- Modals ---------- */
 .modal-overlay {
   position: fixed;
@@ -3687,43 +3662,45 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   font-size: 0.75rem;
   color: var(--text-muted);
   text-align: center;
-  line-height: 1.4;
-  margin-top: auto;
-  padding: var(--space-md) 0;
+  line-height: 1.5;
+  margin-top: var(--space-xl);
+  padding: 2.25rem 1rem 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 0.65rem;
+  border-top: 1px solid var(--border);
+  width: 100%;
 }
 
 .footer-brand {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-bottom: 2px;
+  gap: 8px;
 }
 
 .footer-title {
   font-weight: 600;
+  font-size: 0.82rem;
   color: var(--text-secondary);
 }
 
 .footer-dot {
   color: var(--text-muted);
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 .footer-github-link {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  color: var(--text-muted);
+  gap: 5px;
+  color: var(--text-secondary);
   text-decoration: none;
-  font-size: 0.73rem;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
   background: var(--bg-glass);
   border: 1px solid var(--border);
   transition: all var(--transition-fast);
@@ -3737,56 +3714,49 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .footer-disclaimer {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
-  opacity: 0.85;
+  opacity: 0.8;
+  max-width: 480px;
+  line-height: 1.5;
 }
 
-.settings-github-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--accent-light);
-  text-decoration: none;
-  font-size: 0.72rem;
-  font-weight: 600;
-  margin-top: 6px;
-  padding: 3px 9px;
-  border-radius: 4px;
-  background: var(--bg-glass);
-  border: 1px solid var(--border);
-  transition: all var(--transition-fast);
-}
-
-.settings-github-link:hover {
-  color: #ffffff;
-  border-color: var(--accent-light);
-  background: rgba(99, 102, 241, 0.25);
-  transform: translateY(-1px);
-}
-
-/* ---------- Check Updates Button in Settings ---------- */
-.settings-version-header {
+/* ---------- Settings Version Footer in Side Pane ---------- */
+.settings-version {
+  margin-top: auto;
+  padding: 1.75rem 1.25rem max(2rem, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  margin-bottom: 2px;
+  gap: 0.75rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+:root.light .settings-version {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.settings-version-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
 }
 
 .check-updates-btn {
   background: var(--bg-glass);
   border: 1px solid var(--border);
   color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  padding: 3px 9px;
-  font-size: 0.7rem;
-  font-weight: 500;
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: 0.73rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
-  margin-top: 2px;
   transition: all var(--transition-fast);
 }
 
@@ -3799,6 +3769,34 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 .check-updates-btn.checking i {
   animation: spin-cw 1s linear infinite;
+}
+
+.settings-version-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.settings-github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  transition: all var(--transition-fast);
+}
+
+.settings-github-link:hover {
+  color: #ffffff;
+  border-color: var(--accent-light);
+  background: rgba(99, 102, 241, 0.25);
+  transform: translateY(-1px);
 }
 
 @keyframes spin-cw {
