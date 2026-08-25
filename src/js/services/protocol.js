@@ -169,15 +169,58 @@ export const DeviceProtocol = {
 
     // ─── 5. Universal Fallback ──────────────────────────────────
     DEFAULT: {
-      type: 'DL308',
-      series: 'seriesC3',
+      type: 'GENERIC_CLOCK',
+      series: 'generic',
       displayName: 'Seiko Bluetooth Clock',
       hasFeatures: false,
-      protocol: 'cts_fff0',
-      timeServiceUUID: '0000fff0-0000-1000-8000-00805f9b34fb',
-      timeWriteCharUUID: '0000fff2-0000-1000-8000-00805f9b34fb',
+      protocol: 'auto_detect',
     }
   },
+
+  // ─── Multi-Type Protocol Candidates (for adaptive probing & fallbacks) ───
+  CANDIDATE_PROTOCOLS: [
+    {
+      id: 'lpwise_5301',
+      name: 'NexTime LPWISE (0x5301)',
+      series: 'nexTime',
+      timeServiceUUID: '00005301-0000-0041-4c50-574953450000',
+      timeWriteCharUUID: '00005302-0000-0041-4c50-574953450000',
+      timeNotifyCharUUID: '00005303-0000-0041-4c50-574953450000',
+      payloadType: 'nexTime_8byte',
+    },
+    {
+      id: 'cts_1806',
+      name: 'Multi-Sound CTS (0x1806)',
+      series: 'multiSound',
+      timeServiceUUID: '00001806-0000-1000-8000-00805f9b34fb',
+      timeWriteCharUUID: '00002a16-0000-1000-8000-00805f9b34fb',
+      payloadType: 'cts_10byte',
+    },
+    {
+      id: 'cts_fff0',
+      name: 'Series C3 & SQ Digital (0xFFF0)',
+      series: 'seriesC3',
+      timeServiceUUID: '0000fff0-0000-1000-8000-00805f9b34fb',
+      timeWriteCharUUID: '0000fff2-0000-1000-8000-00805f9b34fb',
+      payloadType: 'cts_10byte',
+    },
+    {
+      id: 'cts_ffe1',
+      name: 'Alternative Digital (0xFFE1)',
+      series: 'seriesC3',
+      timeServiceUUID: '0000ffe1-0000-1000-8000-00805f9b34fb',
+      timeWriteCharUUID: '0000fff4-0000-1000-8000-00805f9b34fb',
+      payloadType: 'cts_10byte',
+    },
+    {
+      id: 'cts_1805',
+      name: 'SIG Current Time (0x1805)',
+      series: 'standardDigital',
+      timeServiceUUID: '00001805-0000-1000-8000-00805f9b34fb',
+      timeWriteCharUUID: '00002a2b-0000-1000-8000-00805f9b34fb',
+      payloadType: 'cts_10byte',
+    }
+  ],
 
   detectModel(deviceName = '') {
     const name = (deviceName || '').toUpperCase().trim();

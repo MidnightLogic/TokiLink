@@ -374,66 +374,81 @@ export class BluetoothService {
   }
 
   /**
-   * Universal Clock Time Sync method supporting all 4 Seiko clock series:
+   * Universal Clock Time Sync method supporting all Seiko clock series:
    *  - Multi-Sound Series (SS501, SS201)
    *  - Series C3 (DL308K)
    *  - Standard Digital SQ Series (SQ820, SQ821)
    *  - NexTime Hybrid Series (ZS450, ZS451, ZS250..256, QHB201)
+   *  - Generic / Custom-named Seiko Bluetooth Clocks (Adaptive Multi-Protocol Probing)
    */
   async syncClockTime(device, targetDate = new Date()) {
     const config = DeviceProtocol.getConfig(device?.name || '');
-    debug.log(`[BLE Sync] Starting sync for ${device?.name || 'clock'} using profile:`, config.type, config.protocol);
+    debug.log(`[BLE Sync] Starting sync for "${device?.name || 'clock'}" (detected: ${config.type}, protocol: ${config.protocol})`);
 
-    if (config.protocol === 'lpwise_5301') {
-      // NexTime Series (LPWISE protocol)
-      const payload = DeviceProtocol.buildNexTimePayload(targetDate);
-      debug.log(`[BLE Sync] Writing NexTime 8-byte payload:`, DeviceProtocol.formatPayload(payload));
+    // Build ordered list of candidate protocols to try:
+    // If the device name matched a specific protocol, place it first, followed by all fallback candidates.
+    const candidates = [];
+    if (config.protocol && config.protocol !== 'auto_detect') {
+      const preferred = DeviceProtocol.CANDIDATE_PROTOCOLS.find(p => p.id === config.protocol);
+      if (preferred) candidates.push(preferred);
+    }
 
+    DeviceProtocol.CANDIDATE_PROTOCOLS.forEach(cand => {
+      if (!candidates.some(c => c.id === cand.id)) {
+        candidates.push(cand);
+      }
+    });
+
+    let lastError = null;
+
+    // Probe candidate protocols in sequence until a matching GATT service & characteristic succeeds
+    for (const proto of candidates) {
       try {
-        // Optional notify setup on RX characteristic
-        try {
-          const notifyChar = await this.getCharacteristic(config.timeServiceUUID, config.timeNotifyCharUUID);
-          if (notifyChar?.startNotifications) {
-            await notifyChar.startNotifications();
+        debug.log(`[BLE Sync] Attempting synchronization via ${proto.name} (${proto.timeServiceUUID})...`);
+
+        if (proto.payloadType === 'nexTime_8byte') {
+          // NexTime LPWISE 8-byte write
+          const payload = DeviceProtocol.buildNexTimePayload(targetDate);
+
+          // Optional notify setup on RX characteristic
+          try {
+            const notifyChar = await this.getCharacteristic(proto.timeServiceUUID, proto.timeNotifyCharUUID);
+            if (notifyChar?.startNotifications) {
+              await notifyChar.startNotifications();
+            }
+          } catch (e) {
+            debug.warn('[BLE Sync] NexTime notification subscribe skipped/unsupported:', e);
           }
-        } catch (e) {
-          debug.warn('[BLE Sync] NexTime notification subscribe skipped/unsupported:', e);
-        }
 
-        // Send query/auth packet
-        try {
-          const authPayload = DeviceProtocol.buildNexTimeAuth();
-          await this.write(config.timeServiceUUID, config.timeWriteCharUUID, authPayload);
+          // Optional auth query packet
+          try {
+            const authPayload = DeviceProtocol.buildNexTimeAuth();
+            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, authPayload);
+            await new Promise(r => setTimeout(r, 60));
+          } catch (e) {
+            debug.warn('[BLE Sync] Auth pre-packet skipped:', e);
+          }
+
+          // Write time packet
+          await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
+          await new Promise(r => setTimeout(r, 100));
+          debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
+          return { success: true, protocol: proto.id, series: proto.series, payload };
+        } else {
+          // Standard CTS 10-byte write
+          const payload = DeviceProtocol.buildTimePayload(targetDate);
+          await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
           await new Promise(r => setTimeout(r, 60));
-        } catch (e) {
-          debug.warn('[BLE Sync] Auth pre-packet skipped:', e);
+          debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
+          return { success: true, protocol: proto.id, series: proto.series, payload };
         }
-
-        // Write time packet
-        await this.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
-        await new Promise(r => setTimeout(r, 100));
-        return { success: true, protocol: 'lpwise_5301', payload };
       } catch (err) {
-        debug.warn('[BLE Sync] NexTime LPWISE write failed, attempting standard fallback:', err);
+        debug.log(`[BLE Sync] Candidate ${proto.name} not available on peripheral (${err.message}). Trying next candidate...`);
+        lastError = err;
       }
     }
 
-    // Standard CTS 10-byte protocol (Multi-Sound, Series C3, Standard Digital SQ)
-    const payload = DeviceProtocol.buildTimePayload(targetDate);
-    debug.log(`[BLE Sync] Writing Standard CTS 10-byte payload:`, DeviceProtocol.formatPayload(payload));
-
-    try {
-      await this.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
-      await new Promise(r => setTimeout(r, 60));
-      return { success: true, protocol: config.protocol || 'cts', payload };
-    } catch (primaryErr) {
-      if (config.altTimeServiceUUID && config.altTimeWriteCharUUID) {
-        debug.log('[BLE Sync] Primary service failed, trying alternative service:', config.altTimeServiceUUID);
-        await this.write(config.altTimeServiceUUID, config.altTimeWriteCharUUID, payload);
-        return { success: true, protocol: 'alt_cts', payload };
-      }
-      throw primaryErr;
-    }
+    throw lastError || new Error(`No compatible Seiko time synchronization service found on "${device?.name || 'clock'}".`);
   }
 
   /**

@@ -47,6 +47,12 @@ const zs256 = DeviceProtocol.detectModel('ZS256B-M');
 assert(zs256.type === 'NEXTIME_GENERIC', 'Detects generic ZS256 model');
 assert(zs256.series === 'nexTime', 'ZS256 mapped to nexTime series');
 
+// 5. Generic Unrecognized Clock
+const genericClock = DeviceProtocol.detectModel('Custom Renamed Clock');
+assert(genericClock.type === 'GENERIC_CLOCK', 'Unknown clock returns generic fallback model');
+assert(genericClock.protocol === 'auto_detect', 'Generic clock uses auto_detect protocol');
+assert(Array.isArray(DeviceProtocol.CANDIDATE_PROTOCOLS) && DeviceProtocol.CANDIDATE_PROTOCOLS.length >= 4, 'Candidate protocols are populated');
+
 console.log('\n--- Testing Payload Construction ---');
 
 // Test CTS 10-byte payload
