@@ -486,9 +486,8 @@ class App {
         }
       }
 
-      // 2. Pre-compute target time & payload BEFORE connecting so zero idle delay while connected
+      // 2. Pre-compute target time BEFORE connecting so zero idle delay while connected
       const targetDate = this.clockView.getImmediateSyncTarget();
-      const payload = DeviceProtocol.buildTimePayload(targetDate);
 
       // 3. Connect to GATT
       await bleService.connect(device);
@@ -496,16 +495,8 @@ class App {
       connectionStateStore.set('syncing');
       connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
 
-      // 4. Write Time Payload IMMEDIATELY upon connect (zero idle delay)
-      if (isDebug()) console.log(`[Sync] Writing Time Payload to ${config.timeWriteCharUUID}:`, DeviceProtocol.formatPayload(payload));
-      await bleService.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
-      await new Promise(r => setTimeout(r, 60));
-      try {
-        await bleService.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
-      } catch (e) {
-        // First packet already delivered
-      }
-      await new Promise(r => setTimeout(r, 80));
+      // 4. Perform adaptive clock time sync across Multi-Sound / Series C3 / SQ / NexTime
+      await bleService.syncClockTime(device, targetDate);
       if (isDebug()) console.log(`[Sync] SUCCESS! Transmitted time packet to ${device.name}`);
 
       // 5. Explicit clean GATT disconnect so Seiko clock immediately exits BLE sync mode and renders the new time

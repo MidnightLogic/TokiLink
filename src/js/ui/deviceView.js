@@ -77,13 +77,24 @@ export class DeviceView {
       if (this.dom.deviceId) this.dom.deviceId.textContent = device.id || '';
 
       const model = DeviceProtocol.detectModel(device.name);
-      const isSS201 = model.hasFeatures || (device.name || '').toUpperCase().includes('SS201') || (device.name || '').toUpperCase().includes('SS501');
+      const isMultiSound = model.hasFeatures || (device.name || '').toUpperCase().includes('SS201') || (device.name || '').toUpperCase().includes('SS501');
+
+      const deviceTag = document.querySelector('.device-tag');
+      if (deviceTag) {
+        const seriesKey = `series.${model.series || 'generic'}`;
+        deviceTag.textContent = i18n.t(seriesKey) || model.type || 'BLE Clock';
+      }
 
       if (tabs) {
-        if (isSS201 || isDebugOrMock) {
+        if (isMultiSound || isDebugOrMock) {
           tabs.classList.remove('hidden');
         } else {
           tabs.classList.add('hidden');
+          const activeTabBtn = document.querySelector('.tab-btn.active');
+          if (activeTabBtn && activeTabBtn.dataset.tab !== 'time') {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'time'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-time'));
+          }
         }
       }
     } else {

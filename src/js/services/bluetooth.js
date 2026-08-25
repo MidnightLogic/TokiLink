@@ -374,6 +374,69 @@ export class BluetoothService {
   }
 
   /**
+   * Universal Clock Time Sync method supporting all 4 Seiko clock series:
+   *  - Multi-Sound Series (SS501, SS201)
+   *  - Series C3 (DL308K)
+   *  - Standard Digital SQ Series (SQ820, SQ821)
+   *  - NexTime Hybrid Series (ZS450, ZS451, ZS250..256, QHB201)
+   */
+  async syncClockTime(device, targetDate = new Date()) {
+    const config = DeviceProtocol.getConfig(device?.name || '');
+    debug.log(`[BLE Sync] Starting sync for ${device?.name || 'clock'} using profile:`, config.type, config.protocol);
+
+    if (config.protocol === 'lpwise_5301') {
+      // NexTime Series (LPWISE protocol)
+      const payload = DeviceProtocol.buildNexTimePayload(targetDate);
+      debug.log(`[BLE Sync] Writing NexTime 8-byte payload:`, DeviceProtocol.formatPayload(payload));
+
+      try {
+        // Optional notify setup on RX characteristic
+        try {
+          const notifyChar = await this.getCharacteristic(config.timeServiceUUID, config.timeNotifyCharUUID);
+          if (notifyChar?.startNotifications) {
+            await notifyChar.startNotifications();
+          }
+        } catch (e) {
+          debug.warn('[BLE Sync] NexTime notification subscribe skipped/unsupported:', e);
+        }
+
+        // Send query/auth packet
+        try {
+          const authPayload = DeviceProtocol.buildNexTimeAuth();
+          await this.write(config.timeServiceUUID, config.timeWriteCharUUID, authPayload);
+          await new Promise(r => setTimeout(r, 60));
+        } catch (e) {
+          debug.warn('[BLE Sync] Auth pre-packet skipped:', e);
+        }
+
+        // Write time packet
+        await this.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
+        await new Promise(r => setTimeout(r, 100));
+        return { success: true, protocol: 'lpwise_5301', payload };
+      } catch (err) {
+        debug.warn('[BLE Sync] NexTime LPWISE write failed, attempting standard fallback:', err);
+      }
+    }
+
+    // Standard CTS 10-byte protocol (Multi-Sound, Series C3, Standard Digital SQ)
+    const payload = DeviceProtocol.buildTimePayload(targetDate);
+    debug.log(`[BLE Sync] Writing Standard CTS 10-byte payload:`, DeviceProtocol.formatPayload(payload));
+
+    try {
+      await this.write(config.timeServiceUUID, config.timeWriteCharUUID, payload);
+      await new Promise(r => setTimeout(r, 60));
+      return { success: true, protocol: config.protocol || 'cts', payload };
+    } catch (primaryErr) {
+      if (config.altTimeServiceUUID && config.altTimeWriteCharUUID) {
+        debug.log('[BLE Sync] Primary service failed, trying alternative service:', config.altTimeServiceUUID);
+        await this.write(config.altTimeServiceUUID, config.altTimeWriteCharUUID, payload);
+        return { success: true, protocol: 'alt_cts', payload };
+      }
+      throw primaryErr;
+    }
+  }
+
+  /**
    * Sends SS201 / SS501 control packet (Characteristic 0xFFE3, Service 0xFFE0)
    */
   async sendControlPayload(device, payload) {
