@@ -476,7 +476,10 @@ class App {
       return device;
     } catch (err) {
       connectionStateStore.set('disconnected');
-      const isBlocked = err.name === 'SecurityError' || (err.message && /permission.*blocked|access.*denied.*permanently/i.test(err.message));
+      connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+
+      // Only show permission blocked banner if permissions are explicitly denied at origin level in browser settings
+      const isBlocked = /permission.*blocked|access.*denied.*permanently|origin.*not.*allowed/i.test(err.message || '');
       if (isBlocked) {
         connectionStatusTextStore.set(i18n.t('sync.status.blocked'));
         if (this.diagnostics?.browser?.isBrave) {
@@ -484,8 +487,6 @@ class App {
         } else {
           this.dom.permissionBlockedBanner?.classList.remove('hidden');
         }
-      } else {
-        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
       }
       if (err.name !== 'NotFoundError' && !isBlocked) {
         console.warn('[App] BLE pairing cancelled or peripheral busy:', err.message || err);
@@ -576,54 +577,48 @@ class App {
       }
     };
 
-    let directConnectSucceeded = false;
-
-    // Phase 1: Try direct connection with cached/permitted device (for 1-click zero-dialog sync)
+    // If we have a cached / permitted device, attempt 1-click direct sync
     if (targetDevice) {
       try {
         await executeSync(targetDevice);
-        directConnectSucceeded = true;
         return;
       } catch (err) {
-        console.warn(`[Sync] Direct connect to cached device (${targetDevice.name || targetDevice.id}) failed: ${err.message}. Clearing stale session and recovering via device picker...`);
+        console.warn(`[Sync] Direct connect to cached device (${targetDevice.name || targetDevice.id}) failed: ${err.message}. Clearing stale session cache.`);
         bleService.clearSessionCache(targetDevice.id);
-        targetDevice = null;
+        connectionStateStore.set('disconnected');
+        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        return;
       }
     }
 
-    // Phase 2: Live Discovery Fallback (if no permitted device, direct reconnect timed out, or peripheral restarted)
-    if (!directConnectSucceeded) {
-      try {
-        connectionStateStore.set('searching');
-        connectionStatusTextStore.set(i18n.t('sync.status.searching'));
+    // If no permitted device is in memory, open the native device picker immediately within the fresh user gesture
+    try {
+      const freshDevice = await this.pairNewClock(false);
+      if (!freshDevice) {
+        connectionStateStore.set('disconnected');
+        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        return;
+      }
 
-        const freshDevice = await this.pairNewClock(false);
-        if (!freshDevice) {
+      await executeSync(freshDevice);
+    } catch (err) {
+      console.error('[Sync] Discovery sync failed:', err);
+      connectionStateStore.set('error');
+      connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
+
+      const log = syncLogStore.get();
+      syncLogStore.set([{
+        timestamp: Date.now(),
+        success: false,
+        detail: `Sync error: ${err.message}`
+      }, ...log.slice(0, 29)]);
+
+      setTimeout(() => {
+        if (connectionStateStore.get() === 'error') {
           connectionStateStore.set('disconnected');
           connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-          return;
         }
-
-        await executeSync(freshDevice);
-      } catch (err) {
-        console.error('[Sync] Failed:', err);
-        connectionStateStore.set('error');
-        connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
-
-        const log = syncLogStore.get();
-        syncLogStore.set([{
-          timestamp: Date.now(),
-          success: false,
-          detail: `Sync error: ${err.message}`
-        }, ...log.slice(0, 29)]);
-
-        setTimeout(() => {
-          if (connectionStateStore.get() === 'error') {
-            connectionStateStore.set('disconnected');
-            connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-          }
-        }, 4000);
-      }
+      }, 4000);
     }
   }
 }
