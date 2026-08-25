@@ -43,8 +43,8 @@ export class RadioView {
     });
 
     // Stepper continuous seek on hold
-    this.setupHoldSeek(this.dom.radioSeekDownBtn, false);
-    this.setupHoldSeek(this.dom.radioSeekUpBtn, true);
+    this.setupHoldAction(this.dom.radioSeekDownBtn, () => this.stepFrequency(false));
+    this.setupHoldAction(this.dom.radioSeekUpBtn, () => this.stepFrequency(true));
 
     // Volume slider
     this.dom.radioVolumeSlider?.addEventListener('input', (e) => {
@@ -53,20 +53,10 @@ export class RadioView {
       this.setVolume(val);
     });
 
-    // Volume steppers & Mute
+    // Volume steppers with press-and-hold support & Mute
     this.dom.radioMuteBtn?.addEventListener('click', () => this.toggleMute());
-    this.dom.radioVolDownBtn?.addEventListener('click', () => {
-      const cur = radioStore.get().volume || 0;
-      const next = Math.max(0, cur - 1);
-      if (next > 0) this.lastNonZeroVolume = next;
-      this.setVolume(next);
-    });
-    this.dom.radioVolUpBtn?.addEventListener('click', () => {
-      const cur = radioStore.get().volume || 0;
-      const next = Math.min(30, cur + 1);
-      this.lastNonZeroVolume = next;
-      this.setVolume(next);
-    });
+    this.setupHoldAction(this.dom.radioVolDownBtn, () => this.stepVolume(-1));
+    this.setupHoldAction(this.dom.radioVolUpBtn, () => this.stepVolume(1));
 
     // Preset Modal Controls
     this.dom.presetModalCloseBtn?.addEventListener('click', () => this.closePresetModal());
@@ -82,6 +72,19 @@ export class RadioView {
     });
   }
 
+  stepFrequency(isUp) {
+    const current = parseFloat(radioStore.get().frequency || '89.5');
+    const next = isUp ? Math.min(108.0, current + 0.1) : Math.max(76.0, current - 0.1);
+    this.setFrequency(next);
+  }
+
+  stepVolume(delta) {
+    const cur = radioStore.get().volume || 0;
+    const next = Math.max(0, Math.min(30, cur + delta));
+    if (next > 0) this.lastNonZeroVolume = next;
+    this.setVolume(next);
+  }
+
   toggleMute() {
     const current = radioStore.get().volume || 0;
     if (current > 0) {
@@ -92,30 +95,39 @@ export class RadioView {
     }
   }
 
-  setupHoldSeek(btn, isUp) {
+  setupHoldAction(btn, actionFn) {
     if (!btn) return;
     let interval = null;
     let timeout = null;
-
-    const step = () => {
-      const current = parseFloat(radioStore.get().frequency || '89.5');
-      const next = isUp ? Math.min(108.0, current + 0.1) : Math.max(76.0, current - 0.1);
-      this.setFrequency(next);
-    };
-
-    const start = (e) => {
-      e.preventDefault();
-      step();
-      timeout = setTimeout(() => {
-        interval = setInterval(step, 75);
-      }, 300);
-    };
+    let isPressed = false;
 
     const stop = () => {
+      if (!isPressed) return;
+      isPressed = false;
       if (timeout) clearTimeout(timeout);
       if (interval) clearInterval(interval);
       timeout = null;
       interval = null;
+      btn.classList.remove('active-pressed');
+    };
+
+    const start = (e) => {
+      if (isPressed) return;
+      isPressed = true;
+      if (e.cancelable) e.preventDefault();
+      btn.classList.add('active-pressed');
+      actionFn();
+
+      timeout = setTimeout(() => {
+        if (!isPressed) return;
+        interval = setInterval(() => {
+          if (isPressed) {
+            actionFn();
+          } else {
+            stop();
+          }
+        }, 90);
+      }, 300);
     };
 
     btn.addEventListener('mousedown', start);
@@ -123,6 +135,14 @@ export class RadioView {
     btn.addEventListener('mouseup', stop);
     btn.addEventListener('mouseleave', stop);
     btn.addEventListener('touchend', stop);
+    btn.addEventListener('touchcancel', stop);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Window-level safety listeners to guarantee stop even if finger slides off element
+    window.addEventListener('mouseup', stop, { passive: true });
+    window.addEventListener('touchend', stop, { passive: true });
+    window.addEventListener('touchcancel', stop, { passive: true });
+    window.addEventListener('blur', stop, { passive: true });
   }
 
   async sendToBle(payload) {
