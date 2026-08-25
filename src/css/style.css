@@ -96,6 +96,373 @@ html.light {
   --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.12);
 }
 
+/* ============================================================
+   Light Theme Component Refinements
+   (Preserves 100% of Dark Mode styling without modification)
+   ============================================================ */
+
+/* ---------- Sync Button (Light Mode) ---------- */
+html.light .sync-btn,
+:root.light .sync-btn {
+  background: linear-gradient(150deg, #6366f1 0%, #7c3aed 52%, #8b5cf6 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.18),
+    0 8px 24px rgba(99, 102, 241, 0.38),
+    0 0 18px rgba(139, 92, 246, 0.28);
+}
+
+html.light .sync-btn:hover:not(:disabled),
+:root.light .sync-btn:hover:not(:disabled) {
+  border-color: #ffffff;
+  box-shadow:
+    inset 0 1.5px 2.5px rgba(255, 255, 255, 0.7),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.18),
+    0 10px 28px rgba(99, 102, 241, 0.48),
+    0 0 24px rgba(139, 92, 246, 0.4);
+}
+
+html.light #syncIconWrap,
+:root.light #syncIconWrap {
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+}
+
+/* ---------- Brave Browser Banner (Light Mode) ---------- */
+html.light .brave-compat-banner,
+:root.light .brave-compat-banner {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.08);
+}
+
+html.light .brave-banner-title,
+:root.light .brave-banner-title {
+  color: #0f172a;
+}
+
+html.light .brave-banner-desc,
+:root.light .brave-banner-desc {
+  color: #475569;
+}
+
+html.light .brave-banner-icon-badge,
+:root.light .brave-banner-icon-badge {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+}
+
+html.light .brave-banner-icon,
+:root.light .brave-banner-icon {
+  color: #ea580c;
+}
+
+html.light .brave-steps-container,
+:root.light .brave-steps-container {
+  background: #fffaf5;
+  border: 1px solid #ffedd5;
+}
+
+html.light .brave-step-row,
+:root.light .brave-step-row {
+  color: #1e293b;
+}
+
+html.light .brave-step-num,
+:root.light .brave-step-num {
+  background: #ea580c;
+  border-color: #ea580c;
+  color: #ffffff;
+}
+
+html.light .brave-flag-copy-wrap,
+:root.light .brave-flag-copy-wrap {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+}
+
+html.light .brave-flag-code,
+:root.light .brave-flag-code {
+  color: #c2410c;
+  font-weight: 600;
+}
+
+html.light .brave-flag-copy-btn,
+:root.light .brave-flag-copy-btn {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #ea580c;
+}
+
+html.light .brave-flag-copy-btn:hover,
+:root.light .brave-flag-copy-btn:hover {
+  background: #ea580c;
+  color: #ffffff;
+  border-color: #ea580c;
+}
+
+html.light .brave-banner-hint,
+:root.light .brave-banner-hint {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #7c2d12;
+}
+
+html.light .brave-hint-badge,
+:root.light .brave-hint-badge {
+  background: #ea580c;
+  color: #ffffff;
+}
+
+/* ---------- Permission Blocked Banner (Light Mode) ---------- */
+html.light .permission-blocked-banner,
+:root.light .permission-blocked-banner {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.08);
+}
+
+html.light .permission-icon-badge,
+:root.light .permission-icon-badge {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+}
+
+html.light .permission-icon,
+:root.light .permission-icon {
+  color: #dc2626;
+}
+
+html.light .permission-steps-container,
+:root.light .permission-steps-container {
+  background: #fff5f5;
+  border: 1px solid #fee2e2;
+}
+
+html.light .permission-step-row,
+:root.light .permission-step-row {
+  color: #1e293b;
+}
+
+html.light .permission-step-num,
+:root.light .permission-step-num {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+/* ---------- iOS Setup Banner (Light Mode) ---------- */
+html.light .ios-compat-banner,
+:root.light .ios-compat-banner {
+  background: #ffffff;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+}
+
+html.light .ios-banner-icon-badge,
+:root.light .ios-banner-icon-badge {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+}
+
+html.light .ios-banner-icon,
+:root.light .ios-banner-icon {
+  color: #4f46e5;
+}
+
+html.light .ios-method-card,
+:root.light .ios-method-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+html.light .ios-method-card.ios-method-recommended,
+:root.light .ios-method-card.ios-method-recommended {
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+}
+
+html.light .ios-method-card.ios-method-pwa,
+:root.light .ios-method-card.ios-method-pwa {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+html.light .ios-note-box,
+:root.light .ios-note-box {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+/* ---------- 1-Click Fast Sync Setup Guide Modal (Light Mode) ---------- */
+html.light .modal-card,
+:root.light .modal-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+html.light .modal-header,
+:root.light .modal-header {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+html.light .modal-title,
+:root.light .modal-title {
+  color: #0f172a;
+}
+
+html.light .backend-guide-sub,
+:root.light .backend-guide-sub {
+  color: #64748b;
+}
+
+html.light .backend-guide-intro,
+:root.light .backend-guide-intro {
+  color: #475569;
+}
+
+html.light .backend-guide-icon-badge,
+:root.light .backend-guide-icon-badge {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #d97706;
+}
+
+html.light .backend-guide-step,
+:root.light .backend-guide-step {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+html.light .backend-step-badge,
+:root.light .backend-step-badge {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+html.light .backend-step-label,
+:root.light .backend-step-label {
+  color: #1e293b;
+}
+
+html.light .backend-flag-copy-wrap,
+:root.light .backend-flag-copy-wrap {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+html.light .backend-flag-code,
+:root.light .backend-flag-code {
+  color: #4338ca;
+  font-weight: 600;
+}
+
+html.light .backend-flag-copy-btn,
+:root.light .backend-flag-copy-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
+html.light .backend-flag-copy-btn:hover,
+:root.light .backend-flag-copy-btn:hover {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #ffffff;
+}
+
+html.light .backend-brave-box,
+:root.light .backend-brave-box {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+}
+
+html.light .backend-brave-header,
+:root.light .backend-brave-header {
+  color: #c2410c;
+}
+
+html.light .backend-brave-text,
+:root.light .backend-brave-text {
+  color: #7c2d12;
+}
+
+html.light .modal-footer,
+:root.light .modal-footer {
+  border-top: 1px solid #f1f5f9;
+}
+
+/* ---------- Settings Tip Box (Light Mode) ---------- */
+html.light .settings-tip-box,
+:root.light .settings-tip-box {
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+}
+
+html.light .settings-tip-title-wrap,
+:root.light .settings-tip-title-wrap {
+  color: #4f46e5;
+}
+
+html.light .settings-tip-btn,
+:root.light .settings-tip-btn {
+  background: #ffffff;
+  border: 1px solid #c4b5fd;
+  color: #4f46e5;
+}
+
+html.light .settings-tip-btn:hover,
+:root.light .settings-tip-btn:hover {
+  background: #4f46e5;
+  color: #ffffff;
+  border-color: #4f46e5;
+}
+
+html.light .settings-tip-text,
+:root.light .settings-tip-text {
+  color: #475569;
+}
+
+/* ---------- PWA Update Floating Toast (Light Mode) ---------- */
+html.light .pwa-update-toast,
+:root.light .pwa-update-toast {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15), 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+html.light .pwa-update-title,
+:root.light .pwa-update-title {
+  color: #0f172a;
+}
+
+html.light .pwa-update-sub,
+:root.light .pwa-update-sub {
+  color: #64748b;
+}
+
+html.light .pwa-update-icon,
+:root.light .pwa-update-icon {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+/* ---------- Form Controls in Light Mode ---------- */
+html.light .modal-time-input,
+html.light .modal-number-input,
+html.light .modal-text-input,
+html.light .modal-select,
+:root.light .modal-time-input,
+:root.light .modal-number-input,
+:root.light .modal-text-input,
+:root.light .modal-select {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
 /* ---------- Reset & Base ---------- */
 *,
 *::before,
