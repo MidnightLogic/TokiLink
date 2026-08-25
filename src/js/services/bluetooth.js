@@ -378,7 +378,10 @@ export class BluetoothService {
 
     if (characteristic.writeValueWithResponse) {
       await characteristic.writeValueWithResponse(buffer);
-    } else if (characteristic.writeValue) {
+      return;
+    }
+
+    if (characteristic.writeValue) {
       await characteristic.writeValue(buffer);
     }
   }
@@ -386,9 +389,14 @@ export class BluetoothService {
   // ─── Adaptive Protocol Synchronization Engine ─────────────────
 
   /**
-   * Performs high-speed clock synchronization with adaptive protocol probing.
+   * Universal Clock Time Sync method supporting all Seiko clock series:
+   *  - Multi-Sound Series (SS501, SS201)
+   *  - Series C3 (DL308K)
+   *  - Standard Digital SQ Series (SQ820, SQ821)
+   *  - NexTime Hybrid Series (ZS450, ZS451, ZS250..256, QHB201)
+   *  - Generic / Custom-named Seiko Bluetooth Clocks
    */
-  async syncTime(device, targetDate = new Date()) {
+  async syncClockTime(device, targetDate = new Date()) {
     let bleDevice = this._device;
 
     if (!this.isConnected || this._device?.id !== device.id) {
@@ -435,7 +443,7 @@ export class BluetoothService {
 
           // Write time packet
           await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
-          await new Promise(r => setTimeout(r, 100));
+          await new Promise(r => setTimeout(r, 60));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
           // Background battery telemetry query
@@ -461,6 +469,13 @@ export class BluetoothService {
     }
 
     throw lastError || new Error(`No compatible Seiko time synchronization service found on "${device?.name || 'clock'}".`);
+  }
+
+  /**
+   * Alias for syncClockTime
+   */
+  async syncTime(device, targetDate = new Date()) {
+    return this.syncClockTime(device, targetDate);
   }
 
   /**
