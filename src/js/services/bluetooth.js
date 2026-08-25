@@ -31,6 +31,7 @@ export class BluetoothService {
     this._characteristics = new Map();
     this._listeners = new Map();
     this._sessionDeviceCache = new Map(); // id -> BluetoothDevice, survives within a single session
+    this._failedDirectConnectDevices = new Set(); // IDs of devices where direct GATT connect failed
 
     if (typeof navigator !== 'undefined' && navigator.bluetooth && typeof navigator.bluetooth.addEventListener === 'function') {
       try {
@@ -132,7 +133,12 @@ export class BluetoothService {
       const lower = d.name.toLowerCase();
       return DeviceProtocol.NAME_FILTERS.some(filter => lower.includes(filter.toLowerCase()));
     });
-    return matched.length > 0 ? matched : devices;
+    const candidateDevices = matched.length > 0 ? matched : devices;
+
+    // Filter out devices where direct GATT connection has failed, forcing discovery picker recovery
+    const validPermitted = candidateDevices.filter(d => !this.hasDirectConnectFailed(d.id));
+    debug.log(`[BLE Debug] Eligible permitted devices for direct sync: ${validPermitted.length} (filtered ${candidateDevices.length - validPermitted.length} failed direct-connect candidates)`);
+    return validPermitted;
   }
 
   /**
@@ -155,6 +161,7 @@ export class BluetoothService {
 
     this._device = device;
     this._sessionDeviceCache.set(device.id, device);
+    this.clearDirectConnectFailed(device.id); // Fresh picker selection resets failure counter
     this._bindDeviceEvents(device);
     return device;
   }
@@ -298,12 +305,32 @@ export class BluetoothService {
     }
   }
 
+  markDirectConnectFailed(deviceId) {
+    if (deviceId) {
+      this._failedDirectConnectDevices.add(deviceId);
+      debug.log(`[BLE] Device marked as failed direct connect: ${deviceId}`);
+    }
+  }
+
+  hasDirectConnectFailed(deviceId) {
+    return deviceId ? this._failedDirectConnectDevices.has(deviceId) : false;
+  }
+
+  clearDirectConnectFailed(deviceId = null) {
+    if (deviceId) {
+      this._failedDirectConnectDevices.delete(deviceId);
+    } else {
+      this._failedDirectConnectDevices.clear();
+    }
+  }
+
   /**
    * Clears in-memory session device references and resets GATT socket maps.
    */
   clearSessionCache(deviceId = null) {
     if (deviceId) {
       this._sessionDeviceCache.delete(deviceId);
+      this.markDirectConnectFailed(deviceId);
       if (this._device && this._device.id === deviceId) {
         this._device = null;
       }
