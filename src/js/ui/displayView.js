@@ -52,6 +52,9 @@ export class DisplayView {
   async sendToBle(payload) {
     const activeDevice = activeDeviceStore.get();
     if (!activeDevice) return;
+    const model = DeviceProtocol.detectModel(activeDevice.name);
+    const isMultiSound = model.hasFeatures || (activeDevice.name || '').toUpperCase().includes('SS201') || (activeDevice.name || '').toUpperCase().includes('SS501');
+    if (!isMultiSound) return; // Skip BLE write on pure digital clocks to prevent stalls
     try {
       await bleService.sendControlPayload(activeDevice, payload);
     } catch (err) {

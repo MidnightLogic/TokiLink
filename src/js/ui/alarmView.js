@@ -60,6 +60,9 @@ export class AlarmView {
   async sendAlarmToBle(alarm) {
     const activeDevice = activeDeviceStore.get();
     if (!activeDevice) return;
+    const model = DeviceProtocol.detectModel(activeDevice.name);
+    const isMultiSound = model.hasFeatures || (activeDevice.name || '').toUpperCase().includes('SS201') || (activeDevice.name || '').toUpperCase().includes('SS501');
+    if (!isMultiSound) return; // Skip BLE write on pure digital clocks to prevent stalls
     const payload = DeviceProtocol.buildSS201Alarm(alarm);
     if (isDebug()) console.log(`[AlarmView] Sending Alarm ${alarm.alarmNo} to BLE:`, DeviceProtocol.formatPayload(payload));
     try {
@@ -72,6 +75,9 @@ export class AlarmView {
   async sendDeleteToBle(alarmNo) {
     const activeDevice = activeDeviceStore.get();
     if (!activeDevice) return;
+    const model = DeviceProtocol.detectModel(activeDevice.name);
+    const isMultiSound = model.hasFeatures || (activeDevice.name || '').toUpperCase().includes('SS201') || (activeDevice.name || '').toUpperCase().includes('SS501');
+    if (!isMultiSound) return; // Skip BLE write on pure digital clocks to prevent stalls
     const payload = DeviceProtocol.buildSS201DeleteAlarm(alarmNo);
     if (isDebug()) console.log(`[AlarmView] Sending Delete Alarm ${alarmNo} to BLE:`, DeviceProtocol.formatPayload(payload));
     try {

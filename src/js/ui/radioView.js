@@ -148,6 +148,9 @@ export class RadioView {
   async sendToBle(payload) {
     const activeDevice = activeDeviceStore.get();
     if (!activeDevice) return;
+    const model = DeviceProtocol.detectModel(activeDevice.name);
+    const isMultiSound = model.hasFeatures || (activeDevice.name || '').toUpperCase().includes('SS201') || (activeDevice.name || '').toUpperCase().includes('SS501');
+    if (!isMultiSound) return; // Skip BLE write on pure digital clocks to prevent stalls
     try {
       await bleService.sendControlPayload(activeDevice, payload);
     } catch (err) {
@@ -210,7 +213,6 @@ export class RadioView {
     if (this.dom.presetModalFreqInput) this.dom.presetModalFreqInput.value = preset.freq || '89.5';
 
     modal.classList.remove('hidden');
-    if (this.renderIcons) this.renderIcons();
   }
 
   closePresetModal() {
@@ -263,20 +265,43 @@ export class RadioView {
       this.dom.radioMuteLabel.textContent = isMuted ? 'Unmute' : 'Mute';
     }
 
+    const currentFreq = parseFloat(radio.frequency).toFixed(1);
+    const presetSig = JSON.stringify(radio.presets) + '_' + (i18n.locale || '');
+
+    if (this._lastPresetSig !== presetSig) {
+      this._lastPresetSig = presetSig;
+      this.renderPresetGrid(radio.presets, currentFreq);
+    } else {
+      this.updatePresetHighlight(currentFreq);
+    }
+  }
+
+  updatePresetHighlight(currentFreq) {
+    const grid = this.dom.presetGrid;
+    if (!grid) return;
+    const btns = grid.querySelectorAll('.preset-btn');
+    btns.forEach(btn => {
+      const freq = btn.dataset.freq;
+      btn.classList.toggle('active', freq === currentFreq);
+    });
+  }
+
+  renderPresetGrid(presets, currentFreq) {
     const grid = this.dom.presetGrid;
     if (!grid) return;
 
     grid.innerHTML = '';
-    const currentFreq = parseFloat(radio.frequency).toFixed(1);
     const presetPrefix = i18n.t('ss201.radio.preset') || 'Preset';
 
-    radio.presets.forEach((p, idx) => {
-      const isCurrent = parseFloat(p.freq).toFixed(1) === currentFreq;
+    presets.forEach((p, idx) => {
+      const pFreq = parseFloat(p.freq).toFixed(1);
+      const isCurrent = pFreq === currentFreq;
       const isDefault = !p.name || /^(Preset|Station|Préréglage|Speicher|Presintonía|プリセット|预设)\s*\d+$/i.test(p.name);
       const displayName = isDefault ? `${presetPrefix} ${idx + 1}` : p.name;
 
       const btn = document.createElement('button');
       btn.className = `preset-btn ${isCurrent ? 'active' : ''}`;
+      btn.dataset.freq = pFreq;
       btn.innerHTML = `
         <span class="preset-num">CH ${idx + 1}</span>
         <span class="preset-freq">${p.freq}</span>
@@ -287,7 +312,5 @@ export class RadioView {
       });
       grid.appendChild(btn);
     });
-
-    if (this.renderIcons) this.renderIcons();
   }
 }
