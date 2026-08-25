@@ -472,16 +472,30 @@
               <i data-lucide="volume-2" class="slider-icon"></i>
             </div>
           </div>
+
+          <!-- Bass Boost -->
+          <div class="control-group">
+            <div class="control-label-row">
+              <label class="control-label" data-i18n="ss201.display.bass">Bass Boost</label>
+              <span class="control-value-badge" id="bassVal">OFF</span>
+            </div>
+            <div class="segmented-control bass-segments">
+              <button class="segment-btn active" data-bass="0" data-i18n="ss201.display.off">OFF</button>
+              <button class="segment-btn" data-bass="1">+1</button>
+              <button class="segment-btn" data-bass="2">+2</button>
+              <button class="segment-btn" data-bass="3">+3</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- ═══ DISPLAY & AUDIO TAB CONTENT ═══ -->
+      <!-- ═══ DISPLAY & POWER TAB CONTENT ═══ -->
       <div class="tab-content" id="tab-display">
         <div class="panel-card">
           <div class="panel-card-header">
             <div class="panel-card-title">
               <i data-lucide="sun"></i>
-              <span data-i18n="ss201.display.title">Display &amp; Sound Settings</span>
+              <span data-i18n="ss201.display.title">Display Settings</span>
             </div>
           </div>
 
@@ -497,20 +511,6 @@
               <button class="segment-btn" data-brightness="2">2</button>
               <button class="segment-btn active" data-brightness="3">3</button>
               <button class="segment-btn" data-brightness="4"><i data-lucide="sun" width="14" height="14"></i> 4</button>
-            </div>
-          </div>
-
-          <!-- Bass Boost -->
-          <div class="control-group">
-            <div class="control-label-row">
-              <label class="control-label" data-i18n="ss201.display.bass">Bass Boost</label>
-              <span class="control-value-badge" id="bassVal">OFF</span>
-            </div>
-            <div class="segmented-control bass-segments">
-              <button class="segment-btn active" data-bass="0" data-i18n="ss201.display.off">OFF</button>
-              <button class="segment-btn" data-bass="1">+1</button>
-              <button class="segment-btn" data-bass="2">+2</button>
-              <button class="segment-btn" data-bass="3">+3</button>
             </div>
           </div>
 
