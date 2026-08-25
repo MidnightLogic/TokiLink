@@ -2442,6 +2442,10 @@ body::after {
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
   transition: all var(--transition-fast);
 }
 
@@ -2464,7 +2468,8 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  animation: fadeIn 0.2s var(--ease-out);
+  animation: fadeIn 0.12s var(--ease-out);
+  will-change: opacity, transform;
 }
 
 /* ---------- Panels & Cards ---------- */
@@ -3105,16 +3110,18 @@ body::after {
   background: var(--bg-secondary);
   border-left: 1px solid var(--border);
   z-index: 160;
-  transform: translateX(100%);
+  transform: translate3d(100%, 0, 0);
   transition: transform var(--transition-base);
+  will-change: transform;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
 }
 
 .settings-panel.open {
-  transform: translateX(0);
+  transform: translate3d(0, 0, 0);
 }
 
 .settings-panel-header {

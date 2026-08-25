@@ -434,8 +434,13 @@ export class BluetoothService {
           await new Promise(r => setTimeout(r, 100));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
-          // Read battery telemetry if supported
-          this.readBatteryLevel(device).catch(() => {});
+          // Read battery telemetry while GATT connection is active
+          try {
+            await Promise.race([
+              this.readBatteryLevel(device),
+              new Promise(r => setTimeout(r, 350))
+            ]);
+          } catch (e) {}
 
           return { success: true, protocol: proto.id, series: proto.series, payload };
         } else {
@@ -445,8 +450,13 @@ export class BluetoothService {
           await new Promise(r => setTimeout(r, 60));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
-          // Read battery telemetry if supported
-          this.readBatteryLevel(device).catch(() => {});
+          // Read battery telemetry while GATT connection is active
+          try {
+            await Promise.race([
+              this.readBatteryLevel(device),
+              new Promise(r => setTimeout(r, 350))
+            ]);
+          } catch (e) {}
 
           return { success: true, protocol: proto.id, series: proto.series, payload };
         }
