@@ -517,7 +517,7 @@ class App {
     }
 
     // Helper to execute atomic time fetch, GATT connection, immediate time write, and clean disconnect
-    const executeSync = async (device) => {
+    const executeSync = async (device, timeoutMs = 8500) => {
       try {
         const config = DeviceProtocol.getConfig(device.name || '');
         connectionStateStore.set('connecting');
@@ -532,8 +532,8 @@ class App {
           }
         }
 
-        // 2. Connect to GATT with a crisp timeout (4.5s)
-        await bleService.connect(device, 4500);
+        // 2. Connect to GATT with designated timeout budget
+        await bleService.connect(device, timeoutMs);
 
         connectionStateStore.set('syncing');
         connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
@@ -577,48 +577,51 @@ class App {
       }
     };
 
-    // If we have a cached / permitted device, attempt 1-click direct sync
+    let directConnectSucceeded = false;
+
+    // Phase 1: Fast direct connect attempt (1.8s timeout) preserving the active user gesture
     if (targetDevice) {
       try {
-        await executeSync(targetDevice);
+        await executeSync(targetDevice, 1800);
+        directConnectSucceeded = true;
         return;
       } catch (err) {
-        console.warn(`[Sync] Direct connect to cached device (${targetDevice.name || targetDevice.id}) failed: ${err.message}. Clearing stale session cache.`);
+        console.warn(`[Sync] Fast direct connect check to ${targetDevice.name || targetDevice.id} failed: ${err.message}. Seamlessly opening picker fallback within active user gesture...`);
         bleService.clearSessionCache(targetDevice.id);
-        connectionStateStore.set('disconnected');
-        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-        return;
       }
     }
 
-    // If no permitted device is in memory, open the native device picker immediately within the fresh user gesture
-    try {
-      const freshDevice = await this.pairNewClock(false);
-      if (!freshDevice) {
-        connectionStateStore.set('disconnected');
-        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-        return;
-      }
-
-      await executeSync(freshDevice);
-    } catch (err) {
-      console.error('[Sync] Discovery sync failed:', err);
-      connectionStateStore.set('error');
-      connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
-
-      const log = syncLogStore.get();
-      syncLogStore.set([{
-        timestamp: Date.now(),
-        success: false,
-        detail: `Sync error: ${err.message}`
-      }, ...log.slice(0, 29)]);
-
-      setTimeout(() => {
-        if (connectionStateStore.get() === 'error') {
+    // Phase 2: Live Discovery Fallback (runs within the remaining active user gesture window)
+    if (!directConnectSucceeded) {
+      try {
+        const freshDevice = await this.pairNewClock(false);
+        if (!freshDevice) {
           connectionStateStore.set('disconnected');
           connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+          return;
         }
-      }, 4000);
+
+        // Freshly selected device gets a generous 9.0s connection budget for ACL negotiation
+        await executeSync(freshDevice, 9000);
+      } catch (err) {
+        console.error('[Sync] Discovery sync failed:', err);
+        connectionStateStore.set('error');
+        connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
+
+        const log = syncLogStore.get();
+        syncLogStore.set([{
+          timestamp: Date.now(),
+          success: false,
+          detail: `Sync error: ${err.message}`
+        }, ...log.slice(0, 29)]);
+
+        setTimeout(() => {
+          if (connectionStateStore.get() === 'error') {
+            connectionStateStore.set('disconnected');
+            connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+          }
+        }, 4000);
+      }
     }
   }
 }

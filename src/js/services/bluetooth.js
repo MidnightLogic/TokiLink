@@ -237,7 +237,7 @@ export class BluetoothService {
     return !!(this._server && this._server.connected);
   }
 
-  async connect(device, timeoutMs = 6000) {
+  async connect(device, timeoutMs = 8000) {
     if (!device) throw new Error('No device provided for connection.');
 
     this._device = device;
@@ -251,8 +251,8 @@ export class BluetoothService {
       return this._server;
     }
 
-    // Allow 200ms settling window for OS Bluetooth HCI controller between rapid reconnects
-    await new Promise(r => setTimeout(r, 200));
+    // Allow 100ms settling window for OS Bluetooth HCI controller
+    await new Promise(r => setTimeout(r, 100));
 
     const connectWithTimeout = (targetDevice, ms) => {
       let timer;
@@ -268,12 +268,16 @@ export class BluetoothService {
     };
 
     try {
-      debug.log(`[BLE Debug] Connecting to GATT server for: ${device.name || device.id}...`);
+      debug.log(`[BLE Debug] Connecting to GATT server for: ${device.name || device.id} (timeout: ${timeoutMs}ms)...`);
       this._server = await connectWithTimeout(device, timeoutMs);
       debug.log('[BLE Debug] GATT connected successfully.');
       this.emit('connected', { device });
       return this._server;
     } catch (err) {
+      // If doing a fast pre-flight check, fail fast so User Gesture is preserved for picker fallback
+      if (timeoutMs <= 2500) {
+        throw err;
+      }
       debug.log(`[BLE Debug] Initial connect caught busy socket or timeout (${err.message}), retrying in 250ms...`);
       await new Promise(r => setTimeout(r, 250));
       this._server = await connectWithTimeout(device, timeoutMs);
