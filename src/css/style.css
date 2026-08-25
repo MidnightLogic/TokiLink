@@ -542,18 +542,55 @@ html.light .pwa-update-icon,
   color: #4f46e5;
 }
 
-/* ---------- Form Controls in Light Mode ---------- */
+/* ---------- Form Controls & Selects in Light Mode ---------- */
 html.light .modal-time-input,
 html.light .modal-number-input,
 html.light .modal-text-input,
 html.light .modal-select,
+html.light .lang-select,
+html.light .theme-select,
+html.light select,
 :root.light .modal-time-input,
 :root.light .modal-number-input,
 :root.light .modal-text-input,
-:root.light .modal-select {
-  background: #ffffff;
+:root.light .modal-select,
+:root.light .lang-select,
+:root.light .theme-select,
+:root.light select {
+  background-color: #ffffff;
   border-color: #cbd5e1;
   color: #0f172a;
+  color-scheme: light;
+}
+
+html.light .modal-time-input,
+:root.light .modal-time-input {
+  color: #4f46e5;
+}
+
+html.light select,
+html.light .modal-select,
+html.light .lang-select,
+html.light .theme-select,
+:root.light select,
+:root.light .modal-select,
+:root.light .lang-select,
+:root.light .theme-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+html.light select option,
+html.light select optgroup,
+html.light .modal-select option,
+html.light .lang-select option,
+html.light .theme-select option,
+:root.light select option,
+:root.light select optgroup,
+:root.light .modal-select option,
+:root.light .lang-select option,
+:root.light .theme-select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 /* ---------- Reset & Base ---------- */
@@ -569,6 +606,30 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+}
+
+select {
+  font-family: inherit;
+  color-scheme: dark;
+}
+
+html.light select,
+:root.light select {
+  color-scheme: light;
+}
+
+select option,
+select optgroup {
+  background-color: #1e293b;
+  color: #f1f5f9;
+}
+
+html.light select option,
+html.light select optgroup,
+:root.light select option,
+:root.light select optgroup {
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 body {
@@ -2913,19 +2974,39 @@ body::after {
 
 .lang-select,
 .theme-select {
-  background: var(--bg-glass);
+  background-color: #1e293b;
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 2rem 0.45rem 0.65rem;
   font-size: 0.85rem;
+  font-family: var(--font-body);
   outline: none;
+  color-scheme: dark;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 12px 12px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.lang-select:focus,
+.theme-select:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .lang-select option,
-.theme-select option {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+.theme-select option,
+.lang-select optgroup,
+.theme-select optgroup {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  padding: 8px 12px;
 }
 
 .settings-version {
@@ -3042,8 +3123,7 @@ body::after {
 
 .modal-time-input,
 .modal-number-input,
-.modal-text-input,
-.modal-select {
+.modal-text-input {
   background: var(--bg-glass);
   color: var(--text-primary);
   border: 1px solid var(--border);
@@ -3052,6 +3132,40 @@ body::after {
   font-size: 0.95rem;
   outline: none;
   width: 100%;
+}
+
+.modal-select {
+  background-color: #1e293b;
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 2.2rem 0.65rem 0.85rem;
+  font-size: 0.92rem;
+  font-family: var(--font-body);
+  outline: none;
+  width: 100%;
+  color-scheme: dark;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 14px 14px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.modal-select:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.modal-select option,
+.modal-select optgroup {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  padding: 8px 12px;
 }
 
 .modal-time-input {
