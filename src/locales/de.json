@@ -107,7 +107,7 @@
   "diagnostic.noticeDesc": "Der Tiefenscan ist in der Regel nicht erforderlich. Er deaktiviert alle Bluetooth-Filter und listet alle Geräte in Reichweite auf (Smartphones, Fernseher, Beacons). Das Laden der Gerätenamen kann einige Sekunden dauern. Nur verwenden, wenn die Uhr im Schnellscan nicht gefunden wird.",
   "diagnostic.advancedOptions": "Erweiterte Scan-Optionen",
   "diagnostic.deepDiscoveryLabel": "Tiefenscan-Modus (Alle Bluetooth-Geräte in Reichweite anzeigen)",
-  "diagnostic.filteredTip": "Schnellscan: Filtert automatisch nach bekannten Seiko-Präfixen (DL, SS, SQ, ZS, STCC etc.) für sofortiges Koppeln ohne Signalüberlastung.",
+  "diagnostic.deepDiscoverySub": "Deaktiviert Namensfilter, um nicht katalogisierte oder umbenannte Seiko-Geräte zu finden.",
   "diagnostic.startScan": "Diagnose starten",
   "diagnostic.retry": "Scan wiederholen",
   "guide.modalTitle": "1-Klick-Synchronisation einrichten",

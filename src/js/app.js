@@ -488,61 +488,63 @@ class App {
 
     // Helper to execute atomic time fetch, GATT connection, immediate time write, and clean disconnect
     const executeSync = async (device) => {
-      const config = DeviceProtocol.getConfig(device.name || '');
-      connectionStateStore.set('connecting');
-      connectionStatusTextStore.set(`${i18n.t('sync.btn.connecting')} ${device.name || 'clock'}...`);
-
-      // 1. Fetch fresh atomic time FIRST (prior to opening BLE GATT connection)
-      if (settingsStore.get().useApi) {
-        try {
-          await timeService.fetchApiTime();
-        } catch (e) {
-          console.warn('[Sync] Time API pre-fetch warning, continuing:', e);
-        }
-      }
-
-      // 2. Connect to GATT
-      await bleService.connect(device);
-
-      connectionStateStore.set('syncing');
-      connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
-
-      // 3. Compute target time AT THE EXACT INSTANT OF TRANSMISSION (eliminates GATT connection latency)
-      const targetDate = this.clockView.getImmediateSyncTarget();
-
-      // 4. Perform adaptive clock time sync across Multi-Sound / Series C3 / SQ / NexTime
-      await bleService.syncClockTime(device, targetDate);
-      if (isDebug()) console.log(`[Sync] SUCCESS! Transmitted time packet to ${device.name}`);
-
-      // 5. Explicit clean GATT disconnect so Seiko clock immediately exits BLE sync mode and renders the new time
       try {
-        await bleService.disconnect();
-      } catch (e) {
-        // Safe to ignore if already dropped by peripheral
-      }
+        const config = DeviceProtocol.getConfig(device.name || '');
+        connectionStateStore.set('connecting');
+        connectionStatusTextStore.set(`${i18n.t('sync.btn.connecting')} ${device.name || 'clock'}...`);
 
-      // 6. Update Success State
-      const syncTimeStr = targetDate.toLocaleTimeString();
-      connectionStateStore.set('connected');
-      connectionStatusTextStore.set(`${i18n.t('sync.status.synced')} ${syncTimeStr} → ${device.name}`);
-
-      DeviceActions.updateSyncTimestamp(device.id);
-
-      // Log entry
-      const log = syncLogStore.get();
-      syncLogStore.set([{
-        timestamp: Date.now(),
-        success: true,
-        device: device.name || 'Seiko Clock',
-        timeSynced: syncTimeStr
-      }, ...log.slice(0, 29)]);
-
-      setTimeout(() => {
-        if (connectionStateStore.get() === 'connected') {
-          connectionStateStore.set('disconnected');
-          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        // 1. Fetch fresh atomic time FIRST (prior to opening BLE GATT connection)
+        if (settingsStore.get().useApi) {
+          try {
+            await timeService.fetchApiTime();
+          } catch (e) {
+            console.warn('[Sync] Time API pre-fetch warning, continuing:', e);
+          }
         }
-      }, 3500);
+
+        // 2. Connect to GATT
+        await bleService.connect(device);
+
+        connectionStateStore.set('syncing');
+        connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
+
+        // 3. Compute target time AT THE EXACT INSTANT OF TRANSMISSION (eliminates GATT connection latency)
+        const targetDate = this.clockView.getImmediateSyncTarget();
+
+        // 4. Perform adaptive clock time sync across Multi-Sound / Series C3 / SQ / NexTime
+        await bleService.syncClockTime(device, targetDate);
+        if (isDebug()) console.log(`[Sync] SUCCESS! Transmitted time packet to ${device.name}`);
+
+        // 5. Update Success State
+        const syncTimeStr = targetDate.toLocaleTimeString();
+        connectionStateStore.set('connected');
+        connectionStatusTextStore.set(`${i18n.t('sync.status.synced')} ${syncTimeStr} → ${device.name}`);
+
+        DeviceActions.updateSyncTimestamp(device.id);
+
+        // Log entry
+        const log = syncLogStore.get();
+        syncLogStore.set([{
+          timestamp: Date.now(),
+          success: true,
+          device: device.name || 'Seiko Clock',
+          timeSynced: syncTimeStr
+        }, ...log.slice(0, 29)]);
+
+        setTimeout(() => {
+          if (connectionStateStore.get() === 'connected') {
+            connectionStateStore.set('disconnected');
+            connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+          }
+        }, 3500);
+      } finally {
+        // ALWAYS cleanly disconnect GATT so the clock immediately returns to normal time display and advertising
+        try {
+          await bleService.disconnect(device);
+        } catch (e) {
+          // Safe to ignore
+        }
+      }
     };
 
     // Phase 1: Try direct connection with cached/permitted device (for 1-click zero-dialog sync)

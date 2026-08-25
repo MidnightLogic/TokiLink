@@ -107,7 +107,7 @@
   "diagnostic.noticeDesc": "El escaneo profundo generalmente no es necesario. Desactiva los filtros y muestra todos los dispositivos cercanos (móviles, televisores, balizas). La carga de nombres puede tardar varios segundos. Úselo únicamente si el escaneo rápido no encuentra su reloj.",
   "diagnostic.advancedOptions": "Opciones avanzadas de análisis",
   "diagnostic.deepDiscoveryLabel": "Modo Búsqueda Profunda (Escanear todos los dispositivos Bluetooth)",
-  "diagnostic.filteredTip": "Escaneo rápido: Filtra automáticamente prefijos Seiko conocidos (DL, SS, SQ, ZS, STCC, etc.) para emparejar al instante sin congestión.",
+  "diagnostic.deepDiscoverySub": "Desactiva los filtros de nombre para detectar dispositivos Seiko no catalogados o renombrados.",
   "diagnostic.startScan": "Iniciar diagnóstico",
   "diagnostic.retry": "Reintentar análisis",
   "guide.modalTitle": "Configurar sincronización en 1 Clic",

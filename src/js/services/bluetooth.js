@@ -243,13 +243,19 @@ export class BluetoothService {
     }
   }
 
-  async disconnect() {
-    if (this._device && this._device.gatt && this._device.gatt.connected) {
+  async disconnect(device = null) {
+    const dev = device || this._device;
+    if (dev && dev.gatt && dev.gatt.connected) {
       try {
-        await this._device.gatt.disconnect();
+        dev.gatt.disconnect();
       } catch (err) {
-        debug.warn('[BLE Debug] Error during disconnect:', err);
+        debug.warn('[BLE Debug] Error during device disconnect:', err);
       }
+    }
+    if (this._server && this._server.connected) {
+      try {
+        this._server.disconnect();
+      } catch (err) {}
     }
     this._server = null;
     this._services.clear();

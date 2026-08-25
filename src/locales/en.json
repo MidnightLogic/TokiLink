@@ -109,7 +109,7 @@
   "diagnostic.noticeDesc": "Deep scan is generally not needed. It turns off all Bluetooth filters and lists every device in your vicinity (smartphones, TVs, beacons). It may take several seconds for the browser to retrieve names. Use only if your Seiko clock is not found using the default Fast Scan.",
   "diagnostic.advancedOptions": "Advanced Scan Options",
   "diagnostic.deepDiscoveryLabel": "Deep Discovery Mode (Scan all nearby Bluetooth devices)",
-  "diagnostic.filteredTip": "Fast scan: Automatically filters for known Seiko prefixes (DL, SS, SQ, ZS, STCC, etc.) for instant pairing without air traffic congestion.",
+  "diagnostic.deepDiscoverySub": "Disables name filters to discover uncatalogued or custom-renamed Seiko hardware.",
   "diagnostic.startScan": "Start Diagnostic Scan",
   "diagnostic.retry": "Retry Scan",
   "guide.modalTitle": "1-Click Fast Sync Setup",

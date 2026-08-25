@@ -107,7 +107,7 @@
   "diagnostic.noticeDesc": "通常このスキャンは不要です。Bluetoothフィルターを解除して周囲のすべての機器（スマホ、テレビ、ビーコン等）を表示するため、端末名の取得に時間がかかります。通常の高速スキャンで時計が見つからない場合のみご利用ください。",
   "diagnostic.advancedOptions": "高度なスキャンオプション",
   "diagnostic.deepDiscoveryLabel": "ディープスキャン（周囲のすべてのBluetooth機器を表示）",
-  "diagnostic.filteredTip": "高速スキャン: セイコーのプレフィックス（DL, SS, SQ, ZS, STCC等）で絞り込み、電波混雑を防いで瞬時にペアリングします。",
+  "diagnostic.deepDiscoverySub": "未登録や名前が変更されたセイコー機器を検出するため、名前フィルターを無効にします。",
   "diagnostic.startScan": "診断スキャンを開始",
   "diagnostic.retry": "スキャンを再試行",
   "guide.modalTitle": "1クリック同期の設定ガイド",

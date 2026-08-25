@@ -107,7 +107,7 @@
   "diagnostic.noticeDesc": "Ce mode n'est généralement pas nécessaire. Il désactive les filtres Bluetooth et affiche tous les appareils à proximité (smartphones, téléviseurs, balises). La détection des noms peut prendre du temps. À n'utiliser que si l'horloge n'est pas détectée avec le scan rapide.",
   "diagnostic.advancedOptions": "Options de scan avancées",
   "diagnostic.deepDiscoveryLabel": "Mode Découverte Profonde (Tous les périphériques Bluetooth)",
-  "diagnostic.filteredTip": "Scan rapide : Filtre automatiquement les préfixes Seiko connus (DL, SS, SQ, ZS, STCC, etc.) pour un appairage instantané sans encombrement.",
+  "diagnostic.deepDiscoverySub": "Désactive les filtres de nom pour détecter les appareils Seiko non répertoriés ou renommés.",
   "diagnostic.startScan": "Démarrer l'inspection",
   "diagnostic.retry": "Réessayer le scan",
   "guide.modalTitle": "Configuration de la synchro 1-Clic",
