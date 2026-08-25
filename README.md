@@ -11,135 +11,135 @@
   </a>
 </p>
 
-An unofficial, high-precision **Progressive Web App (PWA)** built with **Vanilla JavaScript** and the **Web Bluetooth API** to synchronize and control Bluetooth-enabled Seiko digital and analog clocks directly from any Web Bluetooth-capable browser (Chrome, Edge, Opera, Samsung Internet on Android, Windows, macOS, ChromeOS, and Linux) without requiring proprietary native mobile apps.
+**TokiLink for Seiko** is an unofficial, high-precision **Progressive Web App (PWA)** that unifies and controls **all Bluetooth-enabled Seiko digital, multi-sound, and NexTime clocks** directly from your web browser. 
+
+Using modern **Web Bluetooth**, TokiLink replaces multiple proprietary, region-locked mobile apps with a single, elegant, privacy-first web application that runs on **Android, Windows, macOS, ChromeOS, Linux, and iOS**.
 
 > [!NOTE]
-> **Legal Disclaimer:** **TokiLink for Seiko** is an independent, community-driven open-source project. It is **not affiliated with, endorsed by, or sponsored by Seiko Group Corporation, Seiko Clock Inc., or any of their subsidiaries**. All trademarks, product names, and model identifiers are the property of their respective owners and are used strictly under nominative fair use for hardware compatibility and identification purposes.
+> **Legal Disclaimer:** **TokiLink for Seiko** is an independent, open-source community project. It is **not affiliated with, endorsed by, or sponsored by Seiko Group Corporation, Seiko Clock Inc., or any of their subsidiaries**. All product names, trademarks, and model identifiers belong to their respective owners and are used strictly for hardware compatibility and identification under nominative fair use.
 
 ---
 
-## 🌟 Key Features
+## 🏷️ Supported Seiko Clock Models
 
-- **⚡ Zero-App Time Synchronization**: Pair and calibrate your Seiko clock directly from the web browser.
-- **⏱️ Atomic NTP Time Calibration**: Pre-fetches atomic UTC time with millisecond round-trip time (RTT) offset compensation before broadcasting to the clock.
-- **🌍 World Timezone Slider**: Dynamic dual-mode time controller featuring a global slider spanning **UTC−12:00 to UTC+14:00** with live city references, or manual datetime override.
-- **⏰ Multi-Schedule Alarms**: Custom recurring day-of-week alarms, snooze intervals, volume control, and chime sound selection.
-- **📻 FM Radio Controller**: Live FM tuning (76.0 – 108.0 MHz), seek controls, and 5 customizable radio station presets.
-- **💡 Display & Audio Controls**: Multi-level display brightness adjustment, bass boost toggle, and auto power-off settings.
-- **🌙 Sleep / Relaxation Timer**: Programmable sleep countdowns (15 / 30 / 60 / 90 / 120 mins) with background audio melodies.
-- **📱 Installable Progressive Web App (PWA)**: Complete offline caching via Workbox Service Workers, mobile-optimized standalone layout, and Web Manifest.
-- **🌐 6-Language Localization**: English (`en`), Japanese (`ja`), French (`fr`), Spanish (`es`), German (`de`), and Simplified Chinese (`zh`).
+TokiLink unifies models across all official Seiko clock apps into one universal application:
+
+| Series | Supported Models | Key Capabilities & Features |
+| :--- | :--- | :--- |
+| **Multi-Sound Clocks** *(Onkyo Speaker Series)* | **SS501A / SS501K** *(Wide)*<br>**SS201W / SS201K** *(Upright)* | • Atomic Time Sync<br>• Multi-Schedule Dual Alarms (Melody / FM Radio, Volume, Snooze)<br>• FM Radio Tuner (76.0–108.0 MHz) & 5 Customizable Station Presets<br>• 5-Level Display Brightness & 4-Level Bass Boost<br>• Sleep Relaxation Timer & Auto Power-Off |
+| **Series C3** *(Gradient Color LED Series)* | **DL308K** *(DL308 Series)* | • Atomic NTP Time Synchronization<br>• World Timezone Offset Slider (UTC−12 to UTC+14)<br>• Custom Datetime Calibration |
+| **Standard Digital** *(SQ Series)* | **SQ820W / SQ820K**<br>**SQ821W / SQ821K** | • Atomic NTP Time Synchronization<br>• World Timezone Offset Slider (UTC−12 to UTC+14)<br>• Custom Datetime Calibration |
+| **NexTime Series** *(Hybrid Multi-Sync Clocks)* | **ZS450S** *(Digital Wall/Desk)*<br>**ZS451S** *(Wall + Calendar/Temp/Humidity)*<br>**ZS250S / ZS250W**<br>**ZS251S / ZS251W**<br>**ZS252S / ZS252W / ZS252B**<br>**ZS253S / ZS253W**<br>**ZS254S**, **ZS255W**, **ZS256B**<br>**QHB201SM / QHB201WM** | • Atomic NTP Time Synchronization<br>• World Timezone Offset Slider (UTC−12 to UTC+14)<br>• Custom Datetime Calibration |
+
+---
+
+## 🌟 Comprehensive Feature Guide
+
+### ⚡ 1. Zero-Install Atomic Time Synchronization
+- **One-Click Instant Sync**: Calibrate your clock to the exact millisecond in seconds.
+- **NTP Network Latency Compensation**: Pre-fetches atomic UTC time and calculates round-trip time (RTT) offsets before transmitting to the clock for laboratory-grade precision.
+- **Adaptive UI**: Automatically focuses on the clean **Time** sync screen for digital clocks while seamlessly revealing audio and radio controls when a Multi-Sound model is connected.
+
+### 🌍 2. World Timezone & Custom Datetime Mode
+- **Interactive Global Slider**: Smoothly adjust your clock's time across **UTC−12:00 to UTC+14:00** with live city landmarks (e.g., Tokyo, London, New York, Sydney).
+- **Stepper Buttons & Home Reset**: Quick `+` and `−` stepping for rapid timezone jumps with a single-tap reset to your local home time.
+- **Custom Datetime Input**: Manually specify exact dates and times for testing, daylight saving verification, or custom offsets.
+
+### ⏰ 3. Multi-Schedule Alarms *(Multi-Sound Series: SS501 / SS201)*
+- **Dual Independent Alarms**: Configure Alarm 1 and Alarm 2 with distinct wake-up times and recurrence.
+- **Day-of-Week Scheduling**: Select specific active days (Monday through Sunday) with quick presets for *Weekdays* or *Weekends*.
+- **Wake-Up Sound Selection**: Choose between pleasant onboard chime melodies or wake up to your favorite FM radio preset.
+- **Volume & Snooze Controls**: Customize wake-up volume (levels 1–30) and toggle 5-minute snooze repetition.
+
+### 📻 4. FM Radio Tuner & 5 Station Presets *(Multi-Sound Series: SS501 / SS201)*
+- **Full Band Coverage**: Tune across the entire **76.0 MHz to 108.0 MHz** FM band.
+- **Precision Stepper & Seek**: Step up/down by 0.1 MHz or use auto-seek to find local broadcasting channels.
+- **5 Customizable Station Presets**: Store your favorite radio stations with personalized station names and instant one-tap recall.
+- **Master Volume Control**: Adjust radio listening volume smoothly from 0 to 30.
+
+### 💡 5. Display & Sound Controls *(Multi-Sound Series: SS501 / SS201)*
+- **5-Level Display Brightness**: Dim the clock display for night-time bedside use or brighten it for sunlit rooms.
+- **4-Level Bass Boost**: Enhance audio richness and low-end depth for Onkyo speaker output.
+- **Sleep & Relaxation Timer**: Set a countdown timer (15, 30, 60, 90, or 120 minutes) with soothing audio playback before automatic shutdown.
+- **Auto Power-Off**: Save power with configurable inactivity standby timers.
+
+### 📱 6. Progressive Web App (PWA) & Offline Capability
+- **Installable Desktop & Mobile App**: Add TokiLink to your Home Screen or Desktop as a standalone app with full offline caching via Service Workers.
+- **Automatic In-App Update Notifications**: Seamlessly alerts you when a new version or feature update is available with 1-click reload.
+
+### 🎨 7. Modern Glassmorphic Design & Multi-Language Support
+- **Vibrant Dark & Light Modes**: Beautiful frosted glass cards, glowing plasma sync button, and dynamic visual state indicators.
+- **6 Supported Languages**: Fully localized in:
+  - 🇺🇸 **English** (`en`)
+  - 🇯🇵 **Japanese** (`ja`)
+  - 🇫🇷 **French** (`fr`)
+  - 🇪🇸 **Spanish** (`es`)
+  - 🇩🇪 **German** (`de`)
+  - 🇨🇳 **Simplified Chinese** (`zh`)
+
+---
 
 ## 🌐 Browser & Platform Compatibility
 
-Web Bluetooth (`navigator.bluetooth`) requires a secure context (HTTPS or `localhost`) and browser support:
+Web Bluetooth (`navigator.bluetooth`) requires a secure HTTPS connection and browser support:
 
-| Platform | Supported Browsers | Status | Notes |
+| Platform | Recommended Browsers | Compatibility | Notes |
 | :--- | :--- | :---: | :--- |
-| **Android** | **Chrome**, **Edge**, **Samsung Internet**, **Opera** | ✅ **Full Support** | Native Web Bluetooth & 1-click PWA installation |
+| **Android** | **Chrome**, **Edge**, **Samsung Internet**, **Opera** | ✅ **Full Support** | Native Web Bluetooth & 1-click PWA install |
 | **Android — Brave** | **Brave Browser** | ⚠️ **Flag Required** | Enable `brave://flags/#brave-web-bluetooth-api` and Relaunch |
-| **Windows / macOS / Linux / ChromeOS** | **Chrome**, **Edge**, **Opera** | ✅ **Full Support** | Native Web Bluetooth. *(Tip: enable `#enable-web-bluetooth-new-permissions-backend` for 1-click zero-dialog sync)* |
-| **Windows / macOS / Linux — Brave** | **Brave Browser** | ⚠️ **Flag Required** | Enable `brave://flags/#brave-web-bluetooth-api` in Brave Flags and Relaunch |
-| **iOS (iPhone / iPad) — Native Safari** | **[Beacio Safari Extension](https://beacio.com/)** | ✅ **Supported in Safari + PWA** | Web Bluetooth extension for Safari. Allows **Share → Add to Home Screen** to install as a standalone PWA! |
-| **iOS (iPhone / iPad) — Standalone Browser** | **[Bluefy Browser](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055)** | ✅ **Supported via App** | Zero-setup Web Bluetooth browser. Ready out-of-the-box for bookmarks. |
-| **iOS (iPhone / iPad) — Default Safari** | **Safari**, **Chrome (iOS)**, **Edge (iOS)**, **Firefox (iOS)** | ❌ **No Native Bluetooth** | Apple enforces WebKit sandbox without native Web Bluetooth. Guided banner appears on launch. |
+| **Windows / macOS / Linux / ChromeOS** | **Chrome**, **Edge**, **Opera** | ✅ **Full Support** | Native Web Bluetooth *(Tip: enable `#enable-web-bluetooth-new-permissions-backend` for 1-click zero-dialog sync)* |
+| **Windows / macOS / Linux — Brave** | **Brave Browser** | ⚠️ **Flag Required** | Enable `brave://flags/#brave-web-bluetooth-api` and Relaunch |
+| **iOS (iPhone / iPad) — Native Safari** | **[Beacio Safari Extension](https://beacio.com/)** | ✅ **Supported in Safari + PWA** | Web Bluetooth extension for Safari. Supports **Share → Add to Home Screen** to install as a standalone PWA! |
+| **iOS (iPhone / iPad) — Dedicated App** | **[Bluefy Browser](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055)** | ✅ **Supported via App** | Dedicated Web Bluetooth browser from the App Store. Ready out-of-the-box. |
 
 > [!TIP]
 > **Using on iPhone / iPad:**
-> 1. **Option 1 (Fastest Setup — Direct Browser):** Install **[Bluefy Browser](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055)** from the App Store. Tap the banner's *"Launch Bluefy"* button to open and sync immediately.
-> 2. **Option 2 (Home Screen PWA Support):** Install the free **[Beacio Extension](https://beacio.com/)** and enable it in *Settings → Safari → Extensions*. You can then use native Safari and tap **Share → Add to Home Screen** to install TokiLink as a standalone offline iOS app!
+> 1. **Option 1 (Fastest Setup — Dedicated Browser):** Install **[Bluefy Browser](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055)** from the App Store. TokiLink will launch and sync immediately.
+> 2. **Option 2 (Home Screen PWA App):** Install the free **[Beacio Extension](https://beacio.com/)** from the App Store, enable it in *Settings → Safari → Extensions*, then open TokiLink in Safari and tap **Share → Add to Home Screen**!
 
 > [!TIP]
 > **Using on Brave Browser (Desktop & Android):**
-> Brave blocks Web Bluetooth by default for privacy. To enable:
-> 1. Navigate to: `brave://flags/#brave-web-bluetooth-api` and set **Web Bluetooth API** to **Enabled**.
+> Brave blocks Web Bluetooth by default. To enable:
+> 1. Paste `brave://flags/#brave-web-bluetooth-api` into the address bar and set to **Enabled**.
 > 2. *(Recommended)* Set **Use the new permissions backend for Web Bluetooth** (`#enable-web-bluetooth-new-permissions-backend`) to **Enabled**.
 > 3. Click **Relaunch**.
 
-> [!TIP]
-> **Power User Tip (Desktop Chrome / Edge / Opera):**
-> To enable true 1-click sync without repeating the browser device picker dialog on Desktop, enable `chrome://flags/#enable-web-bluetooth-new-permissions-backend`.
-
 ---
 
-## 🏷️ Supported Clock Models
-
-TokiLink supports genuine Bluetooth-enabled Seiko digital and multi-sound clocks:
-
-| Series / Model Line | Model Identifier | Features & Capabilities |
-| :--- | :--- | :--- |
-| **AppClock Multi-Sound** | **SS201**, **SS501** | High-Precision Atomic Time Sync, Multi-Schedule Alarms, FM Radio Tuning & Presets, Display Brightness, Bass Boost, Sleep Melody Timers, Auto Power-Off |
-| **Series C3 Digital** | **DL308K** *(DL308 Series)* | High-Precision Atomic Time Synchronization |
-| **Standard Digital** | **SQ820K** *(SQ820 Series)* | High-Precision Atomic Time Synchronization |
-
----
-
-## 🛠️ Architecture Overview
-
-```
-src/
-├── css/
-│   └── style.css            # Responsive Glassmorphic UI & Design Tokens
-├── js/
-│   ├── app.js               # Application Orchestrator & BLE Lifecycle Handler
-│   ├── store.js             # Nano Stores Reactive Global State
-│   ├── i18n.js              # Lightweight Multi-language Translation Engine
-│   ├── services/
-│   │   ├── bluetooth.js     # Decoupled Web Bluetooth GATT Driver
-│   │   ├── platform.js      # Unified Platform & Web Bluetooth Diagnostic Service
-│   │   ├── protocol.js      # Hardware Model Detectors & Packet Encoders
-│   │   ├── time.js          # Atomic NTP Synchronization Engine (RTT-compensated)
-│   │   └── timezones.js     # UTC-12 to UTC+14 World Timezone Dataset & Resolvers
-│   └── ui/
-│       ├── clockView.js     # Live Clock, Timezone Slider, & Sync Controller
-│       ├── deviceView.js    # Paired Device Cards & Status Indicator Pills
-│       ├── settingsView.js  # Settings Modal & Preferences
-│       ├── alarmView.js     # Multi-schedule Alarms Manager
-│       ├── radioView.js     # FM Radio Tuner & Station Presets
-│       └── displayView.js   # Display Brightness, Bass & Sleep Timers
-└── locales/                 # JSON i18n Translation Bundles (en, ja, fr, es, de, zh)
-```
-
----
-
-## 🚀 Getting Started
+## 🚀 Getting Started for Developers
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- A browser with Web Bluetooth enabled (Google Chrome, Microsoft Edge, Opera, or Samsung Internet)
-- HTTPS or `localhost` environment (required by Web Bluetooth security policies)
+- A Web Bluetooth compatible browser (Google Chrome, Microsoft Edge, Opera, or Samsung Internet)
 
-### Installation & Local Development
+### Local Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/seiko-clock-sync.git
-cd seiko-clock-sync
+# 1. Clone the repository
+git clone https://github.com/midnightlogic/tokilink.git
+cd tokilink
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Run Vite development server
+# 3. Start local development server
 npm run dev
 ```
 
-### Local HTTPS Tunnel (Mobile Device Testing)
+### Local HTTPS Tunnel for Mobile Device Testing
 
 ```bash
-# Start Vite dev server & Cloudflare HTTPS Tunnel concurrently
+# Start Vite dev server with Cloudflare HTTPS Tunnel
 npm run tunnel
 
-# Start Production Bundle & Cloudflare Tunnel (for testing true offline PWA install on mobile)
+# Start Production Bundle with Cloudflare Tunnel (for testing true offline PWA install)
 npm run tunnel:prod
 ```
 
-### Production Build & Preview
+### Production Build
 
 ```bash
-# Compile optimized production bundle with full offline PWA precache
-npm run build
-
-# Fast incremental production build
+# Build optimized production bundle
 npm run build:fast
 
 # Preview production build locally
@@ -148,15 +148,15 @@ npm run preview
 
 ---
 
-## 🔒 Security & Privacy
+## 🔒 Privacy & Security
 
-- **100% Client-Side**: All Bluetooth GATT operations and time computations execute locally in the browser sandbox.
-- **No Analytics / No Tracking**: No personal data or device MAC addresses are transmitted to external servers.
-- **NTP Time Provider**: Uses public privacy-friendly atomic time endpoints (`timeapi.io` / `worldtimeapi.org`) strictly for drift offset calibration.
+- **100% Client-Side Execution**: All Bluetooth communication and time computations take place entirely within your browser sandbox.
+- **Zero Tracking / No Analytics**: No personal data, device identifiers, or MAC addresses are ever collected or sent to external servers.
+- **Open-Source Transparency**: Complete source code is openly audited and available on GitHub under the Apache 2.0 License.
 
 ---
 
 ## 📄 License & Trademark Notice
 
-- **Software License:** Apache License, Version 2.0. Copyright © 2026 MidnightLogic. Developed for the open-source and smart home horology community.
-- **Trademark Notice:** Seiko®, AppClock, and related model designations (DL308, SS201, SS501, etc.) are registered trademarks of Seiko Group Corporation / Seiko Clock Inc. This software is an independent third-party implementation.
+- **Software License:** Apache License, Version 2.0. Copyright © 2026 MidnightLogic.
+- **Trademark Notice:** Seiko®, Series C3, NexTime, and model designations (SS501, SS201, DL308, SQ820, SQ821, ZS450, ZS451, ZS250..ZS256) are registered trademarks of Seiko Group Corporation / Seiko Clock Inc. This software is an independent third-party implementation.
