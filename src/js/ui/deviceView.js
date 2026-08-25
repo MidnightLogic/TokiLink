@@ -61,11 +61,10 @@ export class DeviceView {
   renderActiveDevice(device) {
     const card = this.dom.deviceCard;
     const tabs = this.dom.featureTabs;
-    const settings = settingsStore.get();
     const urlParams = new URLSearchParams(window.location.search);
-    const isDebugOrMock = settings.debug || urlParams.get('debug') === 'true' || urlParams.get('mock') === 'true';
+    const isMock = urlParams.get('mock') === 'true';
 
-    if (!device && isDebugOrMock) {
+    if (!device && isMock) {
       device = { id: '00:11:22:33:44:55', name: 'SS201 BLE Clock', model: 'SS201' };
     }
 
@@ -86,7 +85,7 @@ export class DeviceView {
       }
 
       if (tabs) {
-        if (isMultiSound || isDebugOrMock) {
+        if (isMultiSound || isMock) {
           tabs.classList.remove('hidden');
         } else {
           tabs.classList.add('hidden');
