@@ -48,7 +48,17 @@ export class RadioView {
 
     // Volume slider
     this.dom.radioVolumeSlider?.addEventListener('input', (e) => {
-      this.setVolume(Number(e.target.value));
+      const val = Number(e.target.value);
+      if (val > 0) this.lastNonZeroVolume = val;
+      this.setVolume(val);
+    });
+
+    // Mute toggles
+    this.dom.radioMuteBtn?.addEventListener('click', () => this.toggleMute());
+    this.dom.radioVolDownBtn?.addEventListener('click', () => this.toggleMute());
+    this.dom.radioVolUpBtn?.addEventListener('click', () => {
+      const cur = radioStore.get().volume || 0;
+      this.setVolume(Math.min(30, cur + 3));
     });
 
     // Preset Modal Controls
@@ -63,6 +73,16 @@ export class RadioView {
     this.dom.editPresetsBtn?.addEventListener('click', () => {
       this.openPresetModal(radioStore.get().activePreset || 0);
     });
+  }
+
+  toggleMute() {
+    const current = radioStore.get().volume || 0;
+    if (current > 0) {
+      this.lastNonZeroVolume = current;
+      this.setVolume(0);
+    } else {
+      this.setVolume(this.lastNonZeroVolume || 12);
+    }
   }
 
   setupHoldSeek(btn, isUp) {
@@ -202,7 +222,19 @@ export class RadioView {
     if (this.dom.radioFreqInput) this.dom.radioFreqInput.value = radio.frequency;
     if (this.dom.radioFreqSlider) this.dom.radioFreqSlider.value = radio.frequency;
     if (this.dom.radioVolumeSlider) this.dom.radioVolumeSlider.value = radio.volume;
-    if (this.dom.radioVolumeVal) this.dom.radioVolumeVal.textContent = radio.volume;
+
+    const isMuted = radio.volume === 0;
+    if (this.dom.radioVolumeVal) {
+      this.dom.radioVolumeVal.textContent = isMuted ? 'Muted' : radio.volume;
+      this.dom.radioVolumeVal.classList.toggle('muted', isMuted);
+    }
+
+    if (this.dom.radioMuteBtn) {
+      this.dom.radioMuteBtn.classList.toggle('active', isMuted);
+    }
+    if (this.dom.radioMuteLabel) {
+      this.dom.radioMuteLabel.textContent = isMuted ? 'Unmute' : 'Mute';
+    }
 
     const grid = this.dom.presetGrid;
     if (!grid) return;

@@ -139,21 +139,21 @@ export class ClockView {
       this.updateBadge();
     });
 
-    // Setup home indicator label and dynamic track gradient
-    if (this.dom.tzHomeLabel) {
-      const localItem = TIMEZONE_CITIES[this.localTzIdx];
-      const offsetFormatted = this.formatOffsetHours(localItem.offset);
-      this.dom.tzHomeLabel.textContent = `Home (${offsetFormatted})`;
-    }
+    // Setup home indicator house marker position
+    this.updateHomeMarkerPosition();
+  }
 
-    if (this.dom.tzSlider) {
+  updateHomeMarkerPosition() {
+    if (this.dom.tzHomeMarkerWrap) {
+      const maxIdx = TIMEZONE_CITIES.length - 1;
+      const percent = Math.min(96, Math.max(4, (this.localTzIdx / maxIdx) * 100));
+      this.dom.tzHomeMarkerWrap.style.left = `${percent.toFixed(1)}%`;
+
       const localItem = TIMEZONE_CITIES[this.localTzIdx];
-      const h = localItem ? localItem.offset : 0;
-      const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-      const pMinus1 = clamp(((h - 1 + 12) / 26) * 100, 0, 100).toFixed(1);
-      const pHome = clamp(((h + 12) / 26) * 100, 0, 100).toFixed(1);
-      const pPlus1 = clamp(((h + 1 + 12) / 26) * 100, 0, 100).toFixed(1);
-      this.dom.tzSlider.style.background = `linear-gradient(to right, #38bdf8 0%, #38bdf8 ${pMinus1}%, #22c55e ${pHome}%, #38bdf8 ${pPlus1}%, #38bdf8 100%)`;
+      const offsetFormatted = this.formatOffsetHours(localItem ? localItem.offset : 0);
+      if (this.dom.tzHomeBadgeText) {
+        this.dom.tzHomeBadgeText.textContent = `Home (${offsetFormatted})`;
+      }
     }
   }
 

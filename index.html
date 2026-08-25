@@ -314,10 +314,16 @@
                   <i data-lucide="minus" width="14" height="14"></i>
                 </button>
                 <div class="tz-slider-track-wrap">
+                  <div class="tz-home-marker-wrap" id="tzHomeMarkerWrap">
+                    <div class="tz-home-badge" id="tzHomeBadge" title="Your Local Home Timezone">
+                      <i data-lucide="home" width="11" height="11"></i>
+                      <span id="tzHomeBadgeText">Home</span>
+                    </div>
+                    <div class="tz-home-arrow"></div>
+                  </div>
                   <input type="range" id="tzSlider" class="tz-range-slider" min="0" max="37" step="1" value="31">
                   <div class="tz-slider-labels">
                     <span class="tz-limit-label">UTC-12</span>
-                    <span class="tz-home-label" id="tzHomeLabel">Home</span>
                     <span class="tz-limit-label">UTC+14</span>
                   </div>
                 </div>
@@ -464,12 +470,22 @@
           <div class="control-group">
             <div class="control-label-row">
               <label class="control-label" data-i18n="ss201.radio.volume">Volume</label>
-              <span class="control-value-badge" id="radioVolumeVal">12</span>
+              <div class="volume-header-right">
+                <button type="button" class="volume-mute-btn" id="radioMuteBtn" title="Toggle Mute">
+                  <i data-lucide="volume-2" id="radioMuteBtnIcon" width="13" height="13"></i>
+                  <span id="radioMuteLabel">Mute</span>
+                </button>
+                <span class="control-value-badge" id="radioVolumeVal">12</span>
+              </div>
             </div>
             <div class="slider-with-icons">
-              <i data-lucide="volume-1" class="slider-icon"></i>
-              <input type="range" id="radioVolumeSlider" min="0" max="30" value="12" class="range-slider">
-              <i data-lucide="volume-2" class="slider-icon"></i>
+              <button type="button" class="volume-icon-btn" id="radioVolDownBtn" title="Toggle Mute">
+                <i data-lucide="volume-x" class="slider-icon" id="radioVolLeftIcon"></i>
+              </button>
+              <input type="range" id="radioVolumeSlider" min="0" max="30" value="12" class="range-slider" aria-label="Radio Volume">
+              <button type="button" class="volume-icon-btn" id="radioVolUpBtn" title="Max Volume">
+                <i data-lucide="volume-2" class="slider-icon"></i>
+              </button>
             </div>
           </div>
 
