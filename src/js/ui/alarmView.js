@@ -246,7 +246,8 @@ export class AlarmView {
     if (!list) return;
 
     list.innerHTML = '';
-    const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const dayKeys = ['days.sun', 'days.mon', 'days.tue', 'days.wed', 'days.thu', 'days.fri', 'days.sat'];
+    const dayNames = dayKeys.map(k => i18n.t(k));
     const settings = settingsStore.get();
     const is24h = settings.use24h;
 

@@ -9,7 +9,7 @@
     "tunnel": "concurrently -n \"vite,cf\" -c \"cyan,magenta\" \"vite\" \"npx cloudflared tunnel --url http://127.0.0.1:5173\"",
     "tunnel:cf": "concurrently -n \"vite,cf\" -c \"cyan,magenta\" \"vite\" \"npx cloudflared tunnel --url http://127.0.0.1:5173\"",
     "tunnel:prod": "npm run build:fast && concurrently -n \"preview,cf\" -c \"cyan,magenta\" \"vite preview --port 5173\" \"npx cloudflared tunnel --url http://127.0.0.1:5173\"",
-    "test": "node tests/test-protocols.js",
+    "test": "node tests/test-protocols.js && node tests/test-i18n.js",
     "build": "npm test && npm run generate:pwa && vite build",
     "build:fast": "npm test && vite build",
     "generate:pwa": "npx -y pwa-asset-generator public/pwa-512x512.png public/pwa-assets --background \"#0a0e17\" --index index.html"
