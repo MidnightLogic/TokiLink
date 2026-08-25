@@ -143,243 +143,251 @@ export class DiagnosticProbeService {
       syncLogSample: syncLogStore.get().slice(0, 10),
     };
 
-    onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'}...` });
-
-    let server = null;
-    const maxRetries = 3;
-    let lastConnectError = null;
-
-    // Allow 250ms settling delay for HCI controller between picker and connect
-    await new Promise(r => setTimeout(r, 250));
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        if (bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
-          server = bluetoothDevice.gatt;
-        } else {
-          onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'} (Attempt ${attempt}/${maxRetries})...` });
-          server = await bluetoothDevice.gatt.connect();
-        }
-        report.device.gattConnected = true;
-        break;
-      } catch (err) {
-        lastConnectError = err;
-        report.errors.push(`GATT connection attempt ${attempt} failed: ${err.message}`);
-        // If device origin permission is revoked / unauthorised, don't retry
-        if (err.name === 'SecurityError' || (err.message && /not authori[sz]ed|not permitted/i.test(err.message))) {
-          break;
-        }
-        if (attempt < maxRetries) {
-          onProgress({ step: 1, text: `Retrying connection in ${attempt * 300}ms...` });
-          await new Promise(r => setTimeout(r, attempt * 300));
-        }
-      }
-    }
-
-    if (!server || !server.connected) {
-      throw new Error(`Failed to establish GATT connection after ${maxRetries} attempts: ${lastConnectError?.message || 'GATT stack busy'}`);
-    }
-
-    onProgress({ step: 2, text: 'Enumerating all primary GATT services...' });
-
-    let primaryServices = [];
     try {
-      if (server.getPrimaryServices) {
-        primaryServices = await server.getPrimaryServices();
-      }
-    } catch (err) {
-      report.errors.push(`getPrimaryServices failed: ${err.message}`);
-    }
+      onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'}...` });
 
-    // If getPrimaryServices didn't return (common on restricted Web Bluetooth platforms), probe all candidates
-    if (primaryServices.length === 0) {
-      onProgress({ step: 2, text: 'Scanning candidate Seiko & SIG GATT services...' });
-      const allUuids = DeviceProtocol.allServiceUUIDs();
-      for (const uuid of allUuids) {
+      let server = null;
+      const maxRetries = 3;
+      let lastConnectError = null;
+
+      // Allow 250ms settling delay for HCI controller between picker and connect
+      await new Promise(r => setTimeout(r, 250));
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const s = await server.getPrimaryService(uuid);
-          if (s && !primaryServices.some(existing => existing.uuid.toLowerCase() === s.uuid.toLowerCase())) {
-            primaryServices.push(s);
+          if (bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
+            server = bluetoothDevice.gatt;
+          } else {
+            onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'} (Attempt ${attempt}/${maxRetries})...` });
+            server = await bluetoothDevice.gatt.connect();
           }
+          report.device.gattConnected = true;
+          break;
+        } catch (err) {
+          lastConnectError = err;
+          report.errors.push(`GATT connection attempt ${attempt} failed: ${err.message}`);
+          // If device origin permission is revoked / unauthorised, don't retry
+          if (err.name === 'SecurityError' || (err.message && /not authori[sz]ed|not permitted/i.test(err.message))) {
+            break;
+          }
+          if (attempt < maxRetries) {
+            onProgress({ step: 1, text: `Retrying connection in ${attempt * 300}ms...` });
+            await new Promise(r => setTimeout(r, attempt * 300));
+          }
+        }
+      }
+
+      if (!server || !server.connected) {
+        throw new Error(`Failed to establish GATT connection after ${maxRetries} attempts: ${lastConnectError?.message || 'GATT stack busy'}`);
+      }
+
+      onProgress({ step: 2, text: 'Enumerating all primary GATT services...' });
+
+      let primaryServices = [];
+      try {
+        if (server.getPrimaryServices) {
+          primaryServices = await server.getPrimaryServices();
+        }
+      } catch (err) {
+        report.errors.push(`getPrimaryServices failed: ${err.message}`);
+      }
+
+      // If getPrimaryServices didn't return (common on restricted Web Bluetooth platforms), probe all candidates
+      if (primaryServices.length === 0) {
+        onProgress({ step: 2, text: 'Scanning candidate Seiko & SIG GATT services...' });
+        const allUuids = DeviceProtocol.allServiceUUIDs();
+        for (const uuid of allUuids) {
+          try {
+            const s = await server.getPrimaryService(uuid);
+            if (s && !primaryServices.some(existing => existing.uuid.toLowerCase() === s.uuid.toLowerCase())) {
+              primaryServices.push(s);
+            }
+          } catch (e) {}
+        }
+      }
+
+      onProgress({ step: 3, text: `Found ${primaryServices.length} service(s). Enumerating characteristics...` });
+
+      for (let i = 0; i < primaryServices.length; i++) {
+        const service = primaryServices[i];
+        const serviceEntry = {
+          uuid: service.uuid,
+          label: this.getServiceLabel(service.uuid),
+          isPrimary: service.isPrimary,
+          characteristics: [],
+        };
+
+        onProgress({ step: 3, text: `Inspecting service ${i + 1}/${primaryServices.length}: ${serviceEntry.label}...` });
+
+        try {
+          const characteristics = await service.getCharacteristics();
+          for (const char of characteristics) {
+            const props = char.properties || {};
+            const propList = [];
+            if (props.read) propList.push('read');
+            if (props.write) propList.push('write');
+            if (props.writeWithoutResponse) propList.push('writeWithoutResponse');
+            if (props.notify) propList.push('notify');
+            if (props.indicate) propList.push('indicate');
+
+            const charEntry = {
+              uuid: char.uuid,
+              label: this.getCharLabel(char.uuid),
+              properties: propList,
+              readValueHex: null,
+              readValueAscii: null,
+              descriptors: [],
+              capturedNotifications: [],
+            };
+
+            // If characteristic is readable, read current value safely
+            if (props.read && char.readValue) {
+              try {
+                if (!bluetoothDevice.gatt.connected) {
+                  server = await bluetoothDevice.gatt.connect();
+                }
+                const valDataView = await char.readValue();
+                const bytes = new Uint8Array(valDataView.buffer);
+                charEntry.readValueHex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+                
+                // Safe ASCII decoder
+                let asciiStr = '';
+                for (let b of bytes) {
+                  asciiStr += (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.';
+                }
+                charEntry.readValueAscii = asciiStr;
+
+                // Parse characteristic semantic value
+                const parsed = this.parseCharacteristicValue(char.uuid, bytes, asciiStr);
+                if (parsed) {
+                  charEntry.parsedValue = parsed;
+                  const u = char.uuid.toLowerCase();
+                  if (u.includes('2a19')) report.device.batteryLevel = parsed;
+                  if (u.includes('2a24')) report.device.hardwareModel = parsed;
+                  if (u.includes('2a26')) report.device.firmwareRevision = parsed;
+                  if (u.includes('2a27')) report.device.hardwareRevision = parsed;
+                  if (u.includes('2a28')) report.device.softwareRevision = parsed;
+                  if (u.includes('2a29')) report.device.manufacturerName = parsed;
+                }
+              } catch (readErr) {
+                // 0x2A00 (Device Name) is often blocklisted for direct GATT reads in Web Bluetooth
+                if (char.uuid.toLowerCase().includes('2a00') && bluetoothDevice.name) {
+                  charEntry.readValueAscii = bluetoothDevice.name;
+                  charEntry.parsedValue = bluetoothDevice.name;
+                } else {
+                  charEntry.readError = readErr.message;
+                }
+                // If read dropped the connection, re-establish for remaining characteristics
+                if (!bluetoothDevice.gatt.connected) {
+                  try { server = await bluetoothDevice.gatt.connect(); } catch (e) {}
+                }
+              }
+            }
+
+            // Enumerate Descriptors if supported (e.g. 0x2901 User Description)
+            if (char.getDescriptors && server.connected) {
+              try {
+                const descriptors = await char.getDescriptors();
+                for (const desc of descriptors) {
+                  const descEntry = {
+                    uuid: desc.uuid,
+                    valueHex: null,
+                    valueAscii: null,
+                  };
+                  if (desc.readValue && server.connected) {
+                    try {
+                      const descVal = await desc.readValue();
+                      const dBytes = new Uint8Array(descVal.buffer);
+                      descEntry.valueHex = Array.from(dBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+                      descEntry.valueAscii = new TextDecoder().decode(dBytes).replace(/[^\x20-\x7E]/g, '');
+                    } catch (e) {}
+                  }
+                  charEntry.descriptors.push(descEntry);
+                }
+              } catch (descErr) {
+                // Descriptors enumeration not supported or restricted on platform
+              }
+            }
+
+            serviceEntry.characteristics.push(charEntry);
+          }
+        } catch (charEnumErr) {
+          serviceEntry.error = `Failed to get characteristics: ${charEnumErr.message}`;
+        }
+
+        report.services.push(serviceEntry);
+      }
+
+      onProgress({ step: 4, text: 'Running protocol write probes...' });
+
+      // Ensure connection is still active before probing candidate protocols
+      if (!bluetoothDevice.gatt.connected) {
+        try {
+          server = await bluetoothDevice.gatt.connect();
+        } catch (reconErr) {
+          debug.warn('[Diagnostic] Reconnect before probe failed:', reconErr);
+        }
+      }
+
+      // Test protocol probing capabilities
+      for (const cand of DeviceProtocol.CANDIDATE_PROTOCOLS) {
+        const probe = {
+          protocolId: cand.id,
+          name: cand.name,
+          serviceUUID: cand.timeServiceUUID,
+          charUUID: cand.timeWriteCharUUID,
+          serviceFound: false,
+          charFound: false,
+          writable: false,
+          probeError: null,
+        };
+
+        try {
+          if (!bluetoothDevice.gatt.connected) {
+            server = await bluetoothDevice.gatt.connect();
+          }
+          const s = await server.getPrimaryService(cand.timeServiceUUID);
+          probe.serviceFound = true;
+          const c = await s.getCharacteristic(cand.timeWriteCharUUID);
+          probe.charFound = true;
+          const props = c.properties || {};
+          probe.writable = !!(props.write || props.writeWithoutResponse);
+        } catch (err) {
+          probe.probeError = err.message;
+        }
+
+        report.probeResults.push(probe);
+      }
+
+      // Evaluate Seiko hardware authenticity
+      const hasSeikoServices = report.services.some(s => {
+        const u = (s.uuid || '').toLowerCase();
+        return u.includes('fff0') || u.includes('1806') || u.includes('5301') || u.includes('ffe0') || u.includes('ffe1');
+      });
+      const matchedProbes = report.probeResults.filter(p => p.serviceFound);
+
+      report.seikoRecognition = {
+        isSeikoHardware: hasSeikoServices || matchedProbes.length > 0,
+        confidence: matchedProbes.length > 0 
+          ? 'VERIFIED_SEIKO_CLOCK' 
+          : (hasSeikoServices ? 'PROBABLE_SEIKO' : 'UNRECOGNIZED_NON_SEIKO_PERIPHERAL'),
+        assessment: matchedProbes.length > 0 
+          ? 'Matches known Seiko clock GATT hardware stack.'
+          : (hasSeikoServices 
+              ? 'Contains Seiko GATT signature services, but write characteristic may be custom or proprietary.'
+              : 'Warning: No Seiko GATT services or clock protocols detected. This peripheral appears to be a non-Seiko Bluetooth device.')
+      };
+
+      onProgress({ step: 5, text: 'Diagnostic scan complete.' });
+
+      return report;
+    } finally {
+      if (bluetoothDevice && bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
+        try {
+          bluetoothDevice.gatt.disconnect();
         } catch (e) {}
       }
     }
-
-    onProgress({ step: 3, text: `Found ${primaryServices.length} service(s). Enumerating characteristics...` });
-
-    for (let i = 0; i < primaryServices.length; i++) {
-      const service = primaryServices[i];
-      const serviceEntry = {
-        uuid: service.uuid,
-        label: this.getServiceLabel(service.uuid),
-        isPrimary: service.isPrimary,
-        characteristics: [],
-      };
-
-      onProgress({ step: 3, text: `Inspecting service ${i + 1}/${primaryServices.length}: ${serviceEntry.label}...` });
-
-      try {
-        const characteristics = await service.getCharacteristics();
-        for (const char of characteristics) {
-          const props = char.properties || {};
-          const propList = [];
-          if (props.read) propList.push('read');
-          if (props.write) propList.push('write');
-          if (props.writeWithoutResponse) propList.push('writeWithoutResponse');
-          if (props.notify) propList.push('notify');
-          if (props.indicate) propList.push('indicate');
-
-          const charEntry = {
-            uuid: char.uuid,
-            label: this.getCharLabel(char.uuid),
-            properties: propList,
-            readValueHex: null,
-            readValueAscii: null,
-            descriptors: [],
-            capturedNotifications: [],
-          };
-
-          // If characteristic is readable, read current value safely
-          if (props.read && char.readValue) {
-            try {
-              if (!bluetoothDevice.gatt.connected) {
-                server = await bluetoothDevice.gatt.connect();
-              }
-              const valDataView = await char.readValue();
-              const bytes = new Uint8Array(valDataView.buffer);
-              charEntry.readValueHex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
-              
-              // Safe ASCII decoder
-              let asciiStr = '';
-              for (let b of bytes) {
-                asciiStr += (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.';
-              }
-              charEntry.readValueAscii = asciiStr;
-
-              // Parse characteristic semantic value
-              const parsed = this.parseCharacteristicValue(char.uuid, bytes, asciiStr);
-              if (parsed) {
-                charEntry.parsedValue = parsed;
-                const u = char.uuid.toLowerCase();
-                if (u.includes('2a19')) report.device.batteryLevel = parsed;
-                if (u.includes('2a24')) report.device.hardwareModel = parsed;
-                if (u.includes('2a26')) report.device.firmwareRevision = parsed;
-                if (u.includes('2a27')) report.device.hardwareRevision = parsed;
-                if (u.includes('2a28')) report.device.softwareRevision = parsed;
-                if (u.includes('2a29')) report.device.manufacturerName = parsed;
-              }
-            } catch (readErr) {
-              // 0x2A00 (Device Name) is often blocklisted for direct GATT reads in Web Bluetooth
-              if (char.uuid.toLowerCase().includes('2a00') && bluetoothDevice.name) {
-                charEntry.readValueAscii = bluetoothDevice.name;
-                charEntry.parsedValue = bluetoothDevice.name;
-              } else {
-                charEntry.readError = readErr.message;
-              }
-              // If read dropped the connection, re-establish for remaining characteristics
-              if (!bluetoothDevice.gatt.connected) {
-                try { server = await bluetoothDevice.gatt.connect(); } catch (e) {}
-              }
-            }
-          }
-
-          // Enumerate Descriptors if supported (e.g. 0x2901 User Description)
-          if (char.getDescriptors && server.connected) {
-            try {
-              const descriptors = await char.getDescriptors();
-              for (const desc of descriptors) {
-                const descEntry = {
-                  uuid: desc.uuid,
-                  valueHex: null,
-                  valueAscii: null,
-                };
-                if (desc.readValue && server.connected) {
-                  try {
-                    const descVal = await desc.readValue();
-                    const dBytes = new Uint8Array(descVal.buffer);
-                    descEntry.valueHex = Array.from(dBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
-                    descEntry.valueAscii = new TextDecoder().decode(dBytes).replace(/[^\x20-\x7E]/g, '');
-                  } catch (e) {}
-                }
-                charEntry.descriptors.push(descEntry);
-              }
-            } catch (descErr) {
-              // Descriptors enumeration not supported or restricted on platform
-            }
-          }
-
-          serviceEntry.characteristics.push(charEntry);
-        }
-      } catch (charEnumErr) {
-        serviceEntry.error = `Failed to get characteristics: ${charEnumErr.message}`;
-      }
-
-      report.services.push(serviceEntry);
-    }
-
-    onProgress({ step: 4, text: 'Running protocol write probes...' });
-
-    // Ensure connection is still active before probing candidate protocols
-    if (!bluetoothDevice.gatt.connected) {
-      try {
-        server = await bluetoothDevice.gatt.connect();
-      } catch (reconErr) {
-        debug.warn('[Diagnostic] Reconnect before probe failed:', reconErr);
-      }
-    }
-
-    // Test protocol probing capabilities
-    for (const cand of DeviceProtocol.CANDIDATE_PROTOCOLS) {
-      const probe = {
-        protocolId: cand.id,
-        name: cand.name,
-        serviceUUID: cand.timeServiceUUID,
-        charUUID: cand.timeWriteCharUUID,
-        serviceFound: false,
-        charFound: false,
-        writable: false,
-        probeError: null,
-      };
-
-      try {
-        if (!bluetoothDevice.gatt.connected) {
-          server = await bluetoothDevice.gatt.connect();
-        }
-        const s = await server.getPrimaryService(cand.timeServiceUUID);
-        probe.serviceFound = true;
-        const c = await s.getCharacteristic(cand.timeWriteCharUUID);
-        probe.charFound = true;
-        const props = c.properties || {};
-        probe.writable = !!(props.write || props.writeWithoutResponse);
-      } catch (err) {
-        probe.probeError = err.message;
-      }
-
-      report.probeResults.push(probe);
-    }
-
-    // Evaluate Seiko hardware authenticity
-    const hasSeikoServices = report.services.some(s => {
-      const u = (s.uuid || '').toLowerCase();
-      return u.includes('fff0') || u.includes('1806') || u.includes('5301') || u.includes('ffe0') || u.includes('ffe1');
-    });
-    const matchedProbes = report.probeResults.filter(p => p.serviceFound);
-
-    report.seikoRecognition = {
-      isSeikoHardware: hasSeikoServices || matchedProbes.length > 0,
-      confidence: matchedProbes.length > 0 
-        ? 'VERIFIED_SEIKO_CLOCK' 
-        : (hasSeikoServices ? 'PROBABLE_SEIKO' : 'UNRECOGNIZED_NON_SEIKO_PERIPHERAL'),
-      assessment: matchedProbes.length > 0 
-        ? 'Matches known Seiko clock GATT hardware stack.'
-        : (hasSeikoServices 
-            ? 'Contains Seiko GATT signature services, but write characteristic may be custom or proprietary.'
-            : 'Warning: No Seiko GATT services or clock protocols detected. This peripheral appears to be a non-Seiko Bluetooth device.')
-    };
-
-    onProgress({ step: 5, text: 'Diagnostic scan complete.' });
-
-    return report;
   }
 
   /**
