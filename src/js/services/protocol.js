@@ -265,12 +265,17 @@ export const DeviceProtocol = {
       if (m.controlServiceUUID) uuids.add(m.controlServiceUUID.toLowerCase());
       if (m.pingServiceUUID) uuids.add(m.pingServiceUUID.toLowerCase());
     });
-    // Add 16-bit shorthand services as well for maximum Web Bluetooth compatibility
-    uuids.add('00001805-0000-1000-8000-00805f9b34fb');
-    uuids.add('00001806-0000-1000-8000-00805f9b34fb');
-    uuids.add('0000ffe0-0000-1000-8000-00805f9b34fb');
-    uuids.add('0000fff0-0000-1000-8000-00805f9b34fb');
-    uuids.add('00005301-0000-0041-4c50-574953450000');
+    // Add standard SIG & proprietary services for maximum Web Bluetooth discovery
+    uuids.add('00001800-0000-1000-8000-00805f9b34fb'); // Generic Access
+    uuids.add('00001801-0000-1000-8000-00805f9b34fb'); // Generic Attribute
+    uuids.add('00001805-0000-1000-8000-00805f9b34fb'); // Current Time Service
+    uuids.add('00001806-0000-1000-8000-00805f9b34fb'); // Reference Time / Seiko Time
+    uuids.add('0000180a-0000-1000-8000-00805f9b34fb'); // Device Information (Model, Firmware)
+    uuids.add('0000180f-0000-1000-8000-00805f9b34fb'); // Battery Service
+    uuids.add('0000ffe0-0000-1000-8000-00805f9b34fb'); // Multi-Sound Control
+    uuids.add('0000ffe1-0000-1000-8000-00805f9b34fb'); // Multi-Sound Alt / Notify
+    uuids.add('0000fff0-0000-1000-8000-00805f9b34fb'); // Series C3 & SQ Time
+    uuids.add('00005301-0000-0041-4c50-574953450000'); // NexTime LPWISE Stack
     return Array.from(uuids);
   },
 
