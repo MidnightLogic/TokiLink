@@ -6,7 +6,7 @@
  */
 
 import { DeviceProtocol } from './protocol.js';
-import { settingsStore } from '../store.js';
+import { settingsStore, activeDeviceStore, pairedDevicesStore } from '../store.js';
 
 function isDebug() {
   try {
@@ -433,6 +433,10 @@ export class BluetoothService {
           await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
           await new Promise(r => setTimeout(r, 100));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
+
+          // Read battery telemetry if supported
+          this.readBatteryLevel(device).catch(() => {});
+
           return { success: true, protocol: proto.id, series: proto.series, payload };
         } else {
           // Standard CTS 10-byte write
@@ -440,6 +444,10 @@ export class BluetoothService {
           await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
           await new Promise(r => setTimeout(r, 60));
           debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
+
+          // Read battery telemetry if supported
+          this.readBatteryLevel(device).catch(() => {});
+
           return { success: true, protocol: proto.id, series: proto.series, payload };
         }
       } catch (err) {
@@ -449,6 +457,40 @@ export class BluetoothService {
     }
 
     throw lastError || new Error(`No compatible Seiko time synchronization service found on "${device?.name || 'clock'}".`);
+  }
+
+  /**
+   * Safely reads battery level percentage from standard Bluetooth Battery Service (0x180F / 0x2A19).
+   */
+  async readBatteryLevel(device) {
+    if (!device) return null;
+    try {
+      const char = await this.getCharacteristic('0000180f-0000-1000-8000-00805f9b34fb', '00002a19-0000-1000-8000-00805f9b34fb');
+      if (char && char.readValue) {
+        const val = await char.readValue();
+        const bytes = new Uint8Array(val.buffer);
+        if (bytes.length >= 1) {
+          const levelStr = `${bytes[0]}%`;
+          debug.log(`[BLE] Battery level read: ${levelStr}`);
+          
+          // Update active device store
+          const currentActive = activeDeviceStore.get();
+          if (currentActive && currentActive.id === device.id) {
+            activeDeviceStore.set({ ...currentActive, batteryLevel: levelStr });
+          }
+          
+          // Update paired devices store
+          const paired = pairedDevicesStore.get() || [];
+          const updated = paired.map(d => d.id === device.id ? { ...d, batteryLevel: levelStr } : d);
+          pairedDevicesStore.set(updated);
+          
+          return levelStr;
+        }
+      }
+    } catch (e) {
+      debug.warn('[BLE] Battery level read skipped:', e.message);
+    }
+    return null;
   }
 
   /**

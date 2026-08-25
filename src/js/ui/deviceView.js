@@ -121,6 +121,7 @@ export class DeviceView {
       item.innerHTML = `
         <span class="device-chip-dot"></span>
         <span class="device-chip-name">${d.name || 'Seiko Clock'}</span>
+        ${d.batteryLevel ? `<span class="device-chip-batt"><i data-lucide="battery" width="11" height="11"></i> ${d.batteryLevel}</span>` : ''}
       `;
       item.addEventListener('click', () => {
         DeviceActions.setActiveDevice(d.id);
@@ -137,6 +138,8 @@ export class DeviceView {
       if (this.onPairNew) this.onPairNew();
     });
     container.appendChild(addBtn);
+
+    if (this.renderIcons) this.renderIcons();
   }
 
   updateStatusPill(state) {
