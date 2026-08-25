@@ -101,32 +101,125 @@ html.light {
    (Preserves 100% of Dark Mode styling without modification)
    ============================================================ */
 
-/* ---------- Sync Button (Light Mode) ---------- */
+/* ---------- Sync Button (Light Mode - All States) ---------- */
 html.light .sync-btn,
 :root.light .sync-btn {
-  background: linear-gradient(150deg, #6366f1 0%, #7c3aed 52%, #8b5cf6 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.6);
-  color: #ffffff;
+  background: linear-gradient(150deg, #6366f1 0%, #7c3aed 52%, #8b5cf6 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  color: #ffffff !important;
   box-shadow:
     inset 0 1.5px 2px rgba(255, 255, 255, 0.5),
     inset 0 -2px 5px rgba(0, 0, 0, 0.18),
     0 8px 24px rgba(99, 102, 241, 0.38),
-    0 0 18px rgba(139, 92, 246, 0.28);
+    0 0 18px rgba(139, 92, 246, 0.28) !important;
 }
 
 html.light .sync-btn:hover:not(:disabled),
 :root.light .sync-btn:hover:not(:disabled) {
-  border-color: #ffffff;
+  border-color: #ffffff !important;
   box-shadow:
     inset 0 1.5px 2.5px rgba(255, 255, 255, 0.7),
     inset 0 -2px 5px rgba(0, 0, 0, 0.18),
     0 10px 28px rgba(99, 102, 241, 0.48),
-    0 0 24px rgba(139, 92, 246, 0.4);
+    0 0 24px rgba(139, 92, 246, 0.4) !important;
 }
 
 html.light #syncIconWrap,
 :root.light #syncIconWrap {
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7)) !important;
+}
+
+html.light .sync-btn .sync-btn-label,
+:root.light .sync-btn .sync-btn-label {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Connecting / Searching / Syncing State (Light Mode) - Vibrant Sky/Cyan Blue */
+html.light .sync-btn.syncing,
+html.light .sync-btn.connecting,
+html.light .sync-btn.searching,
+:root.light .sync-btn.syncing,
+:root.light .sync-btn.connecting,
+:root.light .sync-btn.searching {
+  background: linear-gradient(150deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%) !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  box-shadow:
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.15),
+    0 8px 26px rgba(14, 165, 233, 0.45),
+    0 0 20px rgba(56, 189, 248, 0.35) !important;
+}
+
+html.light .sync-btn.syncing #syncIconWrap,
+html.light .sync-btn.connecting #syncIconWrap,
+html.light .sync-btn.searching #syncIconWrap,
+:root.light .sync-btn.syncing #syncIconWrap,
+:root.light .sync-btn.connecting #syncIconWrap,
+:root.light .sync-btn.searching #syncIconWrap {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)) !important;
+}
+
+html.light .sync-btn.syncing .sync-btn-label,
+html.light .sync-btn.connecting .sync-btn-label,
+html.light .sync-btn.searching .sync-btn-label,
+:root.light .sync-btn.syncing .sync-btn-label,
+:root.light .sync-btn.connecting .sync-btn-label,
+:root.light .sync-btn.searching .sync-btn-label {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Connected State (Light Mode) - Vibrant Emerald Green */
+html.light .sync-btn.connected,
+:root.light .sync-btn.connected {
+  background: linear-gradient(150deg, #15803d 0%, #16a34a 50%, #22c55e 100%) !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  box-shadow:
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.15),
+    0 8px 26px rgba(22, 163, 74, 0.45),
+    0 0 20px rgba(74, 222, 128, 0.35) !important;
+}
+
+html.light .sync-btn.connected #syncIconWrap,
+:root.light .sync-btn.connected #syncIconWrap {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)) !important;
+}
+
+html.light .sync-btn.connected .sync-btn-label,
+:root.light .sync-btn.connected .sync-btn-label {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Error / Failed State (Light Mode) - Vibrant Crimson / Coral */
+html.light .sync-btn.error,
+html.light .sync-btn.fail,
+:root.light .sync-btn.error,
+:root.light .sync-btn.fail {
+  background: linear-gradient(150deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%) !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  box-shadow:
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.15),
+    0 8px 26px rgba(220, 38, 38, 0.45),
+    0 0 20px rgba(248, 113, 113, 0.35) !important;
+}
+
+html.light .sync-btn.error #syncIconWrap,
+html.light .sync-btn.fail #syncIconWrap,
+:root.light .sync-btn.error #syncIconWrap,
+:root.light .sync-btn.fail #syncIconWrap {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9)) !important;
+}
+
+html.light .sync-btn.error .sync-btn-label,
+html.light .sync-btn.fail .sync-btn-label,
+:root.light .sync-btn.error .sync-btn-label,
+:root.light .sync-btn.fail .sync-btn-label {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8) !important;
 }
 
 /* ---------- Brave Browser Banner (Light Mode) ---------- */

@@ -140,7 +140,8 @@ export class PlasmaRenderer {
     }
 
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter'; // Additive blending for electric plasma glow
+    const isLightMode = document.documentElement.classList.contains('light');
+    ctx.globalCompositeOperation = isLightMode ? 'source-over' : 'lighter'; // Additive on dark, saturated on light
 
     // ── 1. Diffuse Outer Plasma Aura ─────────────────────────────
     ctx.shadowBlur = 22;
