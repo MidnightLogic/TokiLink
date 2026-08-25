@@ -976,14 +976,14 @@
                 <p id="diagFilteredTip" style="font-size: 0.78rem; color: #94a3b8; margin: 0; line-height: 1.4;" data-i18n="diagnostic.filteredTip">
                   Fast scan: Automatically filters for known Seiko prefixes (DL, SS, SQ, ZS, STCC, etc.) for instant pairing without air traffic congestion.
                 </p>
-                <div class="diagnostic-unfiltered-notice hidden" id="diagUnfilteredNotice" style="margin-top: 0.4rem;">
+                <div class="diagnostic-unfiltered-notice warning hidden" id="diagUnfilteredNotice" style="margin-top: 0.4rem;">
                   <div class="diagnostic-notice-icon">
-                    <i data-lucide="info" width="16" height="16"></i>
+                    <i data-lucide="alert-triangle" width="16" height="16"></i>
                   </div>
                   <div class="diagnostic-notice-content">
-                    <strong data-i18n="diagnostic.noticeTitle">Device Selection Note:</strong>
+                    <strong data-i18n="diagnostic.noticeTitle">⚠️ Deep Discovery Warning:</strong>
                     <p data-i18n="diagnostic.noticeDesc">
-                      Device name filters are disabled. All Bluetooth devices in your vicinity will appear. Please choose your Seiko clock from the list.
+                      Deep scan is generally not needed. It turns off all Bluetooth filters and lists every device in your vicinity (smartphones, TVs, beacons). It may take several seconds for the browser to retrieve names. Use only if your Seiko clock is not found using the default Fast Scan.
                     </p>
                   </div>
                 </div>

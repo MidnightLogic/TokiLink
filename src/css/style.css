@@ -4216,6 +4216,19 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   box-sizing: border-box;
 }
 
+.diagnostic-unfiltered-notice.warning {
+  background: rgba(245, 158, 11, 0.09);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.diagnostic-unfiltered-notice.warning .diagnostic-notice-icon {
+  color: #f59e0b;
+}
+
+.diagnostic-unfiltered-notice.warning .diagnostic-notice-content strong {
+  color: #fbbf24;
+}
+
 .diagnostic-notice-icon {
   color: #38bdf8;
   flex-shrink: 0;
