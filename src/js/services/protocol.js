@@ -221,6 +221,24 @@ export const DeviceProtocol = {
     }
   ],
 
+  /**
+   * Returns prioritized candidate protocols starting with the model's preferred protocol,
+   * followed by all other known fallback candidate protocols.
+   */
+  getCandidateProtocols(preferredProtocolId) {
+    const list = [];
+    if (preferredProtocolId && preferredProtocolId !== 'auto_detect') {
+      const preferred = this.CANDIDATE_PROTOCOLS.find(p => p.id === preferredProtocolId);
+      if (preferred) list.push(preferred);
+    }
+    this.CANDIDATE_PROTOCOLS.forEach(cand => {
+      if (!list.some(c => c.id === cand.id)) {
+        list.push(cand);
+      }
+    });
+    return list;
+  },
+
   detectModel(deviceName = '') {
     const name = (deviceName || '').toUpperCase().trim();
 

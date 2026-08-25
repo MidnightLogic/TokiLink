@@ -53,6 +53,17 @@ assert(genericClock.type === 'GENERIC_CLOCK', 'Unknown clock returns generic fal
 assert(genericClock.protocol === 'auto_detect', 'Generic clock uses auto_detect protocol');
 assert(Array.isArray(DeviceProtocol.CANDIDATE_PROTOCOLS) && DeviceProtocol.CANDIDATE_PROTOCOLS.length >= 4, 'Candidate protocols are populated');
 
+// 6. Candidate Protocol Resolution
+const c3Candidates = DeviceProtocol.getCandidateProtocols('cts_fff0');
+assert(Array.isArray(c3Candidates) && c3Candidates.length > 0, 'getCandidateProtocols returns array');
+assert(c3Candidates[0].id === 'cts_fff0', 'getCandidateProtocols prioritizes preferred cts_fff0');
+
+const nexTimeCandidates = DeviceProtocol.getCandidateProtocols('lpwise_5301');
+assert(nexTimeCandidates[0].id === 'lpwise_5301', 'getCandidateProtocols prioritizes preferred lpwise_5301');
+
+const genericCandidates = DeviceProtocol.getCandidateProtocols('auto_detect');
+assert(genericCandidates.length === DeviceProtocol.CANDIDATE_PROTOCOLS.length, 'Auto-detect includes all candidate protocols');
+
 console.log('\n--- Testing Payload Construction ---');
 
 // Test CTS 10-byte payload
