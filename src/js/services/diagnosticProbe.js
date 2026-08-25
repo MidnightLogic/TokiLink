@@ -56,6 +56,59 @@ export class DiagnosticProbeService {
   }
 
   /**
+   * Intelligently decodes standard and Seiko BLE characteristic byte arrays into human-readable values.
+   */
+  static parseCharacteristicValue(uuid, bytes, asciiStr) {
+    if (!bytes || bytes.length === 0) return null;
+    const key = (uuid || '').toLowerCase();
+
+    // 1. Battery Level (0x2A19)
+    if (key.includes('2a19') && bytes.length >= 1) {
+      return `${bytes[0]}%`;
+    }
+
+    // 2. Strings: Model (0x2A24), Serial (0x2A25), Firmware (0x2A26), HW (0x2A27), SW (0x2A28), Mfr (0x2A29), Name (0x2A00)
+    if (key.includes('2a24') || key.includes('2a25') || key.includes('2a26') || key.includes('2a27') || key.includes('2a28') || key.includes('2a29') || key.includes('2a00')) {
+      return asciiStr.trim() || null;
+    }
+
+    // 3. BLE Appearance (0x2A01)
+    if (key.includes('2a01') && bytes.length >= 2) {
+      const val = bytes[0] | (bytes[1] << 8);
+      const cat = val === 0x0100 ? 'Generic Clock' : (val === 0x0101 ? 'Watch' : 'Device');
+      return `0x${val.toString(16).padStart(4, '0')} (${cat})`;
+    }
+
+    // 4. Current Time 10-byte struct (0x2A2B, 0x2A16, 0xFFF2)
+    if ((key.includes('2a2b') || key.includes('2a16') || key.includes('fff2')) && bytes.length >= 7) {
+      const year = bytes[0] | (bytes[1] << 8);
+      const month = String(bytes[2]).padStart(2, '0');
+      const day = String(bytes[3]).padStart(2, '0');
+      const hour = String(bytes[4]).padStart(2, '0');
+      const min = String(bytes[5]).padStart(2, '0');
+      const sec = String(bytes[6]).padStart(2, '0');
+      if (year >= 2000 && year <= 2100) {
+        return `${year}-${month}-${day} ${hour}:${min}:${sec}`;
+      }
+    }
+
+    // 5. Temperature (0x2A6E or 0x2A1C)
+    if ((key.includes('2a6e') || key.includes('2a1c')) && bytes.length >= 2) {
+      const raw = bytes[0] | (bytes[1] << 8);
+      const temp = (raw > 32767 ? raw - 65536 : raw) / 100;
+      return `${temp.toFixed(1)} °C`;
+    }
+
+    // 6. Humidity (0x2A6F)
+    if (key.includes('2a6f') && bytes.length >= 2) {
+      const hum = (bytes[0] | (bytes[1] << 8)) / 100;
+      return `${hum.toFixed(1)} %`;
+    }
+
+    return null;
+  }
+
+  /**
    * Performs an in-depth hardware inspection of a Bluetooth peripheral.
    * @param {BluetoothDevice} bluetoothDevice 
    * @param {Function} onProgress - Callback for scan status updates
@@ -170,18 +223,25 @@ export class DiagnosticProbeService {
               const bytes = new Uint8Array(valDataView.buffer);
               charEntry.readValueHex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
               
-              // If this is standard Battery Level (0x2A19), parse percentage
-              if (char.uuid.toLowerCase().includes('2a19') && bytes.length >= 1) {
-                charEntry.batteryLevelPercent = bytes[0];
-                report.device.batteryLevel = `${bytes[0]}%`;
-              }
-
               // Safe ASCII decoder
               let asciiStr = '';
               for (let b of bytes) {
                 asciiStr += (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.';
               }
               charEntry.readValueAscii = asciiStr;
+
+              // Parse characteristic semantic value
+              const parsed = this.parseCharacteristicValue(char.uuid, bytes, asciiStr);
+              if (parsed) {
+                charEntry.parsedValue = parsed;
+                const u = char.uuid.toLowerCase();
+                if (u.includes('2a19')) report.device.batteryLevel = parsed;
+                if (u.includes('2a24')) report.device.hardwareModel = parsed;
+                if (u.includes('2a26')) report.device.firmwareRevision = parsed;
+                if (u.includes('2a27')) report.device.hardwareRevision = parsed;
+                if (u.includes('2a28')) report.device.softwareRevision = parsed;
+                if (u.includes('2a29')) report.device.manufacturerName = parsed;
+              }
             } catch (readErr) {
               charEntry.readError = readErr.message;
             }

@@ -217,11 +217,13 @@ export class DiagnosticView {
           
           let valRow = '';
           if (char.readValueHex) {
+            const parsedBadge = char.parsedValue ? `<span class="diag-val-parsed">➔ ${char.parsedValue}</span>` : '';
             valRow = `
               <div class="diag-val-row">
-                <span class="diag-val-label">Read Value:</span>
+                <span class="diag-val-label">Raw Hex:</span>
                 <code class="diag-val-hex">${char.readValueHex}</code>
-                ${char.readValueAscii ? `<span class="diag-val-ascii">"${char.readValueAscii}"</span>` : ''}
+                ${parsedBadge}
+                ${char.readValueAscii && !char.parsedValue ? `<span class="diag-val-ascii">"${char.readValueAscii}"</span>` : ''}
               </div>
             `;
           }
