@@ -589,34 +589,14 @@ class App {
       }
     };
 
-    let directConnectSucceeded = false;
-
-    // Phase 1: Fast direct connect attempt (1.8s timeout) preserving the active user gesture
+    // Direct 1-Click Sync for paired / permitted device (6.5s connection budget)
     if (targetDevice) {
       try {
-        await executeSync(targetDevice, 1800);
-        directConnectSucceeded = true;
+        await executeSync(targetDevice, 6500);
         return;
       } catch (err) {
-        console.warn(`[Sync] Fast direct connect check to ${targetDevice.name || targetDevice.id} failed: ${err.message}. Seamlessly opening picker fallback within active user gesture...`);
+        console.warn(`[Sync] Direct connect to ${targetDevice.name || targetDevice.id} failed: ${err.message}. Clearing session cache for picker fallback on next sync.`);
         bleService.clearSessionCache(targetDevice.id);
-      }
-    }
-
-    // Phase 2: Live Discovery Fallback (runs within the remaining active user gesture window)
-    if (!directConnectSucceeded) {
-      try {
-        const freshDevice = await this.pairNewClock(false);
-        if (!freshDevice) {
-          connectionStateStore.set('disconnected');
-          connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-          return;
-        }
-
-        // Freshly selected device gets a generous 9.0s connection budget for ACL negotiation
-        await executeSync(freshDevice, 9000);
-      } catch (err) {
-        console.error('[Sync] Discovery sync failed:', err);
         connectionStateStore.set('error');
         connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
 
@@ -628,7 +608,34 @@ class App {
         }, ...log.slice(0, 29)]);
 
         this.scheduleStateReset('disconnected', 4000);
+        return;
       }
+    }
+
+    // Fresh Device Discovery (runs immediately on click 1 when no clock is in memory)
+    try {
+      const freshDevice = await this.pairNewClock(false);
+      if (!freshDevice) {
+        connectionStateStore.set('disconnected');
+        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+        return;
+      }
+
+      // Freshly selected device gets a generous 9.0s connection budget for ACL negotiation
+      await executeSync(freshDevice, 9000);
+    } catch (err) {
+      console.error('[Sync] Discovery sync failed:', err);
+      connectionStateStore.set('error');
+      connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
+
+      const log = syncLogStore.get();
+      syncLogStore.set([{
+        timestamp: Date.now(),
+        success: false,
+        detail: `Sync error: ${err.message}`
+      }, ...log.slice(0, 29)]);
+
+      this.scheduleStateReset('disconnected', 4000);
     }
   }
 }
