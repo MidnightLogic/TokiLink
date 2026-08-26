@@ -599,46 +599,27 @@ class App {
       }
     };
 
-    // Direct 1-Click Sync for paired / permitted device (6.5s connection budget)
+    // Direct 1-Click Sync for paired / permitted device (4.5s connection budget)
     if (targetDevice) {
       try {
-        await executeSync(targetDevice, 6500);
+        await executeSync(targetDevice, 4500);
         return;
       } catch (err) {
-        console.warn(`[Sync] Direct connect to ${targetDevice.name || targetDevice.id} failed: ${err.message}.`);
+        console.warn(`[Sync] Direct connect to ${targetDevice.name || targetDevice.id} failed: ${err.message}. Seamlessly opening picker...`);
         try {
           await bleService.releaseAllSeikoDevices();
         } catch (e) {}
         bleService.markDeviceStale(targetDevice.id);
 
-        // If on Android and error is 'no longer in range' / 'networkerror', show the Android Paired conflict banner
-        const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
-        const isRangeOrNetError = /no longer in range|networkerror|failed to connect/i.test(err.message);
-        if (isAndroid && isRangeOrNetError) {
-          const banner = document.getElementById('androidPairedBanner');
-          if (banner) {
-            banner.classList.remove('hidden');
-            renderIcons();
-          }
-        }
-
-        connectionStateStore.set('error');
-        connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
-
-        const log = syncLogStore.get();
-        syncLogStore.set([{
-          timestamp: Date.now(),
-          success: false,
-          detail: `Sync error: ${err.message}`
-        }, ...log.slice(0, 29)]);
-
-        this.scheduleStateReset('disconnected', 3500);
-        return;
+        // Fall through to Fresh Device Discovery below!
       }
     }
 
-    // Fresh Device Discovery (runs immediately on click 1 when no clock is in memory)
+    // Fresh Device Discovery (runs when no clock in memory or as automatic fallback when handle is stale)
     try {
+      connectionStateStore.set('connecting');
+      connectionStatusTextStore.set(i18n.t('sync.btn.connecting'));
+
       const freshDevice = await this.pairNewClock(false);
       if (!freshDevice) {
         connectionStateStore.set('disconnected');
@@ -650,6 +631,10 @@ class App {
       await executeSync(freshDevice, 9000);
     } catch (err) {
       console.error('[Sync] Discovery sync failed:', err);
+      try {
+        await bleService.releaseAllSeikoDevices();
+      } catch (e) {}
+
       connectionStateStore.set('error');
       connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
 
@@ -660,7 +645,7 @@ class App {
         detail: `Sync error: ${err.message}`
       }, ...log.slice(0, 29)]);
 
-      this.scheduleStateReset('disconnected', 4000);
+      this.scheduleStateReset('disconnected', 3500);
     }
   }
 }
