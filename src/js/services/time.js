@@ -89,14 +89,8 @@ export class TimeService {
     }
 
     if (bestSample) {
-      // If system clock has major drift (> 800ms) or is on desktop browser without hardware NTP:
-      // Apply the measured atomic offset to keep time accurate.
-      // If drift is small (< 80ms), snap to 0ms to eliminate sub-frame UI jitter.
-      if (Math.abs(bestSample.offset) < 80) {
-        this._offsetMs = 0;
-      } else {
-        this._offsetMs = bestSample.offset;
-      }
+      // Apply exact measured atomic offset to achieve true sub-second millisecond parity
+      this._offsetMs = bestSample.offset;
       this._isApiSynced = true;
       this._lastSyncTimestamp = Date.now();
       this._notify();
