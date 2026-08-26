@@ -560,10 +560,8 @@ class App {
         await bleService.connect(device, timeoutMs);
 
         connectionStateStore.set('syncing');
-        connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
-
-        // 3. Compute target time AT THE EXACT INSTANT OF TRANSMISSION (eliminates GATT connection latency)
-        const targetDate = this.clockView.getImmediateSyncTarget();
+        // 3. Compute target time and align execution to atomic second boundary (eliminates latency)
+        const targetDate = await this.clockView.getPrecisionSyncTarget(35);
 
         // 4. Perform adaptive clock time sync across Multi-Sound / Series C3 / SQ / NexTime
         await bleService.syncClockTime(device, targetDate);

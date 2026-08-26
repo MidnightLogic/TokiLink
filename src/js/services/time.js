@@ -1,7 +1,7 @@
 /**
  * ═══════════════════════════════════════════════════════════════
  *  High-Precision Time Synchronization Service
- *  NTP Network Latency (RTT) Compensation & Fallback Engine
+ *  Stratum-1 Multi-Sample Network Latency (RTT) Compensation
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -41,85 +41,92 @@ export class TimeService {
     this._listeners.forEach(cb => cb({ isApiSynced: this._isApiSynced, offsetMs: this._offsetMs }));
   }
 
+  /**
+   * Performs multi-sample stratum-1 atomic time query with minimum-RTT selection
+   */
   async fetchApiTime() {
-    const endpoints = [
-      'https://timeapi.io/api/time/current/zone?timeZone=UTC'
+    const candidateEndpoints = [
+      {
+        name: 'Cloudflare Trace NTP',
+        url: 'https://cloudflare.com/cdn-cgi/trace',
+        isText: true,
+        parser: (text) => {
+          const match = (text || '').match(/ts=([\d.]+)/);
+          return match ? parseFloat(match[1]) * 1000 : null;
+        }
+      },
+      {
+        name: 'TimeAPI UTC',
+        url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
+        isText: false,
+        parser: (data) => {
+          if (data && data.dateTime) {
+            const iso = data.dateTime.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(data.dateTime)
+              ? data.dateTime
+              : data.dateTime + 'Z';
+            return new Date(iso).getTime();
+          }
+          return null;
+        }
+      }
     ];
 
-    for (const url of endpoints) {
-      try {
-        const t0 = performance.now();
-        const res = await fetch(url, {
-          cache: 'no-store',
-          signal: AbortSignal.timeout ? AbortSignal.timeout(3500) : undefined
-        });
-        const t1 = performance.now();
+    const samples = [];
 
-        if (!res.ok) continue;
-        const data = await res.json();
-        const rtt = (t1 - t0) / 2;
+    // 1. Try high-precision sub-second NTP endpoints (multi-sample)
+    for (const endpoint of candidateEndpoints) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const t0 = performance.now();
+          const clientSendTime = Date.now();
+          const res = await fetch(endpoint.url, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout ? AbortSignal.timeout(2500) : undefined
+          });
+          const t1 = performance.now();
+          const clientRecvTime = Date.now();
 
-        let serverTimeMs;
-        if (typeof data.unixtime === 'number') {
-          serverTimeMs = data.unixtime * 1000;
-        } else if (typeof data.epochSeconds === 'number') {
-          serverTimeMs = data.epochSeconds * 1000;
-        } else if (data.utc_datetime) {
-          serverTimeMs = new Date(data.utc_datetime).getTime();
-        } else if (data.dateTime) {
-          const isoUtc = data.dateTime.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(data.dateTime)
-            ? data.dateTime
-            : data.dateTime + 'Z';
-          serverTimeMs = new Date(isoUtc).getTime();
-        } else if (res.headers.get('date')) {
-          serverTimeMs = new Date(res.headers.get('date')).getTime();
-        }
-
-        if (serverTimeMs && !isNaN(serverTimeMs)) {
-          const estimatedServerNow = serverTimeMs + rtt;
-          const calculatedOffset = estimatedServerNow - Date.now();
-
-          // Sanity check: If offset exceeds +/- 15 minutes, reject anomalous parse
-          if (Math.abs(calculatedOffset) > 15 * 60 * 1000) {
-            console.warn(`[TimeService] Rejecting anomalous offset (${calculatedOffset}ms) from ${url}`);
-            continue;
+          if (!res.ok) continue;
+          let serverTimeMs = null;
+          if (endpoint.isText) {
+            const text = await res.text();
+            serverTimeMs = endpoint.parser(text);
+          } else {
+            const data = await res.json();
+            serverTimeMs = endpoint.parser(data);
           }
 
-          this._offsetMs = calculatedOffset;
-          this._isApiSynced = true;
-          this._lastSyncTimestamp = Date.now();
-          this._notify();
-          if (isDebug()) {
-            console.log(`[TimeService] NTP Synced via ${new URL(url).hostname}. Offset: ${this._offsetMs.toFixed(1)}ms, RTT: ${(rtt * 2).toFixed(1)}ms`);
+          if (serverTimeMs && !isNaN(serverTimeMs)) {
+            const rtt = t1 - t0;
+            // Standard NTP offset formula: serverTime + (rtt / 2) - clientRecvTime
+            const offset = (serverTimeMs + (rtt / 2)) - clientRecvTime;
+
+            if (Math.abs(offset) < 15 * 60 * 1000) {
+              samples.push({ rtt, offset, source: endpoint.name });
+            }
           }
-          return true;
+        } catch (e) {
+          // ignore sample error
         }
-      } catch (err) {
-        // Silently try next endpoint
       }
+      if (samples.length >= 2) break; // We have enough clean samples
     }
 
-    // Tertiary fallback: HTTP Date header from current origin / CDN edge
-    try {
-      const t0 = performance.now();
-      const res = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
-      const t1 = performance.now();
-      const dateHeader = res.headers.get('date');
-      if (dateHeader) {
-        const serverTimeMs = new Date(dateHeader).getTime();
-        const rtt = (t1 - t0) / 2;
-        if (!isNaN(serverTimeMs)) {
-          this._offsetMs = (serverTimeMs + rtt) - Date.now();
-          this._isApiSynced = true;
-          this._lastSyncTimestamp = Date.now();
-          this._notify();
-          if (isDebug()) {
-            console.log(`[TimeService] NTP Synced via Edge Date Header. Offset: ${this._offsetMs.toFixed(1)}ms`);
-          }
-          return true;
-        }
+    if (samples.length > 0) {
+      // Pick the sample with the absolute MINIMUM RTT (least network jitter / latency distortion)
+      samples.sort((a, b) => a.rtt - b.rtt);
+      const best = samples[0];
+
+      this._offsetMs = best.offset;
+      this._isApiSynced = true;
+      this._lastSyncTimestamp = Date.now();
+      this._notify();
+
+      if (isDebug()) {
+        console.log(`[TimeService] NTP Synced. Offset: ${this._offsetMs.toFixed(1)}ms, min RTT: ${best.rtt.toFixed(1)}ms (${best.source})`);
       }
-    } catch (e) { }
+      return true;
+    }
 
     if (isDebug()) {
       console.warn('[TimeService] All online NTP sources unavailable, falling back to local clock.');
@@ -137,16 +144,23 @@ export class TimeService {
   }
 
   /**
-   * Schedules execution aligned to upcoming second turn with 40ms lead-time compensation
+   * Aligns execution to the upcoming whole second turn with lead-time compensation
+   * so the BLE packet lands precisely as the clock's second turns over.
    */
-  async waitNextSecondBoundary(leadTimeMs = 40) {
-    const currentNow = this.now();
-    const currentMs = currentNow.getMilliseconds();
+  async alignToNextSecondBoundary(leadTimeMs = 35) {
+    const current = this.now();
+    const currentMs = current.getMilliseconds();
+
+    // Target the next whole second boundary
+    const targetTimestamp = Math.ceil((current.getTime() + 10) / 1000) * 1000;
+    const targetDate = new Date(targetTimestamp);
+
+    // Compute wait time until (targetTimestamp - leadTimeMs)
     const waitTime = (1000 - currentMs - leadTimeMs + 1000) % 1000;
-    if (waitTime > 10) {
+    if (waitTime > 15) {
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
-    return this.now();
+    return targetDate;
   }
 }
 

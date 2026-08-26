@@ -308,9 +308,10 @@ export class ClockView {
   }
 
   /**
-   * Calculates the target Date for zero-idle immediate BLE synchronization
+   * Calculates the target Date and aligns execution to the upcoming second boundary
+   * with 35ms BLE transmission lead-time compensation.
    */
-  getImmediateSyncTarget() {
+  async getPrecisionSyncTarget(leadTimeMs = 35) {
     const settings = settingsStore.get();
     if (settings.manualTime && this.manualMode === 'exact') {
       if (this.dom.manualTimeInput?.value) {
@@ -319,17 +320,18 @@ export class ClockView {
       return new Date();
     }
 
-    // Atomic time rounding to active second
-    const now = timeService.now();
-    const ms = now.getMilliseconds();
-    const roundedTime = new Date(now.getTime() + (ms >= 500 ? (1000 - ms) : -ms));
+    const targetDate = await timeService.alignToNextSecondBoundary(leadTimeMs);
 
     if (settings.manualTime && this.manualMode === 'timezone') {
       const targetTz = TIMEZONE_CITIES[this.selectedTzIdx] || TIMEZONE_CITIES[this.localTzIdx];
-      return getTimeInTimezone(roundedTime, targetTz.offset);
+      return getTimeInTimezone(targetDate, targetTz.offset);
     }
 
-    return roundedTime;
+    return targetDate;
+  }
+
+  getImmediateSyncTarget() {
+    return this.getEffectiveTime();
   }
 
   updateClock() {
