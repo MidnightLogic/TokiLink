@@ -1431,6 +1431,8 @@ body::after {
   font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .clock-bottom-bar {

@@ -30,7 +30,7 @@
   "clock.localTime": "Heure locale",
   "clock.syncTitle": "Synchro Heure:",
   "clock.sourceLocal": "Hors-ligne / Appareil",
-  "clock.sourceApi": "Automatique (En ligne)",
+  "clock.sourceApi": "En ligne",
   "clock.sourceManual": "Personnalisée",
   "clock.loading": "Chargement...",
   "manual.title": "Régler l'heure manuellement",

@@ -30,7 +30,7 @@
   "clock.localTime": "Ortszeit",
   "clock.syncTitle": "Zeitsync:",
   "clock.sourceLocal": "Offline / Gerät",
-  "clock.sourceApi": "Automatisch (Online)",
+  "clock.sourceApi": "Online",
   "clock.sourceManual": "Benutzerdefiniert",
   "clock.loading": "Laden...",
   "manual.title": "Manuelle Zeiteinstellung",

@@ -30,7 +30,7 @@
   "clock.localTime": "当地时间",
   "clock.syncTitle": "时间同步:",
   "clock.sourceLocal": "离线 / 本地设备",
-  "clock.sourceApi": "自动获取 (网络校时)",
+  "clock.sourceApi": "在线校时",
   "clock.sourceManual": "自定义时间",
   "clock.loading": "加载中...",
   "manual.title": "手动调整时间",

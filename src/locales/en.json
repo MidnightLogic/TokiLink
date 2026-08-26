@@ -30,7 +30,7 @@
   "clock.localTime": "Local Time",
   "clock.syncTitle": "Time Sync:",
   "clock.sourceLocal": "Offline / Device",
-  "clock.sourceApi": "Atomic (NTP / API)",
+  "clock.sourceApi": "Online",
   "clock.sourceManual": "Fixed Time Override",
   "clock.loading": "Loading...",
   "manual.title": "Manual Time Override",
