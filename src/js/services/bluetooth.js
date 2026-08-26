@@ -692,12 +692,8 @@ export class BluetoothService {
             }
             const payload = DeviceProtocol.buildNexTimePayload(finalTargetDate);
 
-            // 3. Fire write immediately (zero discovery delay, zero idle sleep!)
-            if (writeChar.writeValueWithResponse) {
-              await writeChar.writeValueWithResponse(payload);
-            } else {
-              await writeChar.writeValue(payload);
-            }
+            // 3. Fire write immediately via property-aware GATT write
+            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
             await new Promise(r => setTimeout(r, 40));
             debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
@@ -723,12 +719,8 @@ export class BluetoothService {
             }
             const payload = DeviceProtocol.buildTimePayload(finalTargetDate);
 
-            // 3. Fire write immediately (zero discovery delay, zero idle sleep!)
-            if (writeChar.writeValueWithResponse) {
-              await writeChar.writeValueWithResponse(payload);
-            } else {
-              await writeChar.writeValue(payload);
-            }
+            // 3. Fire write immediately via property-aware GATT write
+            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
             await new Promise(r => setTimeout(r, 40));
             debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
