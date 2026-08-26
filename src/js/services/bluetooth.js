@@ -678,22 +678,27 @@ export class BluetoothService {
             try {
               const authPayload = DeviceProtocol.buildNexTimeAuth();
               await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, authPayload);
-              await new Promise(r => setTimeout(r, 60));
+              await new Promise(r => setTimeout(r, 40));
             } catch (e) {
               debug.warn('[BLE Sync] Auth pre-packet skipped:', e);
             }
 
-            // 2. NOW that characteristic handles are warm in memory, align to atomic second boundary
-            const finalTargetDate = targetDate || (await timeService.alignToNextSecondBoundary(35));
+            // 2. Compute exact target date without idle delay to prevent peripheral sleep
+            let finalTargetDate = targetDate;
+            if (!finalTargetDate) {
+              const now = timeService.now();
+              const ms = now.getMilliseconds();
+              finalTargetDate = new Date(now.getTime() + (ms >= 500 ? (1000 - ms) : -ms));
+            }
             const payload = DeviceProtocol.buildNexTimePayload(finalTargetDate);
 
-            // 3. Fire write immediately (zero discovery delay!)
+            // 3. Fire write immediately (zero discovery delay, zero idle sleep!)
             if (writeChar.writeValueWithResponse) {
               await writeChar.writeValueWithResponse(payload);
             } else {
               await writeChar.writeValue(payload);
             }
-            await new Promise(r => setTimeout(r, 60));
+            await new Promise(r => setTimeout(r, 40));
             debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
             // Background battery telemetry query only for battery-supported clock series
@@ -709,17 +714,22 @@ export class BluetoothService {
             const writeChar = await this.getCharacteristic(proto.timeServiceUUID, proto.timeWriteCharUUID);
             if (!writeChar) throw new Error('CTS time write characteristic not found');
 
-            // 2. NOW that characteristic handles are warm in memory, align to atomic second boundary
-            const finalTargetDate = targetDate || (await timeService.alignToNextSecondBoundary(35));
+            // 2. Compute exact target date without idle delay to prevent peripheral sleep
+            let finalTargetDate = targetDate;
+            if (!finalTargetDate) {
+              const now = timeService.now();
+              const ms = now.getMilliseconds();
+              finalTargetDate = new Date(now.getTime() + (ms >= 500 ? (1000 - ms) : -ms));
+            }
             const payload = DeviceProtocol.buildTimePayload(finalTargetDate);
 
-            // 3. Fire write immediately (zero discovery delay!)
+            // 3. Fire write immediately (zero discovery delay, zero idle sleep!)
             if (writeChar.writeValueWithResponse) {
               await writeChar.writeValueWithResponse(payload);
             } else {
               await writeChar.writeValue(payload);
             }
-            await new Promise(r => setTimeout(r, 60));
+            await new Promise(r => setTimeout(r, 40));
             debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
             // Background battery telemetry query only for battery-supported clock series
@@ -734,6 +744,10 @@ export class BluetoothService {
         } catch (err) {
           debug.log(`[BLE Sync] Candidate ${proto.name} not available on peripheral (${err.message}). Trying next candidate...`);
           lastError = err;
+          // If the physical GATT connection dropped, stop looping candidates
+          if (!this.isConnected || !this._device?.gatt?.connected) {
+            break;
+          }
         }
       }
 
