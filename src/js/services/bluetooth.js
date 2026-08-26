@@ -151,10 +151,18 @@ export class BluetoothService {
     });
     const candidateDevices = matched.length > 0 ? matched : devices;
 
-    // Filter out devices where direct GATT connection has failed, forcing discovery picker recovery
-    const validPermitted = candidateDevices.filter(d => !this.hasDirectConnectFailed(d.id));
+    // Filter out devices where direct GATT connection has failed, UNLESS the device is currently connected
+    const validPermitted = candidateDevices.filter(d => (d.gatt && d.gatt.connected) || !this.hasDirectConnectFailed(d.id));
     debug.log(`[BLE Debug] Eligible permitted devices for direct sync: ${validPermitted.length} (filtered ${candidateDevices.length - validPermitted.length} failed direct-connect candidates)`);
     return validPermitted;
+  }
+
+  cacheSessionDevice(device) {
+    if (device && device.id) {
+      this._sessionDeviceCache.set(device.id, device);
+      this.clearDirectConnectFailed(device.id);
+      this._device = device;
+    }
   }
 
   /**

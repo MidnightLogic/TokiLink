@@ -8,6 +8,7 @@
 import { DeviceProtocol } from './protocol.js';
 import { timeService } from './time.js';
 import { PlatformService } from './platform.js';
+import { bleService } from './bluetooth.js';
 import { syncLogStore, pairedDevicesStore, settingsStore } from '../store.js';
 
 // Common Bluetooth SIG and Seiko GATT UUID dictionary
@@ -147,38 +148,12 @@ export class DiagnosticProbeService {
       onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'}...` });
 
       let server = null;
-      const maxRetries = 3;
-      let lastConnectError = null;
-
-      // Allow 250ms settling delay for HCI controller between picker and connect
-      await new Promise(r => setTimeout(r, 250));
-
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          if (bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
-            server = bluetoothDevice.gatt;
-          } else {
-            onProgress({ step: 1, text: `Connecting to ${bluetoothDevice.name || 'clock'} (Attempt ${attempt}/${maxRetries})...` });
-            server = await bluetoothDevice.gatt.connect();
-          }
-          report.device.gattConnected = true;
-          break;
-        } catch (err) {
-          lastConnectError = err;
-          report.errors.push(`GATT connection attempt ${attempt} failed: ${err.message}`);
-          // If device origin permission is revoked / unauthorised, don't retry
-          if (err.name === 'SecurityError' || (err.message && /not authori[sz]ed|not permitted/i.test(err.message))) {
-            break;
-          }
-          if (attempt < maxRetries) {
-            onProgress({ step: 1, text: `Retrying connection in ${attempt * 300}ms...` });
-            await new Promise(r => setTimeout(r, attempt * 300));
-          }
-        }
-      }
-
-      if (!server || !server.connected) {
-        throw new Error(`Failed to establish GATT connection after ${maxRetries} attempts: ${lastConnectError?.message || 'GATT stack busy'}`);
+      try {
+        server = await bleService.connect(bluetoothDevice, 8000);
+        report.device.gattConnected = true;
+      } catch (err) {
+        report.errors.push(`GATT connection failed: ${err.message}`);
+        throw new Error(`Failed to establish GATT connection: ${err.message}`);
       }
 
       onProgress({ step: 2, text: 'Enumerating all primary GATT services...' });
@@ -382,9 +357,11 @@ export class DiagnosticProbeService {
 
       return report;
     } finally {
-      if (bluetoothDevice && bluetoothDevice.gatt && bluetoothDevice.gatt.connected) {
+      if (bluetoothDevice) {
         try {
-          bluetoothDevice.gatt.disconnect();
+          await bleService.disconnect(bluetoothDevice);
+          // Allow 350ms settling window for OS BLE controller to tear down ACL and resume advertising
+          await new Promise(r => setTimeout(r, 350));
         } catch (e) {}
       }
     }

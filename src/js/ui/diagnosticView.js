@@ -8,7 +8,7 @@
 import { DiagnosticProbeService } from '../services/diagnosticProbe.js';
 import { DeviceProtocol } from '../services/protocol.js';
 import { bleService } from '../services/bluetooth.js';
-import { activeDeviceStore, pairedDevicesStore } from '../store.js';
+import { activeDeviceStore, pairedDevicesStore, DeviceActions } from '../store.js';
 
 export class DiagnosticView {
   constructor(dom, renderIcons = () => {}) {
@@ -172,8 +172,18 @@ export class DiagnosticView {
         }
       }
 
-      // Cache device reference for quick retries
+      // Cache device reference for quick retries and register with store & BLE session
       this.cachedDiagnosticDevice = targetBleDevice;
+      if (targetBleDevice && targetBleDevice.name) {
+        bleService.cacheSessionDevice(targetBleDevice);
+        const model = DeviceProtocol.detectModel(targetBleDevice.name);
+        DeviceActions.addOrUpdateDevice({
+          id: targetBleDevice.id,
+          name: targetBleDevice.name || 'Seiko Clock',
+          model: model.type,
+        });
+        DeviceActions.setActiveDevice(targetBleDevice.id);
+      }
 
       const report = await DiagnosticProbeService.runFullDiagnostic(targetBleDevice, (status) => {
         if (progressText) progressText.textContent = status.text;
