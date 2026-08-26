@@ -86,6 +86,22 @@ export class BluetoothService {
     }
   }
 
+  /**
+   * Serializes all critical GATT reads, writes, and connection procedures to prevent
+   * DOMException: GATT operation already in progress race conditions.
+   */
+  async withMutex(fn) {
+    const prev = this._mutexPromise || Promise.resolve();
+    let release;
+    this._mutexPromise = new Promise(resolve => { release = resolve; });
+    try {
+      await prev;
+      return await fn();
+    } finally {
+      release();
+    }
+  }
+
   // ─── Device Discovery & Permission Persistence ───────────────
 
   /**
@@ -490,86 +506,88 @@ export class BluetoothService {
    *  - Generic / Custom-named Seiko Bluetooth Clocks
    */
   async syncClockTime(device, targetDate = new Date()) {
-    let bleDevice = this._device;
+    return this.withMutex(async () => {
+      let bleDevice = this._device;
 
-    if (!this.isConnected || this._device?.id !== device.id) {
-      if (this._sessionDeviceCache.has(device.id)) {
-        bleDevice = this._sessionDeviceCache.get(device.id);
-        await this.connect(bleDevice);
-      } else {
-        bleDevice = await this.reconnectStoredDevice(device);
-        await this.connect(bleDevice);
-      }
-    }
-
-    const config = DeviceProtocol.getConfig(device.name);
-    const candidates = DeviceProtocol.getCandidateProtocols(config.protocol);
-
-    let lastError = null;
-
-    for (const proto of candidates) {
-      try {
-        debug.log(`[BLE Sync] Attempting time sync via protocol: ${proto.name}...`);
-
-        if (proto.payloadType === 'nexTime_8byte') {
-          // NexTime LPWISE 8-byte write
-          const payload = DeviceProtocol.buildNexTimePayload(targetDate);
-
-          // Optional notify setup on RX characteristic
-          try {
-            const notifyChar = await this.getCharacteristic(proto.timeServiceUUID, proto.timeNotifyCharUUID);
-            if (notifyChar?.startNotifications) {
-              await notifyChar.startNotifications();
-            }
-          } catch (e) {
-            debug.warn('[BLE Sync] NexTime notification subscribe skipped/unsupported:', e);
-          }
-
-          // Optional auth query packet
-          try {
-            const authPayload = DeviceProtocol.buildNexTimeAuth();
-            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, authPayload);
-            await new Promise(r => setTimeout(r, 60));
-          } catch (e) {
-            debug.warn('[BLE Sync] Auth pre-packet skipped:', e);
-          }
-
-          // Write time packet
-          await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
-          await new Promise(r => setTimeout(r, 60));
-          debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
-
-          // Background battery telemetry query only for battery-supported clock series
-          if (config.series !== 'seriesC3' && config.series !== 'standardDigital') {
-            if (this.isConnected && this._device?.gatt?.connected) {
-              this.readBatteryLevel(device).catch(() => {});
-            }
-          }
-
-          return { success: true, protocol: proto.id, series: proto.series, payload };
+      if (!this.isConnected || this._device?.id !== device.id) {
+        if (this._sessionDeviceCache.has(device.id)) {
+          bleDevice = this._sessionDeviceCache.get(device.id);
+          await this.connect(bleDevice);
         } else {
-          // Standard CTS 10-byte write
-          const payload = DeviceProtocol.buildTimePayload(targetDate);
-          await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
-          await new Promise(r => setTimeout(r, 60));
-          debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
-
-          // Background battery telemetry query only for battery-supported clock series
-          if (config.series !== 'seriesC3' && config.series !== 'standardDigital') {
-            if (this.isConnected && this._device?.gatt?.connected) {
-              this.readBatteryLevel(device).catch(() => {});
-            }
-          }
-
-          return { success: true, protocol: proto.id, series: proto.series, payload };
+          bleDevice = await this.reconnectStoredDevice(device);
+          await this.connect(bleDevice);
         }
-      } catch (err) {
-        debug.log(`[BLE Sync] Candidate ${proto.name} not available on peripheral (${err.message}). Trying next candidate...`);
-        lastError = err;
       }
-    }
 
-    throw lastError || new Error(`No compatible Seiko time synchronization service found on "${device?.name || 'clock'}".`);
+      const config = DeviceProtocol.getConfig(device.name);
+      const candidates = DeviceProtocol.getCandidateProtocols(config.protocol);
+
+      let lastError = null;
+
+      for (const proto of candidates) {
+        try {
+          debug.log(`[BLE Sync] Attempting time sync via protocol: ${proto.name}...`);
+
+          if (proto.payloadType === 'nexTime_8byte') {
+            // NexTime LPWISE 8-byte write
+            const payload = DeviceProtocol.buildNexTimePayload(targetDate);
+
+            // Optional notify setup on RX characteristic
+            try {
+              const notifyChar = await this.getCharacteristic(proto.timeServiceUUID, proto.timeNotifyCharUUID);
+              if (notifyChar?.startNotifications) {
+                await notifyChar.startNotifications();
+              }
+            } catch (e) {
+              debug.warn('[BLE Sync] NexTime notification subscribe skipped/unsupported:', e);
+            }
+
+            // Optional auth query packet
+            try {
+              const authPayload = DeviceProtocol.buildNexTimeAuth();
+              await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, authPayload);
+              await new Promise(r => setTimeout(r, 60));
+            } catch (e) {
+              debug.warn('[BLE Sync] Auth pre-packet skipped:', e);
+            }
+
+            // Write time packet
+            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
+            await new Promise(r => setTimeout(r, 60));
+            debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
+
+            // Background battery telemetry query only for battery-supported clock series
+            if (config.series !== 'seriesC3' && config.series !== 'standardDigital') {
+              if (this.isConnected && this._device?.gatt?.connected) {
+                this.readBatteryLevel(device).catch(() => {});
+              }
+            }
+
+            return { success: true, protocol: proto.id, series: proto.series, payload };
+          } else {
+            // Standard CTS 10-byte write
+            const payload = DeviceProtocol.buildTimePayload(targetDate);
+            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
+            await new Promise(r => setTimeout(r, 60));
+            debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
+
+            // Background battery telemetry query only for battery-supported clock series
+            if (config.series !== 'seriesC3' && config.series !== 'standardDigital') {
+              if (this.isConnected && this._device?.gatt?.connected) {
+                this.readBatteryLevel(device).catch(() => {});
+              }
+            }
+
+            return { success: true, protocol: proto.id, series: proto.series, payload };
+          }
+        } catch (err) {
+          debug.log(`[BLE Sync] Candidate ${proto.name} not available on peripheral (${err.message}). Trying next candidate...`);
+          lastError = err;
+        }
+      }
+
+      throw lastError || new Error(`No compatible Seiko time synchronization service found on "${device?.name || 'clock'}".`);
+    });
   }
 
   /**
@@ -582,31 +600,16 @@ export class BluetoothService {
   /**
    * Safely reads battery level percentage from standard Bluetooth Battery Service (0x180F / 0x2A19).
    */
-  async readBatteryLevel(device) {
-    if (!device || !this.isConnected || !this._device?.gatt?.connected) return null;
+  async readBatteryLevel(device = null) {
+    const dev = device || this._device;
+    if (!dev) return null;
+
     try {
       const char = await this.getCharacteristic('0000180f-0000-1000-8000-00805f9b34fb', '00002a19-0000-1000-8000-00805f9b34fb');
-      if (char && char.readValue) {
-        const val = await char.readValue();
-        const bytes = new Uint8Array(val.buffer);
-        if (bytes.length >= 1) {
-          const levelStr = `${bytes[0]}%`;
-          debug.log(`[BLE] Battery level read: ${levelStr}`);
-          
-          // Update active device store
-          const currentActive = activeDeviceStore.get();
-          if (currentActive && currentActive.id === device.id) {
-            activeDeviceStore.set({ ...currentActive, batteryLevel: levelStr });
-          }
-          
-          // Update paired devices store
-          const paired = pairedDevicesStore.get() || [];
-          const updated = paired.map(d => d.id === device.id ? { ...d, batteryLevel: levelStr } : d);
-          pairedDevicesStore.set(updated);
-          
-          return levelStr;
-        }
-      }
+      const val = await char.readValue();
+      const level = val.getUint8(0);
+      debug.log(`[BLE Battery] Battery level: ${level}%`);
+      return level;
     } catch (e) {
       // Expected for clocks without battery service
     }
@@ -631,18 +634,20 @@ export class BluetoothService {
 
     this._isControlWriting = true;
     try {
-      let bleDevice = this._device;
-      if (!this.isConnected || this._device?.id !== device.id) {
-        if (this._sessionDeviceCache.has(device.id)) {
-          bleDevice = this._sessionDeviceCache.get(device.id);
-          await this.connect(bleDevice);
-        } else {
-          bleDevice = await this.reconnectStoredDevice(device);
-          await this.connect(bleDevice);
+      await this.withMutex(async () => {
+        let bleDevice = this._device;
+        if (!this.isConnected || this._device?.id !== device.id) {
+          if (this._sessionDeviceCache.has(device.id)) {
+            bleDevice = this._sessionDeviceCache.get(device.id);
+            await this.connect(bleDevice);
+          } else {
+            bleDevice = await this.reconnectStoredDevice(device);
+            await this.connect(bleDevice);
+          }
         }
-      }
 
-      await this.write(config.controlServiceUUID, config.controlWriteCharUUID, payload);
+        await this.write(config.controlServiceUUID, config.controlWriteCharUUID, payload);
+      });
     } catch (err) {
       debug.warn('[BLE] sendControlPayload warning:', err);
     } finally {

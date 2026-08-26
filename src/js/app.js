@@ -90,6 +90,7 @@ class App {
   constructor() {
     this.dom = {};
     this.diagnostics = null;
+    this._stateResetTimer = null;
   }
 
   cacheDom() {
@@ -495,11 +496,35 @@ class App {
     }
   }
 
+  scheduleStateReset(targetState = 'disconnected', delayMs = 3500) {
+    if (this._stateResetTimer) {
+      clearTimeout(this._stateResetTimer);
+    }
+    this._stateResetTimer = setTimeout(() => {
+      connectionStateStore.set(targetState);
+      connectionStatusTextStore.set(i18n.t('sync.status.idle'));
+      this._stateResetTimer = null;
+    }, delayMs);
+  }
+
   bindSyncAction() {
     this.dom.syncBtn?.addEventListener('click', () => this.performSync());
   }
 
   async performSync() {
+    // 1. Guard against concurrent / re-entrant sync triggers
+    const currentState = connectionStateStore.get();
+    if (currentState === 'connecting' || currentState === 'syncing' || currentState === 'searching') {
+      console.log('[Sync] Operation already active, ignoring concurrent click.');
+      return;
+    }
+
+    // Cancel any pending auto-reset timer so it doesn't clobber the new state
+    if (this._stateResetTimer) {
+      clearTimeout(this._stateResetTimer);
+      this._stateResetTimer = null;
+    }
+
     let activeDevice = activeDeviceStore.get();
     let permittedDevices = await bleService.getPermittedDevices();
     let targetDevice = permittedDevices.find(d => activeDevice && (d.id === activeDevice.id || (d.name && d.name === activeDevice.name)));
@@ -561,12 +586,7 @@ class App {
           timeSynced: syncTimeStr
         }, ...log.slice(0, 29)]);
 
-        setTimeout(() => {
-          if (connectionStateStore.get() === 'connected') {
-            connectionStateStore.set('disconnected');
-            connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-          }
-        }, 3500);
+        this.scheduleStateReset('disconnected', 3500);
       } finally {
         // ALWAYS cleanly disconnect GATT so the clock immediately returns to normal time display and advertising
         try {
@@ -615,12 +635,7 @@ class App {
           detail: `Sync error: ${err.message}`
         }, ...log.slice(0, 29)]);
 
-        setTimeout(() => {
-          if (connectionStateStore.get() === 'error') {
-            connectionStateStore.set('disconnected');
-            connectionStatusTextStore.set(i18n.t('sync.status.idle'));
-          }
-        }, 4000);
+        this.scheduleStateReset('disconnected', 4000);
       }
     }
   }

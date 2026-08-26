@@ -50,6 +50,8 @@ export class DeviceView {
         const deviceId = activeDevice.id;
         await bleService.forgetDevice(deviceId);
         DeviceActions.removeDevice(deviceId);
+        connectionStateStore.set('disconnected');
+        connectionStatusTextStore.set(i18n.t('sync.status.idle'));
       }
     });
 
