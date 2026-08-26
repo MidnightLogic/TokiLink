@@ -60,10 +60,24 @@ export class TimeService {
         url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
         isText: false,
         parser: (data) => {
-          if (data && data.dateTime) {
-            const iso = data.dateTime.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(data.dateTime)
-              ? data.dateTime
-              : data.dateTime + 'Z';
+          if (!data) return null;
+          // Prioritize numeric fields with milliSeconds to avoid JS Date.parse microsecond truncation
+          if (typeof data.year === 'number' && typeof data.month === 'number' && typeof data.day === 'number') {
+            const ms = typeof data.milliSeconds === 'number' ? data.milliSeconds : 0;
+            return Date.UTC(
+              data.year,
+              data.month - 1,
+              data.day,
+              data.hour || 0,
+              data.minute || 0,
+              data.seconds || 0,
+              ms
+            );
+          }
+          if (data.dateTime) {
+            // Trim 6-digit microseconds (.123456) to 3-digit milliseconds (.123) so Date.parse doesn't drop milliseconds
+            const cleaned = data.dateTime.replace(/(\.\d{3})\d+/, '$1');
+            const iso = cleaned.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(cleaned) ? cleaned : cleaned + 'Z';
             return new Date(iso).getTime();
           }
           return null;
