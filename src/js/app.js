@@ -418,6 +418,10 @@ class App {
     dismissBtn?.addEventListener('click', () => {
       if (toast) toast.classList.add('hidden');
     });
+
+    document.getElementById('androidPairedCloseBtn')?.addEventListener('click', () => {
+      document.getElementById('androidPairedBanner')?.classList.add('hidden');
+    });
   }
 
   initTabs() {
@@ -581,6 +585,9 @@ class App {
           timeSynced: syncTimeStr
         }, ...log.slice(0, 29)]);
 
+        // Hide Android Paired Conflict Banner on successful sync
+        document.getElementById('androidPairedBanner')?.classList.add('hidden');
+
         this.scheduleStateReset('disconnected', 3500);
       } finally {
         // ALWAYS cleanly disconnect GATT so the clock immediately returns to normal time display and advertising
@@ -603,6 +610,17 @@ class App {
           await bleService.releaseAllSeikoDevices();
         } catch (e) {}
         bleService.markDeviceStale(targetDevice.id);
+
+        // If on Android and error is 'no longer in range' / 'networkerror', show the Android Paired conflict banner
+        const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent);
+        const isRangeOrNetError = /no longer in range|networkerror|failed to connect/i.test(err.message);
+        if (isAndroid && isRangeOrNetError) {
+          const banner = document.getElementById('androidPairedBanner');
+          if (banner) {
+            banner.classList.remove('hidden');
+            renderIcons();
+          }
+        }
 
         connectionStateStore.set('error');
         connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);

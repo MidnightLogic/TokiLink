@@ -266,8 +266,35 @@
         </div>
         <div class="ios-banner-hint">
           <span class="ios-hint-badge">Tip</span>
-          <span data-i18n="banner.iosSteps">To install on your Home Screen as an app, use the Safari + Beacio
-          option.</span>
+          <span data-i18n="banner.iosSteps">To install on your Home Screen as an app, use the Safari + Beacio option.</span>
+        </div>
+      </div>
+
+      <!-- ═══ Android OS Paired Device Conflict Banner ═══ -->
+      <div class="android-paired-banner hidden" id="androidPairedBanner">
+        <div class="android-paired-header">
+          <div class="android-paired-icon-badge">
+            <i data-lucide="smartphone" class="android-paired-icon"></i>
+          </div>
+          <div class="android-paired-title-wrap">
+            <h3 class="android-paired-title" data-i18n="banner.androidPairedTitle">Clock Paired in Phone Settings</h3>
+            <p class="android-paired-desc" data-i18n="banner.androidPairedDesc">Your phone is holding a background connection to this clock in Android Bluetooth settings.</p>
+          </div>
+          <button type="button" class="android-banner-close-btn" id="androidPairedCloseBtn" aria-label="Close Notice"><i data-lucide="x"></i></button>
+        </div>
+        <div class="android-paired-steps-container">
+          <div class="android-paired-step-row">
+            <span class="android-paired-step-num">1</span>
+            <span data-i18n="banner.androidPairedStep1">Open your phone's <strong>Settings → Bluetooth (or Connected Devices)</strong>.</span>
+          </div>
+          <div class="android-paired-step-row">
+            <span class="android-paired-step-num">2</span>
+            <span data-i18n="banner.androidPairedStep2">Find your clock under <strong>Paired Devices</strong> and tap ⚙️ → <strong>Unpair / Forget</strong>.</span>
+          </div>
+          <div class="android-paired-step-row">
+            <span class="android-paired-step-num">3</span>
+            <span data-i18n="banner.androidPairedStep3">Return here and tap <strong>Sync</strong> to connect directly.</span>
+          </div>
         </div>
       </div>
 

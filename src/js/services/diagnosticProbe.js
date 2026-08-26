@@ -215,8 +215,11 @@ export class DiagnosticProbeService {
               capturedNotifications: [],
             };
 
-            // If characteristic is readable, read current value safely
-            if (props.read && char.readValue) {
+            // Only read standard safe Device Information characteristics to avoid triggering Android OS system bonding prompts
+            const safeReadUUIDs = ['2a19', '2a24', '2a26', '2a27', '2a28', '2a29', '2a50'];
+            const isSafeToRead = safeReadUUIDs.some(uuid => char.uuid.toLowerCase().includes(uuid));
+
+            if (props.read && char.readValue && isSafeToRead) {
               try {
                 if (!bluetoothDevice.gatt?.connected) {
                   server = await bleService.connect(bluetoothDevice);
