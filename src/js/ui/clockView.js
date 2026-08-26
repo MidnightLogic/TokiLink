@@ -288,9 +288,18 @@ export class ClockView {
   }
 
   startClock() {
-    if (this._interval) clearInterval(this._interval);
-    this.updateClock();
-    this._interval = setInterval(() => this.updateClock(), 1000);
+    if (this._timer) clearTimeout(this._timer);
+
+    const tick = () => {
+      this.updateClock();
+      const now = timeService.now();
+      const ms = now.getMilliseconds();
+      // Dynamically schedule next tick to land on the upcoming millisecond 0 (plus 2ms buffer)
+      const nextTickIn = Math.max(10, 1000 - ms + 2);
+      this._timer = setTimeout(tick, nextTickIn);
+    };
+
+    tick();
   }
 
   getEffectiveTime() {
