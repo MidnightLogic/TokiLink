@@ -318,8 +318,8 @@ export class DiagnosticProbeService {
         };
 
         try {
-          if (!bluetoothDevice.gatt.connected) {
-            server = await bluetoothDevice.gatt.connect();
+          if (!bluetoothDevice.gatt?.connected) {
+            server = await bleService.connect(bluetoothDevice);
           }
           const s = await server.getPrimaryService(cand.timeServiceUUID);
           probe.serviceFound = true;

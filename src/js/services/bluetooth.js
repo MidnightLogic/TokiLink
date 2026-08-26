@@ -31,7 +31,7 @@ export class BluetoothService {
     this._characteristics = new Map();
     this._listeners = new Map();
     this._sessionDeviceCache = new Map(); // id -> BluetoothDevice, survives within a single session
-    this._failedDirectConnectDevices = new Set(); // IDs of devices where direct GATT connect failed
+    this._staleDeviceIds = new Set(); // IDs where Chromium reported handle invalidation or out-of-range
 
     if (typeof navigator !== 'undefined' && navigator.bluetooth && typeof navigator.bluetooth.addEventListener === 'function') {
       try {
@@ -150,14 +150,35 @@ export class BluetoothService {
       return DeviceProtocol.NAME_FILTERS.some(filter => lower.includes(filter.toLowerCase()));
     });
     const candidateDevices = matched.length > 0 ? matched : devices;
-    debug.log(`[BLE Debug] Eligible permitted devices for sync: ${candidateDevices.length}`);
-    return candidateDevices;
+    const validCandidateDevices = candidateDevices.filter(d => !this._staleDeviceIds.has(d.id));
+    debug.log(`[BLE Debug] Eligible permitted devices for sync: ${validCandidateDevices.length} (filtered ${candidateDevices.length - validCandidateDevices.length} stale handles)`);
+    return validCandidateDevices;
   }
 
   cacheSessionDevice(device) {
     if (device && device.id) {
       this._sessionDeviceCache.set(device.id, device);
+      this.clearDeviceStale(device.id);
       this._device = device;
+    }
+  }
+
+  markDeviceStale(deviceId) {
+    if (deviceId) {
+      this._staleDeviceIds.add(deviceId);
+      debug.log(`[BLE] Device marked as stale/out-of-range: ${deviceId}`);
+    }
+  }
+
+  isDeviceStale(deviceId) {
+    return deviceId ? this._staleDeviceIds.has(deviceId) : false;
+  }
+
+  clearDeviceStale(deviceId = null) {
+    if (deviceId) {
+      this._staleDeviceIds.delete(deviceId);
+    } else {
+      this._staleDeviceIds.clear();
     }
   }
 
@@ -181,7 +202,7 @@ export class BluetoothService {
 
     this._device = device;
     this._sessionDeviceCache.set(device.id, device);
-    this.clearDirectConnectFailed(device.id); // Fresh picker selection resets failure counter
+    this.clearDeviceStale(device.id); // Fresh picker selection resets stale flag
     this._bindDeviceEvents(device);
     return device;
   }
@@ -308,14 +329,14 @@ export class BluetoothService {
 
   async disconnect(device = null) {
     const dev = device || this._device;
-    if (dev && dev.gatt && dev.gatt.connected) {
+    if (dev?.gatt) {
       try {
         dev.gatt.disconnect();
       } catch (err) {
         debug.warn('[BLE Debug] Error during device disconnect:', err);
       }
     }
-    if (this._server && this._server.connected) {
+    if (this._server) {
       try {
         this._server.disconnect();
       } catch (err) {}

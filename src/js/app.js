@@ -595,8 +595,13 @@ class App {
         await executeSync(targetDevice, 6500);
         return;
       } catch (err) {
-        console.warn(`[Sync] Direct connect to ${targetDevice.name || targetDevice.id} failed: ${err.message}. Clearing session cache for picker fallback on next sync.`);
+        console.warn(`[Sync] Direct connect to ${targetDevice.name || targetDevice.id} failed: ${err.message}.`);
+        try {
+          await bleService.disconnect(targetDevice);
+        } catch (e) {}
         bleService.clearSessionCache(targetDevice.id);
+        bleService.markDeviceStale(targetDevice.id);
+
         connectionStateStore.set('error');
         connectionStatusTextStore.set(`${i18n.t('sync.status.error')} (${err.message})`);
 
@@ -607,7 +612,7 @@ class App {
           detail: `Sync error: ${err.message}`
         }, ...log.slice(0, 29)]);
 
-        this.scheduleStateReset('disconnected', 4000);
+        this.scheduleStateReset('disconnected', 3500);
         return;
       }
     }
