@@ -210,6 +210,10 @@ export class DiagnosticView {
         errorActions.style.display = 'flex';
       }
       this.renderIcons();
+    } finally {
+      try {
+        await bleService.releaseAllSeikoDevices();
+      } catch (e) {}
     }
   }
 

@@ -190,6 +190,9 @@ export class BluetoothService {
       throw new Error('Web Bluetooth is not supported in this browser.');
     }
 
+    // Teardown all existing GATT links so clocks immediately resume broadcasting advertisements
+    await this.releaseAllSeikoDevices();
+
     const filters = DeviceProtocol.NAME_FILTERS.map(name => ({ namePrefix: name }));
     const optionalServices = DeviceProtocol.allServiceUUIDs();
 
@@ -347,6 +350,54 @@ export class BluetoothService {
     if (this._device) {
       this.emit('disconnected', { device: this._device });
     }
+  }
+
+  /**
+   * Drops GATT connections across ALL known, cached, and permitted Seiko devices
+   * and waits for OS BLE controller to tear down ACLs so clocks resume broadcasting.
+   */
+  async releaseAllSeikoDevices() {
+    debug.log('[BLE Teardown] Releasing all known and permitted Seiko BLE devices...');
+
+    // 1. Disconnect active device & cached session devices
+    if (this._device?.gatt) {
+      try { this._device.gatt.disconnect(); } catch (e) {}
+    }
+    for (const [id, dev] of this._sessionDeviceCache) {
+      if (dev?.gatt) {
+        try { dev.gatt.disconnect(); } catch (e) {}
+      }
+    }
+    if (this._server) {
+      try { this._server.disconnect(); } catch (e) {}
+    }
+
+    // 2. Query OS for all permitted devices and disconnect any Seiko hardware
+    if (typeof navigator !== 'undefined' && navigator.bluetooth?.getDevices) {
+      try {
+        const permitted = await navigator.bluetooth.getDevices();
+        for (const dev of permitted) {
+          if (dev?.gatt) {
+            try {
+              debug.log(`[BLE Teardown] Dropping GATT connection on permitted device: ${dev.name || dev.id}`);
+              dev.gatt.disconnect();
+            } catch (e) {}
+          }
+        }
+      } catch (err) {
+        debug.warn('[BLE Teardown] getDevices error during teardown:', err);
+      }
+    }
+
+    this._device = null;
+    this._server = null;
+    this._services.clear();
+    this._characteristics.clear();
+    this._sessionDeviceCache.clear();
+
+    // 3. 250ms settling window for OS BLE radio to tear down ACLs and restart advertising
+    await new Promise(r => setTimeout(r, 250));
+    debug.log('[BLE Teardown] All Seiko BLE links released.');
   }
 
   /**

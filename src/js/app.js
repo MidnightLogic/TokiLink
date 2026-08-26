@@ -389,6 +389,9 @@ class App {
       });
     }
 
+    // Clean up any lingering GATT connections from prior sessions so peripheral starts advertising
+    await bleService.releaseAllSeikoDevices();
+
     // Look up previously permitted Bluetooth devices on page load
     await this.loadPermittedDevices();
 
@@ -597,9 +600,8 @@ class App {
       } catch (err) {
         console.warn(`[Sync] Direct connect to ${targetDevice.name || targetDevice.id} failed: ${err.message}.`);
         try {
-          await bleService.disconnect(targetDevice);
+          await bleService.releaseAllSeikoDevices();
         } catch (e) {}
-        bleService.clearSessionCache(targetDevice.id);
         bleService.markDeviceStale(targetDevice.id);
 
         connectionStateStore.set('error');

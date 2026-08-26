@@ -218,8 +218,8 @@ export class DiagnosticProbeService {
             // If characteristic is readable, read current value safely
             if (props.read && char.readValue) {
               try {
-                if (!bluetoothDevice.gatt.connected) {
-                  server = await bluetoothDevice.gatt.connect();
+                if (!bluetoothDevice.gatt?.connected) {
+                  server = await bleService.connect(bluetoothDevice);
                 }
                 const valDataView = await char.readValue();
                 const bytes = new Uint8Array(valDataView.buffer);
@@ -253,14 +253,14 @@ export class DiagnosticProbeService {
                   charEntry.readError = readErr.message;
                 }
                 // If read dropped the connection, re-establish for remaining characteristics
-                if (!bluetoothDevice.gatt.connected) {
-                  try { server = await bluetoothDevice.gatt.connect(); } catch (e) {}
+                if (!bluetoothDevice.gatt?.connected) {
+                  try { server = await bleService.connect(bluetoothDevice); } catch (e) {}
                 }
               }
             }
 
             // Enumerate Descriptors if supported (e.g. 0x2901 User Description)
-            if (char.getDescriptors && server.connected) {
+            if (char.getDescriptors && server?.connected) {
               try {
                 const descriptors = await char.getDescriptors();
                 for (const desc of descriptors) {
@@ -269,7 +269,7 @@ export class DiagnosticProbeService {
                     valueHex: null,
                     valueAscii: null,
                   };
-                  if (desc.readValue && server.connected) {
+                  if (desc.readValue && server?.connected) {
                     try {
                       const descVal = await desc.readValue();
                       const dBytes = new Uint8Array(descVal.buffer);
@@ -296,11 +296,11 @@ export class DiagnosticProbeService {
       onProgress({ step: 4, text: 'Running protocol write probes...' });
 
       // Ensure connection is still active before probing candidate protocols
-      if (!bluetoothDevice.gatt.connected) {
+      if (!bluetoothDevice.gatt?.connected) {
         try {
-          server = await bluetoothDevice.gatt.connect();
+          server = await bleService.connect(bluetoothDevice);
         } catch (reconErr) {
-          debug.warn('[Diagnostic] Reconnect before probe failed:', reconErr);
+          console.warn('[Diagnostic] Reconnect before probe failed:', reconErr);
         }
       }
 
@@ -357,13 +357,9 @@ export class DiagnosticProbeService {
 
       return report;
     } finally {
-      if (bluetoothDevice) {
-        try {
-          await bleService.disconnect(bluetoothDevice);
-          // Allow 350ms settling window for OS BLE controller to tear down ACL and resume advertising
-          await new Promise(r => setTimeout(r, 350));
-        } catch (e) {}
-      }
+      try {
+        await bleService.releaseAllSeikoDevices();
+      } catch (e) {}
     }
   }
 
