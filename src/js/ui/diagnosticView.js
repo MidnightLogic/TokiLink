@@ -199,25 +199,29 @@ export class DiagnosticView {
         }
       }
 
-      // If still no device, request from user picker with all services enabled
-      if (!targetBleDevice) {
+      const requestFreshDevice = async () => {
         if (progressText) progressText.textContent = 'Select your clock in the device picker...';
         const isDeepDiscovery = !!document.getElementById('diagDeepDiscoveryToggle')?.checked;
         if (navigator.bluetooth?.requestDevice) {
           if (isDeepDiscovery) {
-            targetBleDevice = await navigator.bluetooth.requestDevice({
+            return await navigator.bluetooth.requestDevice({
               acceptAllDevices: true,
               optionalServices: DeviceProtocol.allServiceUUIDs()
             });
           } else {
-            targetBleDevice = await navigator.bluetooth.requestDevice({
+            return await navigator.bluetooth.requestDevice({
               filters: DeviceProtocol.NAME_FILTERS.map(name => ({ namePrefix: name })),
               optionalServices: DeviceProtocol.allServiceUUIDs()
             });
           }
         } else {
-          targetBleDevice = await bleService.requestDevice();
+          return await bleService.requestDevice();
         }
+      };
+
+      // If no device in memory, prompt device picker
+      if (!targetBleDevice) {
+        targetBleDevice = await requestFreshDevice();
       }
 
       // Cache device reference for quick retries and register with store & BLE session
@@ -233,13 +237,44 @@ export class DiagnosticView {
         DeviceActions.setActiveDevice(targetBleDevice.id);
       }
 
-      const report = await DiagnosticProbeService.runFullDiagnostic(targetBleDevice, (status) => {
-        if (progressText) progressText.textContent = status.text;
-        if (progressBar) {
-          const percent = Math.min(100, Math.max(15, status.step * 20));
-          progressBar.style.width = `${percent}%`;
+      let report = null;
+      try {
+        report = await DiagnosticProbeService.runFullDiagnostic(targetBleDevice, (status) => {
+          if (progressText) progressText.textContent = status.text;
+          if (progressBar) {
+            const percent = Math.min(100, Math.max(15, status.step * 20));
+            progressBar.style.width = `${percent}%`;
+          }
+        });
+      } catch (directErr) {
+        // If connecting to cached/permitted device failed with range/network error, automatically open picker to refresh OS BLE state
+        console.warn('[Diagnostic] Direct connect failed, opening device picker:', directErr);
+        this.cachedDiagnosticDevice = null;
+        try {
+          await bleService.releaseAllSeikoDevices();
+        } catch (e) {}
+        
+        targetBleDevice = await requestFreshDevice();
+        this.cachedDiagnosticDevice = targetBleDevice;
+        if (targetBleDevice && targetBleDevice.name) {
+          bleService.cacheSessionDevice(targetBleDevice);
+          const model = DeviceProtocol.detectModel(targetBleDevice.name);
+          DeviceActions.addOrUpdateDevice({
+            id: targetBleDevice.id,
+            name: targetBleDevice.name || 'Seiko Clock',
+            model: model.type,
+          });
+          DeviceActions.setActiveDevice(targetBleDevice.id);
         }
-      });
+
+        report = await DiagnosticProbeService.runFullDiagnostic(targetBleDevice, (status) => {
+          if (progressText) progressText.textContent = status.text;
+          if (progressBar) {
+            const percent = Math.min(100, Math.max(15, status.step * 20));
+            progressBar.style.width = `${percent}%`;
+          }
+        });
+      }
 
       this.currentReport = report;
       this.renderResults(report);
