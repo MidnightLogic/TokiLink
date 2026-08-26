@@ -22,7 +22,7 @@ export default defineConfig({
     tailwindcss(),
     ...(useSsl ? [basicSsl()] : []),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-assets/*'],
       manifest: {

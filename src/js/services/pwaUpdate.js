@@ -11,6 +11,7 @@ export class PwaUpdateService {
     this.registration = null;
     this.updateAvailable = false;
     this.onUpdateCallback = null;
+    this._isApplyingUpdate = false;
     this._refreshing = false;
   }
 
@@ -21,6 +22,13 @@ export class PwaUpdateService {
     try {
       this.registration = await navigator.serviceWorker.ready;
       this._listenForUpdates(this.registration);
+
+      // Check if there is already a waiting service worker
+      if (this.registration.waiting) {
+        console.log('[PWA Update] Found waiting service worker on init.');
+        this.updateAvailable = true;
+        if (this.onUpdateCallback) this.onUpdateCallback(this.registration);
+      }
 
       // Check for updates on foreground wakeup
       document.addEventListener('visibilitychange', () => {
@@ -56,7 +64,8 @@ export class PwaUpdateService {
     });
 
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!this._refreshing) {
+      // Only reload if user explicitly applied the update
+      if (this._isApplyingUpdate && !this._refreshing) {
         this._refreshing = true;
         window.location.reload();
       }
@@ -87,10 +96,12 @@ export class PwaUpdateService {
   }
 
   applyUpdate() {
+    this._isApplyingUpdate = true;
     if (this.registration?.waiting) {
       this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    } else {
+      window.location.reload();
     }
-    window.location.reload();
   }
 }
 

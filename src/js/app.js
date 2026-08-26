@@ -17,16 +17,8 @@ import {
   Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark
 } from 'lucide';
 
-import { registerSW } from 'virtual:pwa-register';
 import '@khmyznikov/pwa-install';
 import { pwaUpdateService } from './services/pwaUpdate.js';
-
-// Register Service Worker for PWA
-try {
-  registerSW({ immediate: true });
-} catch (e) {
-  console.warn('[PWA] SW register error:', e);
-}
 
 function isDebug() {
   try {
