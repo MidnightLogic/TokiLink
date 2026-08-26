@@ -660,8 +660,9 @@ export class BluetoothService {
           debug.log(`[BLE Sync] Attempting time sync via protocol: ${proto.name}...`);
 
           if (proto.payloadType === 'nexTime_8byte') {
-            // NexTime LPWISE 8-byte write
-            const payload = DeviceProtocol.buildNexTimePayload(targetDate);
+            // 1. Resolve characteristics FIRST (GATT discovery latency happens here)
+            const writeChar = await this.getCharacteristic(proto.timeServiceUUID, proto.timeWriteCharUUID);
+            if (!writeChar) throw new Error('NexTime write characteristic not found');
 
             // Optional notify setup on RX characteristic
             try {
@@ -682,8 +683,16 @@ export class BluetoothService {
               debug.warn('[BLE Sync] Auth pre-packet skipped:', e);
             }
 
-            // Write time packet
-            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
+            // 2. NOW that characteristic handles are warm in memory, align to atomic second boundary
+            const finalTargetDate = targetDate || (await timeService.alignToNextSecondBoundary(35));
+            const payload = DeviceProtocol.buildNexTimePayload(finalTargetDate);
+
+            // 3. Fire write immediately (zero discovery delay!)
+            if (writeChar.writeValueWithResponse) {
+              await writeChar.writeValueWithResponse(payload);
+            } else {
+              await writeChar.writeValue(payload);
+            }
             await new Promise(r => setTimeout(r, 60));
             debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
@@ -694,11 +703,22 @@ export class BluetoothService {
               }
             }
 
-            return { success: true, protocol: proto.id, series: proto.series, payload };
+            return { success: true, protocol: proto.id, series: proto.series, payload, targetDate: finalTargetDate };
           } else {
-            // Standard CTS 10-byte write
-            const payload = DeviceProtocol.buildTimePayload(targetDate);
-            await this.write(proto.timeServiceUUID, proto.timeWriteCharUUID, payload);
+            // 1. Resolve characteristics FIRST (GATT discovery latency happens here)
+            const writeChar = await this.getCharacteristic(proto.timeServiceUUID, proto.timeWriteCharUUID);
+            if (!writeChar) throw new Error('CTS time write characteristic not found');
+
+            // 2. NOW that characteristic handles are warm in memory, align to atomic second boundary
+            const finalTargetDate = targetDate || (await timeService.alignToNextSecondBoundary(35));
+            const payload = DeviceProtocol.buildTimePayload(finalTargetDate);
+
+            // 3. Fire write immediately (zero discovery delay!)
+            if (writeChar.writeValueWithResponse) {
+              await writeChar.writeValueWithResponse(payload);
+            } else {
+              await writeChar.writeValue(payload);
+            }
             await new Promise(r => setTimeout(r, 60));
             debug.log(`[BLE Sync] SUCCESS via ${proto.name}!`);
 
@@ -709,7 +729,7 @@ export class BluetoothService {
               }
             }
 
-            return { success: true, protocol: proto.id, series: proto.series, payload };
+            return { success: true, protocol: proto.id, series: proto.series, payload, targetDate: finalTargetDate };
           }
         } catch (err) {
           debug.log(`[BLE Sync] Candidate ${proto.name} not available on peripheral (${err.message}). Trying next candidate...`);

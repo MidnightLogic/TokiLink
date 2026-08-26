@@ -560,11 +560,14 @@ class App {
         await bleService.connect(device, timeoutMs);
 
         connectionStateStore.set('syncing');
-        // 3. Compute target time and align execution to atomic second boundary (eliminates latency)
-        const targetDate = await this.clockView.getPrecisionSyncTarget(35);
+        connectionStatusTextStore.set(`${i18n.t('sync.btn.syncing')}...`);
+
+        // 3. If in manual override mode, pass explicit manual target; otherwise syncClockTime pre-resolves GATT before second alignment
+        const manualTarget = (settingsStore.get()?.manualTime) ? this.clockView.getEffectiveTime() : null;
 
         // 4. Perform adaptive clock time sync across Multi-Sound / Series C3 / SQ / NexTime
-        await bleService.syncClockTime(device, targetDate);
+        const result = await bleService.syncClockTime(device, manualTarget);
+        const targetDate = result?.targetDate || manualTarget || new Date();
         if (isDebug()) console.log(`[Sync] SUCCESS! Transmitted time packet to ${device.name}`);
 
         // 5. Update Success State
