@@ -9,7 +9,7 @@ import { DeviceProtocol } from './protocol.js';
 import { timeService } from './time.js';
 import { PlatformService } from './platform.js';
 import { bleService } from './bluetooth.js';
-import { syncLogStore, pairedDevicesStore, settingsStore } from '../store.js';
+import { syncLogStore, pairedDevicesStore, activeDeviceStore, settingsStore } from '../store.js';
 
 // Common Bluetooth SIG and Seiko GATT UUID dictionary
 export const GATT_DICTIONARY = {
