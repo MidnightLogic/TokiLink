@@ -4238,6 +4238,95 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   color: #fbbf24;
 }
 
+.diagnostic-unfiltered-notice.warning .diagnostic-notice-content p {
+  color: var(--text-secondary);
+}
+
+.diagnostic-live-state-box {
+  width: 100%;
+  margin-top: var(--space-sm);
+  background: rgba(10, 14, 23, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.diag-live-state-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 5px;
+}
+
+.diag-live-state-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+.diag-live-state-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diag-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.diag-mini-btn:hover {
+  background: var(--bg-card);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.diag-mini-btn.primary {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.diag-mini-btn.danger {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.diag-live-state-pre {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: all;
+}
+
 .diagnostic-notice-icon {
   color: #38bdf8;
   flex-shrink: 0;

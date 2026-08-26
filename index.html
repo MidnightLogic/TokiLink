@@ -998,6 +998,31 @@
                 </div>
               </div>
             </details>
+
+            <!-- Live BLE State & OS Inspector Panel -->
+            <div class="diagnostic-live-state-box" id="diagLiveStateBox">
+              <div class="diag-live-state-header">
+                <div class="diag-live-state-title">
+                  <i data-lucide="cpu" width="14" height="14"></i>
+                  <span>Live Bluetooth State</span>
+                </div>
+                <div class="diag-live-state-actions">
+                  <button type="button" class="diag-mini-btn" id="diagRefreshStateBtn" title="Refresh Live State">
+                    <i data-lucide="refresh-cw" width="12" height="12"></i>
+                    <span>Refresh</span>
+                  </button>
+                  <button type="button" class="diag-mini-btn danger" id="diagForceTeardownBtn" title="Force Disconnect All BLE Devices">
+                    <i data-lucide="zap-off" width="12" height="12"></i>
+                    <span>Drop All</span>
+                  </button>
+                  <button type="button" class="diag-mini-btn primary" id="diagCopyLiveStateBtn" title="Copy Snapshot to Clipboard">
+                    <i data-lucide="copy" width="12" height="12"></i>
+                    <span id="diagCopyLiveStateText">Copy State</span>
+                  </button>
+                </div>
+              </div>
+              <pre class="diag-live-state-pre" id="diagLiveStatePre">Loading Bluetooth state...</pre>
+            </div>
           </div>
 
           <!-- Step 2: Scanning Progress State -->

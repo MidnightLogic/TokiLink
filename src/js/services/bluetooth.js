@@ -6,7 +6,7 @@
  */
 
 import { DeviceProtocol } from './protocol.js';
-import { settingsStore, activeDeviceStore, pairedDevicesStore } from '../store.js';
+import { settingsStore, activeDeviceStore, pairedDevicesStore, connectionStateStore, connectionStatusTextStore } from '../store.js';
 
 function isDebug() {
   try {
@@ -398,6 +398,74 @@ export class BluetoothService {
     // 3. 250ms settling window for OS BLE radio to tear down ACLs and restart advertising
     await new Promise(r => setTimeout(r, 250));
     debug.log('[BLE Teardown] All Seiko BLE links released.');
+  }
+
+  /**
+   * Generates a comprehensive live snapshot of OS permitted devices,
+   * active GATT connection states, session caches, and stores for diagnostic inspection.
+   */
+  async getLiveStateSnapshot() {
+    let permittedDevices = [];
+    let adapterAvailable = null;
+
+    if (typeof navigator !== 'undefined' && navigator.bluetooth) {
+      if (typeof navigator.bluetooth.getAvailability === 'function') {
+        try {
+          adapterAvailable = await navigator.bluetooth.getAvailability();
+        } catch (e) {
+          adapterAvailable = `Error: ${e.message}`;
+        }
+      }
+      if (typeof navigator.bluetooth.getDevices === 'function') {
+        try {
+          const list = (await navigator.bluetooth.getDevices()) || [];
+          permittedDevices = list.map(d => ({
+            id: d.id,
+            name: d.name || '<unnamed>',
+            gattConnected: !!(d.gatt && d.gatt.connected),
+            hasGatt: !!d.gatt,
+          }));
+        } catch (e) {
+          permittedDevices = [`Error querying getDevices: ${e.message}`];
+        }
+      }
+    }
+
+    const sessionCacheList = Array.from(this._sessionDeviceCache.entries()).map(([id, d]) => ({
+      id,
+      name: d.name || '<unnamed>',
+      gattConnected: !!(d.gatt && d.gatt.connected),
+    }));
+
+    const activeDev = activeDeviceStore.get();
+    const pairedList = pairedDevicesStore.get();
+    const settings = settingsStore.get();
+
+    return {
+      timestamp: new Date().toISOString(),
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      bluetoothSupported: BluetoothService.isSupported(),
+      adapterAvailable,
+      osPermittedDevices: permittedDevices,
+      sessionDeviceCache: sessionCacheList,
+      staleDeviceIds: Array.from(this._staleDeviceIds),
+      activeConnection: {
+        isConnected: this.isConnected,
+        device: this._device ? {
+          id: this._device.id,
+          name: this._device.name || '<unnamed>',
+          gattConnected: !!(this._device.gatt && this._device.gatt.connected),
+        } : null,
+        serverConnected: !!(this._server && this._server.connected),
+      },
+      stores: {
+        activeDevice: activeDev,
+        pairedDevices: pairedList,
+        connectionState: connectionStateStore.get(),
+        connectionStatusText: connectionStatusTextStore.get(),
+        debugModeEnabled: !!settings?.debug,
+      }
+    };
   }
 
   /**

@@ -28,6 +28,7 @@ export class DiagnosticView {
       if (modalOverlay) {
         modalOverlay.classList.remove('hidden');
         this.resetToIdle();
+        this.refreshLiveState();
         this.renderIcons();
       }
     });
@@ -92,6 +93,53 @@ export class DiagnosticView {
         DiagnosticProbeService.downloadReportJson(this.currentReport);
       }
     });
+
+    // Live Bluetooth State Inspector Handlers
+    this.initLiveStateInspector();
+  }
+
+  initLiveStateInspector() {
+    const refreshBtn = document.getElementById('diagRefreshStateBtn');
+    const forceTeardownBtn = document.getElementById('diagForceTeardownBtn');
+    const copyBtn = document.getElementById('diagCopyLiveStateBtn');
+    const copyText = document.getElementById('diagCopyLiveStateText');
+
+    refreshBtn?.addEventListener('click', () => this.refreshLiveState());
+
+    forceTeardownBtn?.addEventListener('click', async () => {
+      const pre = document.getElementById('diagLiveStatePre');
+      if (pre) pre.textContent = 'Dropping all OS Bluetooth connections...';
+      try {
+        await bleService.releaseAllSeikoDevices();
+      } catch (e) {}
+      await this.refreshLiveState();
+    });
+
+    copyBtn?.addEventListener('click', async () => {
+      try {
+        const state = this.latestLiveState || (await bleService.getLiveStateSnapshot());
+        await navigator.clipboard.writeText(JSON.stringify(state, null, 2));
+        if (copyText) copyText.textContent = 'Copied!';
+        setTimeout(() => {
+          if (copyText) copyText.textContent = 'Copy State';
+        }, 2000);
+      } catch (err) {
+        console.warn('[Diagnostic] Copy state failed:', err);
+      }
+    });
+  }
+
+  async refreshLiveState() {
+    const pre = document.getElementById('diagLiveStatePre');
+    if (!pre) return;
+    try {
+      pre.textContent = 'Querying live OS Bluetooth state...';
+      const state = await bleService.getLiveStateSnapshot();
+      this.latestLiveState = state;
+      pre.textContent = JSON.stringify(state, null, 2);
+    } catch (err) {
+      pre.textContent = `Error querying state: ${err.message}`;
+    }
   }
 
   resetToIdle() {
