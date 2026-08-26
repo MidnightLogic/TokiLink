@@ -407,8 +407,8 @@ export class ClockView {
     } else if (settings.useApi && timeService.isApiSynced) {
       badge.classList.add('source-api');
       const offset = Math.round(timeService.offsetMs);
-      const offsetSign = offset >= 0 ? '+' : '';
-      textEl.textContent = `${i18n.t('clock.sourceApi')} (${offsetSign}${offset}ms)`;
+      const offsetStr = offset === 0 ? '±0ms' : `${offset > 0 ? '+' : ''}${offset}ms`;
+      textEl.textContent = `${i18n.t('clock.sourceApi')} (${offsetStr})`;
     } else {
       badge.classList.add('source-local');
       textEl.textContent = i18n.t('clock.sourceLocal');
