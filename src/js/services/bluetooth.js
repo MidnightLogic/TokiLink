@@ -6,6 +6,7 @@
  */
 
 import { DeviceProtocol } from './protocol.js';
+import { timeService } from './time.js';
 import { settingsStore, activeDeviceStore, pairedDevicesStore, connectionStateStore, connectionStatusTextStore } from '../store.js';
 
 function isDebug() {
@@ -464,6 +465,13 @@ export class BluetoothService {
         connectionState: connectionStateStore.get(),
         connectionStatusText: connectionStatusTextStore.get(),
         debugModeEnabled: !!settings?.debug,
+      },
+      timeService: {
+        isApiSynced: timeService.isApiSynced,
+        offsetMs: timeService.offsetMs,
+        systemTimeIso: new Date().toISOString(),
+        effectiveTimeIso: timeService.now().toISOString(),
+        timeZone: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'unknown',
       }
     };
   }
