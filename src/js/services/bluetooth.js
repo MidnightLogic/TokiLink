@@ -150,17 +150,13 @@ export class BluetoothService {
       return DeviceProtocol.NAME_FILTERS.some(filter => lower.includes(filter.toLowerCase()));
     });
     const candidateDevices = matched.length > 0 ? matched : devices;
-
-    // Filter out devices where direct GATT connection has failed, UNLESS the device is currently connected
-    const validPermitted = candidateDevices.filter(d => (d.gatt && d.gatt.connected) || !this.hasDirectConnectFailed(d.id));
-    debug.log(`[BLE Debug] Eligible permitted devices for direct sync: ${validPermitted.length} (filtered ${candidateDevices.length - validPermitted.length} failed direct-connect candidates)`);
-    return validPermitted;
+    debug.log(`[BLE Debug] Eligible permitted devices for sync: ${candidateDevices.length}`);
+    return candidateDevices;
   }
 
   cacheSessionDevice(device) {
     if (device && device.id) {
       this._sessionDeviceCache.set(device.id, device);
-      this.clearDirectConnectFailed(device.id);
       this._device = device;
     }
   }
@@ -298,12 +294,11 @@ export class BluetoothService {
       this.emit('connected', { device });
       return this._server;
     } catch (err) {
-      // If doing a fast pre-flight check, fail fast so User Gesture is preserved for picker fallback
-      if (timeoutMs <= 2500) {
-        throw err;
-      }
-      debug.log(`[BLE Debug] Initial connect caught busy socket or timeout (${err.message}), retrying in 250ms...`);
-      await new Promise(r => setTimeout(r, 250));
+      debug.log(`[BLE Debug] Initial connect error (${err.message}). Performing clean socket release and retrying in 300ms...`);
+      try {
+        if (device.gatt) device.gatt.disconnect();
+      } catch (e) {}
+      await new Promise(r => setTimeout(r, 300));
       this._server = await connectWithTimeout(device, timeoutMs);
       debug.log('[BLE Debug] GATT connected on retry.');
       this.emit('connected', { device });
@@ -333,32 +328,12 @@ export class BluetoothService {
     }
   }
 
-  markDirectConnectFailed(deviceId) {
-    if (deviceId) {
-      this._failedDirectConnectDevices.add(deviceId);
-      debug.log(`[BLE] Device marked as failed direct connect: ${deviceId}`);
-    }
-  }
-
-  hasDirectConnectFailed(deviceId) {
-    return deviceId ? this._failedDirectConnectDevices.has(deviceId) : false;
-  }
-
-  clearDirectConnectFailed(deviceId = null) {
-    if (deviceId) {
-      this._failedDirectConnectDevices.delete(deviceId);
-    } else {
-      this._failedDirectConnectDevices.clear();
-    }
-  }
-
   /**
    * Clears in-memory session device references and resets GATT socket maps.
    */
   clearSessionCache(deviceId = null) {
     if (deviceId) {
       this._sessionDeviceCache.delete(deviceId);
-      this.markDirectConnectFailed(deviceId);
       if (this._device && this._device.id === deviceId) {
         this._device = null;
       }
