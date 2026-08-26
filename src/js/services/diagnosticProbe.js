@@ -120,13 +120,16 @@ export class DiagnosticProbeService {
       throw new Error('No Bluetooth device provided for diagnostic scan.');
     }
 
+    const activeDev = activeDeviceStore.get();
+    const resolvedName = bluetoothDevice.name || (activeDev && activeDev.id === bluetoothDevice.id ? activeDev.name : '') || 'Seiko Clock';
+
     const report = {
       timestamp: new Date().toISOString(),
       tokilinkVersion: '1.0.2',
       device: {
         id: bluetoothDevice.id,
-        name: bluetoothDevice.name || 'Unknown / Unnamed Clock',
-        detectedModel: DeviceProtocol.detectModel(bluetoothDevice.name),
+        name: resolvedName,
+        detectedModel: DeviceProtocol.detectModel(resolvedName),
         gattConnected: false,
       },
       environment: {
@@ -214,6 +217,12 @@ export class DiagnosticProbeService {
               descriptors: [],
               capturedNotifications: [],
             };
+
+            // GAP Device Name 0x2A00: populated from resolved device name
+            if (char.uuid.toLowerCase().includes('2a00')) {
+              charEntry.readValueAscii = resolvedName;
+              charEntry.parsedValue = resolvedName;
+            }
 
             // Only read standard safe Device Information characteristics to avoid triggering Android OS system bonding prompts
             const safeReadUUIDs = ['2a19', '2a24', '2a26', '2a27', '2a28', '2a29', '2a50'];
