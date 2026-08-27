@@ -8,126 +8,55 @@ const rootDir = path.resolve(__dirname, '..');
 const publicDir = path.join(rootDir, 'public');
 const pwaAssetsDir = path.join(publicDir, 'pwa-assets');
 
-const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <!-- Deep Cosmic Dark Background -->
-    <radialGradient id="bgGrad" cx="50%" cy="50%" r="75%">
-      <stop offset="0%" stop-color="#151228"/>
-      <stop offset="55%" stop-color="#0a0e17"/>
-      <stop offset="100%" stop-color="#05070d"/>
-    </radialGradient>
-
-    <!-- Static Plasma Ambient Glow -->
-    <radialGradient id="plasmaAura" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.6"/>
-      <stop offset="45%" stop-color="#8b5cf6" stop-opacity="0.3"/>
-      <stop offset="75%" stop-color="#6366f1" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Button Puck Dark Glass Gradient -->
-    <linearGradient id="puckGrad" x1="15%" y1="10%" x2="85%" y2="90%">
-      <stop offset="0%" stop-color="#2a1b44"/>
-      <stop offset="52%" stop-color="#141126"/>
-      <stop offset="100%" stop-color="#0a0d18"/>
-    </linearGradient>
-
-    <!-- Puck Border Neon Purple Gradient -->
-    <linearGradient id="borderGrad" x1="20%" y1="0%" x2="80%" y2="100%">
-      <stop offset="0%" stop-color="#e9d5ff"/>
-      <stop offset="45%" stop-color="#c084fc"/>
-      <stop offset="100%" stop-color="#6366f1"/>
-    </linearGradient>
-
-    <!-- Glass Specular Highlight -->
-    <linearGradient id="specularGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.38"/>
-      <stop offset="35%" stop-color="#ffffff" stop-opacity="0.08"/>
-      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
-    </linearGradient>
-
-    <!-- Bluetooth Icon Gradient -->
-    <linearGradient id="btGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="50%" stop-color="#f5f3ff"/>
-      <stop offset="100%" stop-color="#c084fc"/>
-    </linearGradient>
-
-    <filter id="puckShadow" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#000000" flood-opacity="0.95"/>
-      <feDropShadow dx="0" dy="0" stdDeviation="18" flood-color="#a855f7" flood-opacity="0.4"/>
-    </filter>
-
-    <filter id="btGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#c084fc" flood-opacity="0.75"/>
-      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ffffff" flood-opacity="0.9"/>
-    </filter>
-
-    <filter id="plasmaBeamGlow">
-      <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#c084fc" flood-opacity="0.85"/>
-      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#a855f7" flood-opacity="0.9"/>
-    </filter>
-  </defs>
-
-  <!-- Deep Space Canvas -->
-  <rect width="512" height="512" fill="url(#bgGrad)"/>
-
-  <!-- Static Ambient Plasma Aura -->
-  <circle cx="256" cy="256" r="236" fill="url(#plasmaAura)"/>
-
-  <!-- Static Outer Plasma Ring (Like Sync Button Plasma Ring) -->
-  <circle cx="256" cy="256" r="202" fill="none" stroke="rgba(168, 85, 247, 0.7)" stroke-width="6" filter="url(#plasmaBeamGlow)"/>
-  <circle cx="256" cy="256" r="202" fill="none" stroke="#ffffff" stroke-width="2.5"/>
-
-  <!-- Plasma Sparks & Orbiting Particles -->
-  <circle cx="106" cy="190" r="4.5" fill="#c084fc" opacity="0.9" filter="url(#btGlow)"/>
-  <circle cx="410" cy="230" r="5" fill="#c084fc" opacity="0.85" filter="url(#btGlow)"/>
-  <circle cx="180" cy="80" r="3.8" fill="#e9d5ff" opacity="0.9"/>
-  <circle cx="340" cy="425" r="4.2" fill="#c084fc" opacity="0.85"/>
-  <circle cx="430" cy="310" r="3.2" fill="#e9d5ff" opacity="0.75"/>
-  <circle cx="95" cy="330" r="3.6" fill="#818cf8" opacity="0.8"/>
-  <circle cx="260" cy="460" r="4.8" fill="#c084fc" opacity="0.9"/>
-  <circle cx="390" cy="130" r="3.5" fill="#e9d5ff" opacity="0.85"/>
-
-  <!-- Button Puck Base (Parity with Main App Sync Button) -->
-  <circle cx="256" cy="256" r="172" fill="url(#puckGrad)" stroke="url(#borderGrad)" stroke-width="7" filter="url(#puckShadow)"/>
-
-  <!-- Inner Bevel Highlight -->
-  <circle cx="256" cy="256" r="168" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2"/>
-
-  <!-- Top Specular Crescent Sheen -->
-  <path d="M 112 256 A 144 144 0 0 1 400 256 Z" fill="url(#specularGrad)"/>
-
-  <!-- Official Bluetooth Icon Centered (Lucide Bluetooth: m7 7 10 10-5 5V2l5 5L7 17) -->
-  <!-- Scaled from 24x24 viewBox to 160x160 centered at 256,256 (offset 176,176, scale 6.67) -->
-  <g transform="translate(176, 176) scale(6.67)" stroke="url(#btGrad)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#btGlow)">
-    <path d="m7 7 10 10-5 5V2l5 5L7 17"/>
-  </g>
-</svg>`;
-
-fs.writeFileSync(path.join(publicDir, 'icon.svg'), svgContent, 'utf-8');
-console.log('✅ Generated public/icon.svg with static purple plasma ring and Bluetooth icon');
-
 async function buildPngIcons() {
-  const buffer = Buffer.from(svgContent);
+  const svgPath = path.join(publicDir, 'icon.svg');
+  if (!fs.existsSync(svgPath)) {
+    throw new Error('public/icon.svg not found!');
+  }
 
-  // Favicon (48x48)
-  await sharp(buffer).resize(48, 48).png().toFile(path.join(publicDir, 'favicon.png'));
+  const svgBuffer = fs.readFileSync(svgPath);
 
-  // 192x192
-  await sharp(buffer).resize(192, 192).png().toFile(path.join(publicDir, 'pwa-192x192.png'));
+  // Favicon (48x48 & 32x32 & 16x16)
+  await sharp(svgBuffer).resize(48, 48).png().toFile(path.join(publicDir, 'favicon.png'));
 
-  // 512x512
-  await sharp(buffer).resize(512, 512).png().toFile(path.join(publicDir, 'pwa-512x512.png'));
+  // 192x192 PWA Icon
+  await sharp(svgBuffer).resize(192, 192).png().toFile(path.join(publicDir, 'pwa-192x192.png'));
+
+  // 512x512 PWA Icon
+  await sharp(svgBuffer).resize(512, 512).png().toFile(path.join(publicDir, 'pwa-512x512.png'));
 
   // Apple Touch Icon (180x180)
-  await sharp(buffer).resize(180, 180).png().toFile(path.join(pwaAssetsDir, 'apple-icon-180.png'));
+  await sharp(svgBuffer).resize(180, 180).png().toFile(path.join(pwaAssetsDir, 'apple-icon-180.png'));
 
-  // Maskables
-  await sharp(buffer).resize(192, 192).png().toFile(path.join(pwaAssetsDir, 'manifest-icon-192.maskable.png'));
-  await sharp(buffer).resize(512, 512).png().toFile(path.join(pwaAssetsDir, 'manifest-icon-512.maskable.png'));
+  // Maskable Icons with safe-zone padding
+  // Maskable icons are placed inside a 512x512 canvas with ~10% safe margin to prevent OS corner clipping
+  const maskable192 = await sharp(svgBuffer).resize(160, 160).toBuffer();
+  await sharp({
+    create: {
+      width: 192,
+      height: 192,
+      channels: 4,
+      background: '#181926'
+    }
+  })
+    .composite([{ input: maskable192, gravity: 'center' }])
+    .png()
+    .toFile(path.join(pwaAssetsDir, 'manifest-icon-192.maskable.png'));
 
-  console.log('✅ Generated all PWA PNG icons with static purple plasma ring & Bluetooth icon!');
+  const maskable512 = await sharp(svgBuffer).resize(420, 420).toBuffer();
+  await sharp({
+    create: {
+      width: 512,
+      height: 512,
+      channels: 4,
+      background: '#181926'
+    }
+  })
+    .composite([{ input: maskable512, gravity: 'center' }])
+    .png()
+    .toFile(path.join(pwaAssetsDir, 'manifest-icon-512.maskable.png'));
+
+  console.log('✅ Generated all PWA icons & favicon from public/icon.svg successfully!');
 }
 
 buildPngIcons().catch(console.error);
