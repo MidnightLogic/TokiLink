@@ -21,6 +21,11 @@ export class AlarmView {
   init() {
     i18n.onLocaleChange(() => {
       this.renderAlarms(alarmsStore.get());
+      const dayKeys = ['days.sun', 'days.mon', 'days.tue', 'days.wed', 'days.thu', 'days.fri', 'days.sat'];
+      this.dom.modalDaysGrid?.querySelectorAll('.day-chip').forEach(chip => {
+        const d = Number(chip.dataset.day);
+        if (dayKeys[d]) chip.textContent = i18n.t(dayKeys[d]);
+      });
     });
 
     alarmsStore.subscribe(alarms => {
@@ -182,8 +187,10 @@ export class AlarmView {
       this.dom.alarmModalSnoozeInput.checked = !!alarm.snooze;
     }
 
+    const dayKeys = ['days.sun', 'days.mon', 'days.tue', 'days.wed', 'days.thu', 'days.fri', 'days.sat'];
     this.dom.modalDaysGrid?.querySelectorAll('.day-chip').forEach(chip => {
       const d = Number(chip.dataset.day);
+      if (dayKeys[d]) chip.textContent = i18n.t(dayKeys[d]);
       if (alarm.days.includes(d)) {
         chip.classList.add('active');
       } else {
