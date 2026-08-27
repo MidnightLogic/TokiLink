@@ -5084,6 +5084,9 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   letter-spacing: -0.03em;
   color: #ffffff;
   text-shadow: 0 2px 14px rgba(99, 102, 241, 0.45);
+  display: inline-flex;
+  align-items: baseline;
+  line-height: 1.1;
 }
 
 .pwa-splash-tag {
@@ -5260,12 +5263,17 @@ html.light .app-logo-icon-puck i {
 }
 
 .brand-tm {
-  font-size: 0.55em;
-  font-weight: 600;
-  vertical-align: super;
-  margin-left: 2px;
+  font-size: 0.42em;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: top;
+  position: relative;
+  top: 0.12em;
+  margin-left: 1px;
   opacity: 0.85;
   color: inherit;
+  letter-spacing: normal;
+  display: inline-block;
 }
 
 .app-tagline {
