@@ -94,9 +94,9 @@ for (const file of splashFiles) {
     <!-- Top Specular Sheen -->
     <path d="M ${centerX - puckRadius * 0.83} ${centerY} A ${puckRadius * 0.83} ${puckRadius * 0.83} 0 0 1 ${centerX + puckRadius * 0.83} ${centerY} Z" fill="url(#specularGrad)"/>
 
-    <!-- Puck Center Futuristic Typography (INITIALIZING) -->
-    <text x="${centerX}" y="${centerY + puckSize * 0.035}" font-family="'JetBrains Mono', -apple-system, monospace" font-size="${puckSize * 0.092}" font-weight="700" fill="url(#iconGrad)" text-anchor="middle" letter-spacing="${Math.max(0.5, puckSize * 0.012)}">
-      INITIALIZING
+    <!-- Puck Center Bold Typography (LOADING) -->
+    <text x="${centerX}" y="${centerY + puckSize * 0.04}" font-family="'JetBrains Mono', -apple-system, monospace" font-size="${puckSize * 0.14}" font-weight="800" fill="url(#iconGrad)" text-anchor="middle" letter-spacing="${Math.max(1, puckSize * 0.02)}">
+      LOADING
     </text>
 
     <!-- Plasma Electric Ring Aura -->

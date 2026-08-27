@@ -5035,19 +5035,18 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 .pwa-splash-puck-text {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.50rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #ffffff;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c084fc 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 45%, #c084fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.7));
+  filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.8));
   animation: splashTextPulse 1.8s ease-in-out infinite alternate;
   user-select: none;
   pointer-events: none;
-  max-width: 82px;
   text-align: center;
   white-space: nowrap;
 }
