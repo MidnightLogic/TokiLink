@@ -22,7 +22,7 @@ export default defineConfig({
     tailwindcss(),
     ...(useSsl ? [basicSsl()] : []),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-assets/*'],
       manifest: {
@@ -81,6 +81,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,webmanifest,jpg,jpeg}'],
         navigateFallback: './index.html',
         runtimeCaching: [
@@ -91,12 +94,13 @@ export default defineConfig({
               request.destination === 'style' ||
               request.destination === 'image' ||
               request.destination === 'font',
-            handler: 'StaleWhileRevalidate',
+            handler: 'NetworkFirst',
             options: {
-              cacheName: 'TokiLink-assets-cache',
+              cacheName: 'tokilink-live-cache-v2',
+              networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 150,
-                maxAgeSeconds: 60 * 60 * 24 * 365
+                maxAgeSeconds: 60 * 60 * 24 * 30
               }
             }
           }

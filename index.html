@@ -99,15 +99,61 @@
     <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
     <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1334-750.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
     <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-    <link rel="apple-touch-startup-image" href="public/pwa-assets/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <script>window.__tokilinkStartTime = performance.now();</script>
   </head>
   <body>
+    <!-- ═══ PWA Animated Splash Screen (Displayed for >= 2s) ═══ -->
+    <div id="pwaSplashScreen" class="pwa-splash-screen" aria-hidden="true">
+      <div class="pwa-splash-card">
+        <!-- Dark Theme Button Puck Icon -->
+        <div class="pwa-splash-puck-wrap">
+          <div class="pwa-splash-puck-halo"></div>
+          <div class="pwa-splash-puck">
+            <svg class="pwa-splash-puck-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a9.75 9.75 0 0 1 6.74 2.74"/>
+              <path d="M18.74 5.74 21 8"/>
+              <path d="M21 8V3"/>
+              <path d="M7.5 19.794c-6-3.464-6-12.124 0-15.588"/>
+              <path d="M7.5 4.206A9 9 0 0 1 12 3"/>
+              <path d="M12 7v5l4 2"/>
+              <path d="M14 20.775A9 9 0 0 1 12 21"/>
+              <path d="M19 17.656a9 9 0 0 1-1.5 1.456"/>
+              <path d="M21 12a9 9 0 0 1-.228 2"/>
+              <path d="M21 8h-5"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Brand Typography -->
+        <div class="pwa-splash-brand">
+          <div class="pwa-splash-title-row">
+            <span class="pwa-splash-title">TokiLink</span>
+            <span class="pwa-splash-tag">for Seiko</span>
+          </div>
+          <p class="pwa-splash-subtitle">Universal Web Bluetooth Clock Sync</p>
+        </div>
+
+        <!-- Meter Indicator -->
+        <div class="pwa-splash-meter-wrap">
+          <div class="pwa-splash-meter">
+            <div class="pwa-splash-meter-bar"></div>
+          </div>
+          <span class="pwa-splash-status">Calibrating precision...</span>
+        </div>
+
+        <!-- Footer -->
+        <div class="pwa-splash-footer">
+          <span class="pwa-splash-author">MidnightLogic</span>
+        </div>
+      </div>
+    </div>
+
     <div class="app-container">
 
       <!-- ═══ Header ═══ -->
       <header class="app-header">
         <div class="app-logo">
-          <i data-lucide="clock"></i>
+          <i data-lucide="rotate-cw-fading-clock"></i>
           <div class="app-title-group">
             <h1 class="app-title" data-i18n="app.title">TokiLink</h1>
             <span class="app-tagline" data-i18n="app.forSeiko">for Seiko</span>

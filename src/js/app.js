@@ -14,7 +14,8 @@ import {
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
   Lock, Info, Sparkles, RefreshCw, Zap, ZapOff, ChevronRight, ChevronDown,
-  Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark
+  Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark,
+  RotateCwFadingClock
 } from 'lucide';
 
 import '@khmyznikov/pwa-install';
@@ -69,7 +70,8 @@ const LUCIDE_ICONS = {
   PencilLine, CalendarClock, RotateCcw, Globe, MapPin, Minus,
   Smartphone, ShieldAlert, Copy, ExternalLink, ArrowUpRight, Puzzle,
   Lock, Info, Sparkles, RefreshCw, Zap, ZapOff, ChevronRight, ChevronDown,
-  Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark
+  Cpu, ScanSearch, Play, Layers, Send, Mail, Home, Battery, Bookmark,
+  RotateCwFadingClock
 };
 
 export function renderIcons() {
@@ -397,6 +399,35 @@ class App {
 
     // Watch for PWA updates
     this.initPwaUpdateWatcher();
+
+    // Ensure animated splash screen displays for at least 2 seconds before fading
+    this.initSplashScreen();
+  }
+
+  initSplashScreen() {
+    const splashEl = document.getElementById('pwaSplashScreen');
+    if (!splashEl) return;
+
+    const startTime = (typeof window !== 'undefined' && window.__tokilinkStartTime) || performance.now();
+    const MIN_SPLASH_TIME = 2000; // Display for at least 2 seconds
+
+    const dismiss = () => {
+      const elapsed = performance.now() - startTime;
+      const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
+
+      setTimeout(() => {
+        splashEl.classList.add('fade-out');
+        setTimeout(() => {
+          splashEl.remove();
+        }, 550);
+      }, remaining);
+    };
+
+    if (document.readyState === 'complete') {
+      dismiss();
+    } else {
+      window.addEventListener('load', dismiss, { once: true });
+    }
   }
 
   initPwaUpdateWatcher() {
