@@ -81,9 +81,6 @@ export default defineConfig({
         ]
       },
       workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
-        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,webmanifest,jpg,jpeg}'],
         navigateFallback: './index.html',
         runtimeCaching: [
@@ -94,13 +91,12 @@ export default defineConfig({
               request.destination === 'style' ||
               request.destination === 'image' ||
               request.destination === 'font',
-            handler: 'NetworkFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'tokilink-live-cache-v2',
-              networkTimeoutSeconds: 3,
+              cacheName: 'TokiLink-assets-cache',
               expiration: {
                 maxEntries: 150,
-                maxAgeSeconds: 60 * 60 * 24 * 30
+                maxAgeSeconds: 60 * 60 * 24 * 365
               }
             }
           }
