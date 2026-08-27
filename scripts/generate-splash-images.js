@@ -108,6 +108,10 @@ for (const file of splashFiles) {
       <path d="M21 8h-5"/>
     </g>
 
+    <!-- Plasma Electric Ring Aura -->
+    <circle cx="${centerX}" cy="${centerY}" r="${puckRadius * 1.15}" fill="none" stroke="rgba(192, 132, 252, 0.45)" stroke-width="${Math.max(1.5, puckSize * 0.015)}" stroke-dasharray="8 6"/>
+    <circle cx="${centerX}" cy="${centerY}" r="${puckRadius * 1.18}" fill="none" stroke="rgba(168, 85, 247, 0.3)" stroke-width="${Math.max(1, puckSize * 0.01)}" stroke-dasharray="14 10"/>
+
     <!-- Typography -->
     <text x="${centerX}" y="${textY}" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="${titleFontSize}" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="-0.5">
       TokiLink <tspan fill="#c084fc" font-size="${titleFontSize * 0.5}" font-weight="600" letter-spacing="1">FOR SEIKO</tspan>
@@ -117,8 +121,12 @@ for (const file of splashFiles) {
       Universal Web Bluetooth Clock Sync
     </text>
 
-    <text x="${centerX}" y="${footerY}" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="${footerFontSize}" font-weight="500" fill="#475569" text-anchor="middle" letter-spacing="2">
-      MIDNIGHTLOGIC
+    <!-- Footer with GitHub Logo & MidnightLogic -->
+    <g transform="translate(${centerX - footerFontSize * 4.5}, ${footerY - footerFontSize * 0.85}) scale(${footerFontSize / 20})">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" fill="#94a3b8"/>
+    </g>
+    <text x="${centerX + footerFontSize * 0.8}" y="${footerY}" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="${footerFontSize}" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="1.5">
+      MidnightLogic
     </text>
   </svg>`;
 

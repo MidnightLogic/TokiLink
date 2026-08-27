@@ -4987,44 +4987,40 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 /* Dark Theme Button Puck - Parity with Sync Button Puck */
 .pwa-splash-puck-wrap {
   position: relative;
-  width: 124px;
-  height: 124px;
+  width: 176px;
+  height: 176px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.pwa-splash-puck-halo {
+.pwa-splash-plasma-canvas {
   position: absolute;
-  inset: -14px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(99, 102, 241, 0.18) 50%, transparent 75%);
-  filter: blur(14px);
-  animation: splashPuckPulse 2.4s ease-in-out infinite alternate;
-}
-
-@keyframes splashPuckPulse {
-  0% { transform: scale(0.92); opacity: 0.65; }
-  100% { transform: scale(1.14); opacity: 1; }
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .pwa-splash-puck {
   position: relative;
-  width: 108px;
-  height: 108px;
+  z-index: 2;
+  width: 114px;
+  height: 114px;
   border-radius: 50%;
   background: linear-gradient(155deg, rgba(34, 22, 54, 0.96) 0%, rgba(18, 16, 32, 0.98) 55%, rgba(10, 12, 22, 0.99) 100%);
-  border: 2px solid rgba(192, 132, 252, 0.48);
+  border: 1.5px solid rgba(192, 132, 252, 0.42);
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   box-shadow:
-    inset 0 1.5px 2px rgba(255, 255, 255, 0.4),
-    inset 0 -3px 8px rgba(0, 0, 0, 0.8),
-    0 8px 32px rgba(0, 0, 0, 0.85),
-    0 0 26px rgba(168, 85, 247, 0.32);
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.35),
+    inset 0 -2.5px 6px rgba(0, 0, 0, 0.75),
+    0 6px 24px rgba(0, 0, 0, 0.7),
+    0 0 18px rgba(168, 85, 247, 0.25);
   overflow: hidden;
 }
 
@@ -5033,15 +5029,15 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.05) 40%, transparent 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 38%, transparent 58%);
   pointer-events: none;
 }
 
 .pwa-splash-puck-icon {
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   color: #ffffff;
-  filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.65));
+  filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.6));
 }
 
 .pwa-splash-brand {
@@ -5118,18 +5114,155 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 .pwa-splash-status {
   font-size: 0.72rem;
   font-family: var(--font-mono, monospace);
-  color: #64748b;
+  color: #818cf8;
   letter-spacing: 0.02em;
+  transition: color 0.3s ease;
 }
 
 .pwa-splash-footer {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 
-.pwa-splash-author {
+.pwa-splash-github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
-  color: #475569;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pwa-splash-github-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(192, 132, 252, 0.35);
+  color: #f1f5f9;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+}
+
+.pwa-splash-github-icon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Main App Header Brand & TM Styling (Parity with Splash Page)
+   ═══════════════════════════════════════════════════════════════ */
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-logo-icon-puck {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, rgba(34, 22, 54, 0.96) 0%, rgba(18, 16, 32, 0.98) 55%, rgba(10, 12, 22, 0.99) 100%);
+  border: 1.5px solid rgba(192, 132, 252, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.7),
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 14px rgba(168, 85, 247, 0.25);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-logo-icon-puck:hover {
+  transform: scale(1.05);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.45),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.7),
+    0 6px 16px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+.app-logo-icon-puck svg,
+.app-logo-icon-puck i {
+  width: 22px;
+  height: 22px;
+  color: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(192, 132, 252, 0.6));
+}
+
+html.light .app-logo-icon-puck {
+  background: linear-gradient(155deg, #f5f3ff 0%, #ede9fe 55%, #e0e7ff 100%);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.9),
+    0 4px 12px rgba(99, 102, 241, 0.15),
+    0 0 10px rgba(139, 92, 246, 0.15);
+}
+
+html.light .app-logo-icon-puck svg,
+html.light .app-logo-icon-puck i {
+  color: #6366f1;
+  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.4));
+}
+
+.app-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.app-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.app-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  line-height: 1.1;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.brand-tm {
+  font-size: 0.55em;
+  font-weight: 600;
+  vertical-align: super;
+  margin-left: 2px;
+  opacity: 0.8;
+  color: #c084fc;
+}
+
+html.light .brand-tm {
+  color: #7c3aed;
+}
+
+.app-tagline {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #c084fc;
   text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+html.light .app-tagline {
+  color: #7c3aed;
+}
+
+.app-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
 }

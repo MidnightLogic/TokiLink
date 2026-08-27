@@ -60,6 +60,7 @@ import { RadioView } from './ui/radioView.js';
 import { DisplayView } from './ui/displayView.js';
 import { SettingsView } from './ui/settingsView.js';
 import { DiagnosticView } from './ui/diagnosticView.js';
+import { PlasmaRenderer } from './ui/plasmaEffect.js';
 import { i18n } from './i18n.js';
 
 const LUCIDE_ICONS = {
@@ -408,6 +409,33 @@ class App {
     const splashEl = document.getElementById('pwaSplashScreen');
     if (!splashEl) return;
 
+    // 1. Initialize animated purple plasma ring on splash button puck
+    const splashCanvas = document.getElementById('splashPlasmaCanvas');
+    let splashPlasma = null;
+    if (splashCanvas) {
+      splashPlasma = new PlasmaRenderer(splashCanvas);
+      splashPlasma.setState('ready'); // Purple plasma ring matching main page
+    }
+
+    // 2. Real-time precision status reporting
+    const statusEl = document.getElementById('pwaSplashStatus');
+
+    timeService.onSyncChange(() => {
+      if (statusEl && splashEl.isConnected) {
+        if (timeService.isApiSynced) {
+          const off = Math.round(timeService.offsetMs);
+          const sign = off > 0 ? '+' : '';
+          statusEl.textContent = `Atomic precision calibrated (${sign}${off}ms)`;
+        }
+      }
+    });
+
+    if (timeService.isApiSynced && statusEl) {
+      const off = Math.round(timeService.offsetMs);
+      const sign = off > 0 ? '+' : '';
+      statusEl.textContent = `Atomic precision calibrated (${sign}${off}ms)`;
+    }
+
     const startTime = (typeof window !== 'undefined' && window.__tokilinkStartTime) || performance.now();
     const MIN_SPLASH_TIME = 2000; // Display for at least 2 seconds
 
@@ -418,6 +446,7 @@ class App {
       setTimeout(() => {
         splashEl.classList.add('fade-out');
         setTimeout(() => {
+          splashPlasma?.stop();
           splashEl.remove();
         }, 550);
       }, remaining);

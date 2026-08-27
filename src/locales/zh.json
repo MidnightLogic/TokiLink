@@ -1,6 +1,7 @@
 {
   "app.title": "TokiLink",
   "app.forSeiko": "for Seiko",
+  "app.subtitle": "通用 Web 蓝牙时钟时间同步",
   "banner.unsupported": "推荐浏览器：Google Chrome。",
   "banner.desc": "Web Bluetooth 需要 Google Chrome、Microsoft Edge 或 Opera（Android、Windows、Mac、Linux）。Safari 和 Firefox 原生不支持。",
   "banner.iosTitle": "iOS Safari 蓝牙设置",

@@ -1,6 +1,7 @@
 {
   "app.title": "TokiLink",
   "app.forSeiko": "para Seiko",
+  "app.subtitle": "Sincronización horaria universal por Web Bluetooth",
   "banner.unsupported": "Navegador recomendado: Google Chrome.",
   "banner.desc": "Web Bluetooth requiere Google Chrome, Microsoft Edge u Opera (Android, Windows, Mac, Linux). Safari y Firefox no son compatibles de forma nativa.",
   "banner.iosTitle": "Configuración Bluetooth en iOS Safari",

@@ -1,6 +1,7 @@
 {
   "app.title": "TokiLink",
   "app.forSeiko": "for Seiko",
+  "app.subtitle": "セイコー時計用ユニバーサルWeb Bluetooth時刻同期",
   "banner.unsupported": "推奨ブラウザ: Google Chrome",
   "banner.desc": "Web Bluetooth は Google Chrome、Microsoft Edge、または Opera (Android, Windows, Mac, Linux) が必要です。Safari および Firefox は標準非対応です。",
   "banner.iosTitle": "iOS Safari Bluetooth 設定",
