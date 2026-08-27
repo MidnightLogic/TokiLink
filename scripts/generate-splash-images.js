@@ -94,19 +94,10 @@ for (const file of splashFiles) {
     <!-- Top Specular Sheen -->
     <path d="M ${centerX - puckRadius * 0.83} ${centerY} A ${puckRadius * 0.83} ${puckRadius * 0.83} 0 0 1 ${centerX + puckRadius * 0.83} ${centerY} Z" fill="url(#specularGrad)"/>
 
-    <!-- Lucide rotate-cw-fading-clock centered -->
-    <g transform="translate(${centerX - puckRadius * 0.5}, ${centerY - puckRadius * 0.5}) scale(${puckSize / 24 * 0.5})" stroke="url(#iconGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <path d="M12 3a9.75 9.75 0 0 1 6.74 2.74"/>
-      <path d="M18.74 5.74 21 8"/>
-      <path d="M21 8V3"/>
-      <path d="M7.5 19.794c-6-3.464-6-12.124 0-15.588"/>
-      <path d="M7.5 4.206A9 9 0 0 1 12 3"/>
-      <path d="M12 7v5l4 2"/>
-      <path d="M14 20.775A9 9 0 0 1 12 21"/>
-      <path d="M19 17.656a9 9 0 0 1-1.5 1.456"/>
-      <path d="M21 12a9 9 0 0 1-.228 2"/>
-      <path d="M21 8h-5"/>
-    </g>
+    <!-- Puck Center Futuristic Typography (INITIALIZING) -->
+    <text x="${centerX}" y="${centerY + puckSize * 0.04}" font-family="'JetBrains Mono', -apple-system, monospace" font-size="${puckSize * 0.12}" font-weight="700" fill="url(#iconGrad)" text-anchor="middle" letter-spacing="${Math.max(1, puckSize * 0.02)}">
+      INITIALIZING
+    </text>
 
     <!-- Plasma Electric Ring Aura -->
     <circle cx="${centerX}" cy="${centerY}" r="${puckRadius * 1.15}" fill="none" stroke="rgba(192, 132, 252, 0.45)" stroke-width="${Math.max(1.5, puckSize * 0.015)}" stroke-dasharray="8 6"/>
