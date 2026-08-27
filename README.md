@@ -1,4 +1,4 @@
-# 🕒 TokiLink for Seiko
+# 🕒 TokiLink™ for Seiko
 
 <a href="https://midnightlogic.github.io/tokilink/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Live%20PWA-midnightlogic.github.io%2Ftokilink-4f46e5?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Web App"></a>
 <a href="https://opensource.org/licenses/Apache-2.0" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="License: Apache 2.0"></a>
@@ -11,18 +11,18 @@
   </a>
 </p>
 
-**TokiLink for Seiko** is an unofficial, high-precision **Progressive Web App (PWA)** that unifies and controls **all Bluetooth-enabled Seiko digital, multi-sound, and NexTime clocks** directly from your web browser. 
+**TokiLink™ for Seiko** is an unofficial, high-precision **Progressive Web App (PWA)** that unifies and controls **all Bluetooth-enabled Seiko digital, multi-sound, and NexTime clocks** directly from your web browser. 
 
-Using modern **Web Bluetooth**, TokiLink replaces multiple proprietary, region-locked mobile apps with a single, elegant, privacy-first web application that runs on **Android, Windows, macOS, ChromeOS, Linux, and iOS**.
+Using modern **Web Bluetooth**, TokiLink™ replaces multiple proprietary, region-locked mobile apps with a single, elegant, privacy-first web application that runs on **Android, Windows, macOS, ChromeOS, Linux, and iOS**.
 
 > [!NOTE]
-> **Legal Disclaimer:** **TokiLink for Seiko** is an independent, open-source community project. It is **not affiliated with, endorsed by, or sponsored by Seiko Group Corporation, Seiko Clock Inc., or any of their subsidiaries**. All product names, trademarks, and model identifiers belong to their respective owners and are used strictly for hardware compatibility and identification under nominative fair use.
+> **Legal Disclaimer:** **TokiLink™ for Seiko** is an independent, open-source community project. It is **not affiliated with, endorsed by, or sponsored by Seiko Group Corporation, Seiko Clock Inc., or any of their subsidiaries**. All product names, trademarks, and model identifiers belong to their respective owners and are used strictly for hardware compatibility and identification under nominative fair use.
 
 ---
 
 ## 🏷️ Supported Seiko Clock Models
 
-TokiLink unifies models across all official Seiko clock apps into one universal application:
+TokiLink™ unifies models across all official Seiko clock apps into one universal application:
 
 | Series | Supported Models | Key Capabilities & Features |
 | :--- | :--- | :--- |
@@ -64,7 +64,7 @@ TokiLink unifies models across all official Seiko clock apps into one universal 
 - **Auto Power-Off**: Save power with configurable inactivity standby timers.
 
 ### 📱 6. Progressive Web App (PWA) & Offline Capability
-- **Installable Desktop & Mobile App**: Add TokiLink to your Home Screen or Desktop as a standalone app with full offline caching via Service Workers.
+- **Installable Desktop & Mobile App**: Add TokiLink™ to your Home Screen or Desktop as a standalone app with full offline caching via Service Workers.
 - **Automatic In-App Update Notifications**: Seamlessly alerts you when a new version or feature update is available with 1-click reload.
 
 ### 🎨 7. Modern Glassmorphic Design & Multi-Language Support
@@ -84,7 +84,7 @@ TokiLink unifies models across all official Seiko clock apps into one universal 
 Web Bluetooth (`navigator.bluetooth`) requires a secure HTTPS connection and browser support:
 
 | Platform | Recommended Browsers | Compatibility | Notes |
-| :--- | :--- | :---: | :--- |
+| :--- | :--- | :--- | :--- |
 | **Android** | **Chrome**, **Edge**, **Samsung Internet**, **Opera** | ✅ **Full Support** | Native Web Bluetooth & 1-click PWA install |
 | **Android — Brave** | **Brave Browser** | ⚠️ **Flag Required** | Enable `brave://flags/#brave-web-bluetooth-api` and Relaunch |
 | **Windows / macOS / Linux / ChromeOS** | **Chrome**, **Edge**, **Opera** | ✅ **Full Support** | Native Web Bluetooth *(Tip: enable `#enable-web-bluetooth-new-permissions-backend` for 1-click zero-dialog sync)* |
@@ -94,8 +94,8 @@ Web Bluetooth (`navigator.bluetooth`) requires a secure HTTPS connection and bro
 
 > [!TIP]
 > **Using on iPhone / iPad:**
-> 1. **Option 1 (Fastest Setup — Dedicated Browser):** Install **[Bluefy Browser](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055)** from the App Store. TokiLink will launch and sync immediately.
-> 2. **Option 2 (Home Screen PWA App):** Install the free **[Beacio Extension](https://beacio.com/)** from the App Store, enable it in *Settings → Safari → Extensions*, then open TokiLink in Safari and tap **Share → Add to Home Screen**!
+> 1. **Option 1 (Fastest Setup — Dedicated Browser):** Install **[Bluefy Browser](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055)** from the App Store. TokiLink™ will launch and sync immediately.
+> 2. **Option 2 (Home Screen PWA App):** Install the free **[Beacio Extension](https://beacio.com/)** from the App Store, enable it in *Settings → Safari → Extensions*, then open TokiLink™ in Safari and tap **Share → Add to Home Screen**!
 
 > [!TIP]
 > **Using on Brave Browser (Desktop & Android):**
@@ -159,4 +159,4 @@ npm run preview
 ## 📄 License & Trademark Notice
 
 - **Software License:** Apache License, Version 2.0. Copyright © 2026 MidnightLogic.
-- **Trademark Notice:** Seiko®, Series C3, NexTime, and model designations (SS501, SS201, DL308, SQ820, SQ821, ZS450, ZS451, ZS250..ZS256) are registered trademarks of Seiko Group Corporation / Seiko Clock Inc. This software is an independent third-party implementation.
+- **Trademark Notice:** TokiLink™ is a trademark of MidnightLogic. Seiko®, Series C3, NexTime, and model designations (SS501, SS201, DL308, SQ820, SQ821, ZS450, ZS451, ZS250..ZS256) are registered trademarks of Seiko Group Corporation / Seiko Clock Inc. This software is an independent third-party implementation.
