@@ -4994,6 +4994,24 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   justify-content: center;
 }
 
+/* Instant CSS Ambient Plasma Aura (Renders at T=0ms before JS) */
+.pwa-splash-puck-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(99, 102, 241, 0.18) 55%, transparent 74%);
+  filter: blur(12px);
+  animation: splashPlasmaGlow 2.2s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes splashPlasmaGlow {
+  0% { transform: scale(0.92); opacity: 0.65; }
+  100% { transform: scale(1.1); opacity: 0.95; }
+}
+
 .pwa-splash-plasma-canvas {
   position: absolute;
   inset: 0;
@@ -5035,9 +5053,9 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 .pwa-splash-puck-text {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.72rem;
+  font-size: 0.50rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #ffffff;
   background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c084fc 100%);
@@ -5047,6 +5065,9 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   animation: splashTextPulse 1.8s ease-in-out infinite alternate;
   user-select: none;
   pointer-events: none;
+  max-width: 82px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 @keyframes splashTextPulse {
@@ -5261,12 +5282,8 @@ html.light .app-logo-icon-puck i {
   font-weight: 600;
   vertical-align: super;
   margin-left: 2px;
-  opacity: 0.8;
-  color: #c084fc;
-}
-
-html.light .brand-tm {
-  color: #7c3aed;
+  opacity: 0.85;
+  color: inherit;
 }
 
 .app-tagline {

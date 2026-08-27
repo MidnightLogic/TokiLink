@@ -95,7 +95,7 @@ for (const file of splashFiles) {
     <path d="M ${centerX - puckRadius * 0.83} ${centerY} A ${puckRadius * 0.83} ${puckRadius * 0.83} 0 0 1 ${centerX + puckRadius * 0.83} ${centerY} Z" fill="url(#specularGrad)"/>
 
     <!-- Puck Center Futuristic Typography (INITIALIZING) -->
-    <text x="${centerX}" y="${centerY + puckSize * 0.04}" font-family="'JetBrains Mono', -apple-system, monospace" font-size="${puckSize * 0.12}" font-weight="700" fill="url(#iconGrad)" text-anchor="middle" letter-spacing="${Math.max(1, puckSize * 0.02)}">
+    <text x="${centerX}" y="${centerY + puckSize * 0.035}" font-family="'JetBrains Mono', -apple-system, monospace" font-size="${puckSize * 0.092}" font-weight="700" fill="url(#iconGrad)" text-anchor="middle" letter-spacing="${Math.max(0.5, puckSize * 0.012)}">
       INITIALIZING
     </text>
 
@@ -105,7 +105,7 @@ for (const file of splashFiles) {
 
     <!-- Typography -->
     <text x="${centerX}" y="${textY}" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="${titleFontSize}" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="-0.5">
-      TokiLink <tspan fill="#c084fc" font-size="${titleFontSize * 0.5}" font-weight="600" letter-spacing="1">FOR SEIKO</tspan>
+      TokiLink<tspan font-size="${titleFontSize * 0.45}" dy="-${titleFontSize * 0.35}" fill="#ffffff">™</tspan><tspan dy="${titleFontSize * 0.35}" fill="#c084fc" font-size="${titleFontSize * 0.5}" font-weight="600" letter-spacing="1"> FOR SEIKO</tspan>
     </text>
 
     <text x="${centerX}" y="${subY}" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="${subFontSize}" font-weight="400" fill="#94a3b8" text-anchor="middle">

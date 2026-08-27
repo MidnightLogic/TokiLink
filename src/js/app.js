@@ -409,6 +409,12 @@ class App {
     const splashEl = document.getElementById('pwaSplashScreen');
     if (!splashEl) return;
 
+    // Stop inline pre-loader anim if running and hand over to PlasmaRenderer
+    if (typeof window !== 'undefined' && window.__tokilinkSplashAnim) {
+      cancelAnimationFrame(window.__tokilinkSplashAnim);
+      window.__tokilinkSplashAnim = null;
+    }
+
     // 1. Initialize animated purple plasma ring on splash button puck
     const splashCanvas = document.getElementById('splashPlasmaCanvas');
     let splashPlasma = null;
@@ -446,6 +452,12 @@ class App {
       setTimeout(() => {
         splashEl.classList.add('fade-out');
         setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            window.__tokilinkSplashDismissed = true;
+            if (window.__tokilinkSplashAnim) {
+              cancelAnimationFrame(window.__tokilinkSplashAnim);
+            }
+          }
           splashPlasma?.stop();
           splashEl.remove();
         }, 550);
