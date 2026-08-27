@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://midnightlogic.github.io/tokilink/" target="_blank" rel="noopener noreferrer">
-    <img src="src/demo.gif" alt="TokiLink for Seiko Live Demo" width="680" style="max-width: 100%; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
+    <img src="src/demo.gif" alt="TokiLink for Seiko Live Demo" width="340" style="max-width: 100%; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.35);">
   </a>
 </p>
 
