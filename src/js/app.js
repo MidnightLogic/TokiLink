@@ -409,21 +409,7 @@ class App {
     const splashEl = document.getElementById('pwaSplashScreen');
     if (!splashEl) return;
 
-    // Stop inline pre-loader anim if running and hand over to PlasmaRenderer
-    if (typeof window !== 'undefined' && window.__tokilinkSplashAnim) {
-      cancelAnimationFrame(window.__tokilinkSplashAnim);
-      window.__tokilinkSplashAnim = null;
-    }
-
-    // 1. Initialize animated purple plasma ring on splash button puck
-    const splashCanvas = document.getElementById('splashPlasmaCanvas');
-    let splashPlasma = null;
-    if (splashCanvas) {
-      splashPlasma = new PlasmaRenderer(splashCanvas);
-      splashPlasma.setState('ready'); // Purple plasma ring matching main page
-    }
-
-    // 2. Real-time precision status reporting
+    // Real-time precision status reporting
     const statusEl = document.getElementById('pwaSplashStatus');
 
     timeService.onSyncChange(() => {
@@ -456,9 +442,9 @@ class App {
             window.__tokilinkSplashDismissed = true;
             if (window.__tokilinkSplashAnim) {
               cancelAnimationFrame(window.__tokilinkSplashAnim);
+              window.__tokilinkSplashAnim = null;
             }
           }
-          splashPlasma?.stop();
           splashEl.remove();
         }, 550);
       }, remaining);
