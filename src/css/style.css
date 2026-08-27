@@ -2794,6 +2794,22 @@ body::after {
   color: var(--text-secondary);
 }
 
+.alarm-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.alarm-time.alarm-card-clickable {
+  cursor: pointer;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.alarm-time.alarm-card-clickable:hover {
+  color: var(--accent);
+}
+
+.alarm-edit-btn,
 .alarm-delete-btn {
   background: transparent;
   border: none;
@@ -2806,6 +2822,12 @@ body::after {
   justify-content: center;
   transition: all var(--transition-fast);
   opacity: 0.75;
+}
+
+.alarm-edit-btn:hover {
+  color: var(--accent);
+  opacity: 1;
+  background: rgba(168, 85, 247, 0.15);
 }
 
 .alarm-delete-btn:hover {

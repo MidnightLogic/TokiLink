@@ -280,9 +280,12 @@ export class AlarmView {
 
       card.innerHTML = `
         <div class="alarm-card-top">
-          <div class="alarm-time alarm-card-clickable" data-alarm-id="${alarm.id}">${displayTime}</div>
+          <div class="alarm-time alarm-card-clickable" data-alarm-id="${alarm.id}" title="${i18n.t('modal.alarm.editTitle') || 'Edit Alarm'}">
+            ${displayTime}
+          </div>
           <div class="alarm-card-actions">
-            <button class="alarm-delete-btn" data-alarm-id="${alarm.id}" title="Delete Alarm"><i data-lucide="trash-2" width="16" height="16"></i></button>
+            <button class="alarm-edit-btn" data-alarm-id="${alarm.id}" title="${i18n.t('modal.alarm.editTitle') || 'Edit Alarm'}"><i data-lucide="pencil" width="16" height="16"></i></button>
+            <button class="alarm-delete-btn" data-alarm-id="${alarm.id}" title="${i18n.t('modal.delete') || 'Delete Alarm'}"><i data-lucide="trash-2" width="16" height="16"></i></button>
             <div class="toggle-switch">
               <input type="checkbox" id="alarmToggle_${alarm.id}" ${alarm.on ? 'checked' : ''}>
               <label class="toggle-slider" for="alarmToggle_${alarm.id}"></label>
@@ -291,7 +294,7 @@ export class AlarmView {
         </div>
         <div class="alarm-days">${daysHtml}</div>
         <div class="alarm-meta">
-          <span class="alarm-badge alarm-card-clickable" data-alarm-id="${alarm.id}">${soundLabel}</span>
+          <span class="alarm-badge alarm-card-clickable" data-alarm-id="${alarm.id}" title="${i18n.t('modal.alarm.editTitle') || 'Edit Alarm'}">${soundLabel}</span>
           ${alarm.snooze ? `<span class="alarm-badge">${i18n.t('ss201.alarm.snooze') || 'Snooze (5 min)'}</span>` : ''}
         </div>
       `;
@@ -302,6 +305,14 @@ export class AlarmView {
     list.querySelectorAll('.alarm-card-clickable').forEach(el => {
       el.addEventListener('click', () => {
         const id = Number(el.dataset.alarmId);
+        this.openModal(id);
+      });
+    });
+
+    list.querySelectorAll('.alarm-edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = Number(btn.dataset.alarmId);
         this.openModal(id);
       });
     });
